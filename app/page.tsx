@@ -247,6 +247,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               alt="Done"
               width={300}
               height={300}
+              priority
               style={{ margin: '0 auto 24px' }}
             />
             <h1 className={styles.title}>신청이 완료되었습니다.{"\n"}곧 연락드리겠습니다.</h1>
