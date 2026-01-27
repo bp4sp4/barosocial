@@ -16,25 +16,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "한평생 바로기업 정책자금",
-  description: "한평생 바로기업 정책자금",
+  title: "한평생교육 사회복지사 무료상담",
+  description: "한평생교육 사회복지사 무료상담",
   openGraph: {
-    title: "한평생 바로기업 정책자금",
-    description: "한평생 바로기업 정책자금",
+    title: "한평생교육 사회복지사 무료상담",
+    description: "한평생교육 사회복지사 무료상담",
     images: [
       {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "한평생 바로기업 정책자금",
+        alt: "한평생교육 사회복지사 무료상담",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "한평생 바로기업 정책자금",
-    description: "한평생 바로기업 정책자금",
+    title: "한평생교육 사회복지사 무료상담",
+    description: "한평생교육 사회복지사 무료상담",
     images: ["/og-image.png"],
   },
 };
@@ -45,7 +45,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >

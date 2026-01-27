@@ -76,24 +76,24 @@
   
   /* 입력 필드 */
   .inputGroup {
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     animation: fadeIn 0.5s ease;
   }
   
   .inputLabel {
     display: block;
-    font-size: 15px;
+    font-size: 18px;
     font-weight: 600;
     color: #4e5968;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
   }
   
   .inputField {
     width: 100%;
     border: none;
     border-bottom: 2px solid #f2f4f6;
-    padding: 12px 0;
-    font-size: 18px;
+    padding: 8px 0;
+    font-size: 16px;
     transition: border-color 0.2s;
   }
   

@@ -57,12 +57,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, contact, click_source } = body;
+    const { name, contact, education, reason, click_source } = body;
 
     // 유효성 검사
-    if (!name || !contact) {
+    if (!name || !contact || !education || !reason) {
       return NextResponse.json(
-        { error: 'Name and contact are required' },
+        { error: 'Name, contact, education, and reason are required' },
         { status: 400 }
       );
     }
@@ -74,6 +74,8 @@ export async function POST(request: NextRequest) {
         {
           name,
           contact,
+          education,
+          reason,
           click_source: click_source || null,
         },
       ])
@@ -127,6 +129,8 @@ export async function POST(request: NextRequest) {
         const emailResult = await sendConsultationEmail({
           name,
           contact,
+          education,
+          reason,
           click_source: click_source || null,
         });
         console.log(

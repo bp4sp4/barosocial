@@ -3,6 +3,8 @@ import nodemailer from "nodemailer";
 interface ConsultationEmailData {
   name: string;
   contact: string;
+  education: string;
+  reason: string;
   click_source?: string | null;
 }
 
@@ -72,8 +74,8 @@ export async function sendConsultationEmail(data: ConsultationEmailData) {
 
     // 수신자 이메일: CONSULTATION_EMAIL이 있으면 사용, 없으면 기본값
     const recipientEmail = process.env.CONSULTATION_EMAIL || "bp4sp4@naver.com";
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://바로기업.com";
-    const logoUrl = `${baseUrl}/images/main/logo_black.png`;
+    // 로고 URL - 이메일에서는 절대 URL이 필요합니다
+    const logoUrl = "https://i.ibb.co/HPbZ8FS/logo.png"; // 또는 배포된 사이트의 전체 URL 사용
 
     console.log("[EMAIL] 설정 확인:");
     console.log("[EMAIL] - BREVO_SMTP_LOGIN 존재:", !!smtpLogin);
@@ -91,7 +93,6 @@ export async function sendConsultationEmail(data: ConsultationEmailData) {
       "[EMAIL] - recipientEmail:",
       recipientEmail ? `${recipientEmail.substring(0, 3)}***` : "없음"
     );
-    console.log("[EMAIL] - baseUrl:", baseUrl);
     console.log("[EMAIL] - logoUrl:", logoUrl);
 
     if (!smtpLogin || !smtpKey) {
@@ -156,7 +157,7 @@ export async function sendConsultationEmail(data: ConsultationEmailData) {
           <div style="background-color: #f9fafb; border-radius: 20px; padding: 32px;">
             <table role="presentation" style="width: 100%; border-collapse: collapse;">
               <tr>
-                <td style="padding-bottom: 20px; font-size: 15px; color: #4e5968; width: 100px;">성함/기업명</td>
+                <td style="padding-bottom: 20px; font-size: 15px; color: #4e5968; width: 100px;">이름</td>
                 <td style="padding-bottom: 20px; font-size: 17px; font-weight: 600; color: #191f28; text-align: right;">${
                   data.name
                 }</td>
@@ -173,9 +174,21 @@ export async function sendConsultationEmail(data: ConsultationEmailData) {
                 </td>
               </tr>
               <tr>
+                <td style="padding-bottom: 20px; font-size: 15px; color: #4e5968;">최종학력</td>
+                <td style="padding-bottom: 20px; font-size: 17px; font-weight: 600; color: #191f28; text-align: right;">${
+                  data.education
+                }</td>
+              </tr>
+              <tr>
+                <td style="padding-bottom: 20px; font-size: 15px; color: #4e5968;">취득사유</td>
+                <td style="padding-bottom: 20px; font-size: 17px; font-weight: 600; color: #191f28; text-align: right;">${
+                  data.reason
+                }</td>
+              </tr>
+              <tr>
                 <td style="padding-bottom: 20px; font-size: 15px; color: #4e5968;">유입 경로</td>
                 <td style="padding-bottom: 20px; font-size: 17px; font-weight: 600; color: #191f28; text-align: right;">${
-                  data.click_source || "바로기업 홈페이지"
+                  data.click_source || "바로폼"
                 }</td>
               </tr>
               <tr style="border-top: 1px solid #ebedf0;">
@@ -204,11 +217,13 @@ export async function sendConsultationEmail(data: ConsultationEmailData) {
     `;
 
     const emailText = `
-새로운 상담 신청이 접수되었습니다.
+새로운 사회복지사 상담 신청이 접수되었습니다.
 
-이름(회사명): ${data.name}
+이름: ${data.name}
 연락처: ${data.contact}
-유입 경로: ${data.click_source || "바로기업 홈페이지"}
+최종학력: ${data.education}
+취득사유: ${data.reason}
+유입 경로: ${data.click_source || "바로폼"}
 신청 시간: ${koreanTime}
     `;
 
