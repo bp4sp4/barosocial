@@ -77,7 +77,7 @@ export async function POST(request: NextRequest) {
           education: education || null,
           reason: reason || null,
           click_source: click_source || null,
-          status: '상담대기', // 기본 상태
+          status: '상담대기중', // 기본 상태
         },
       ])
       .select()
@@ -172,6 +172,84 @@ export async function POST(request: NextRequest) {
     }
     } else {
       console.log('[EMAIL] 수동 추가로 이메일 전송을 건너뜁니다.');
+    }
+
+    // Slack 알림 전송 (수동 추가 포함)
+    if (process.env.SLACK_WEBHOOK_URL) {
+      console.log('[SLACK] Slack 알림 전송 시도');
+      try {
+        const slackMessage = {
+          text: is_manual_entry 
+            ? '🆕 *관리자가 새로운 상담 신청을 추가했습니다*'
+            : '📝 *새로운 상담 신청이 접수되었습니다*',
+          blocks: [
+            {
+              type: 'header',
+              text: {
+                type: 'plain_text',
+                text: is_manual_entry 
+                  ? '🆕 관리자 추가 상담 신청'
+                  : '📝 새로운 상담 신청',
+              },
+            },
+            {
+              type: 'section',
+              fields: [
+                {
+                  type: 'mrkdwn',
+                  text: `*이름:*\n${name}`,
+                },
+                {
+                  type: 'mrkdwn',
+                  text: `*연락처:*\n${contact}`,
+                },
+                {
+                  type: 'mrkdwn',
+                  text: `*학력:*\n${education || '미입력'}`,
+                },
+                {
+                  type: 'mrkdwn',
+                  text: `*유입경로:*\n${click_source || '미입력'}`,
+                },
+              ],
+            },
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `*상담 이유:*\n${reason || '미입력'}`,
+              },
+            },
+            {
+              type: 'context',
+              elements: [
+                {
+                  type: 'mrkdwn',
+                  text: `접수 시간: ${new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}`,
+                },
+              ],
+            },
+          ],
+        };
+
+        const slackResponse = await fetch(process.env.SLACK_WEBHOOK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(slackMessage),
+        });
+
+        if (slackResponse.ok) {
+          console.log('[SLACK] Slack 알림 전송 성공');
+        } else {
+          console.error('[SLACK] Slack 알림 전송 실패:', await slackResponse.text());
+        }
+      } catch (slackError) {
+        console.error('[SLACK] Slack 알림 전송 중 오류:', slackError);
+      }
+    } else {
+      console.warn('[SLACK] SLACK_WEBHOOK_URL이 설정되지 않아 Slack 알림을 건너뜁니다');
     }
 
     return NextResponse.json(
