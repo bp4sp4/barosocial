@@ -959,6 +959,7 @@ export default function AdminPage() {
                 >
                   <option value="">선택하세요 (선택사항)</option>
                   <option value="고등학교 졸업">고등학교 졸업</option>
+                  <option value="전문대 졸업">전문대 졸업</option>
                   <option value="대학교 재학">대학교 재학</option>
                   <option value="대학교 졸업">대학교 졸업</option>
                   <option value="대학원 이상">대학원 이상</option>
