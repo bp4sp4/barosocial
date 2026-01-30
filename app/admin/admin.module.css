@@ -642,6 +642,7 @@
   font-weight: 600;
   padding: 2px 0;
   display: inline;
+  box-shadow: 0 -8px 0 0 #ffe066 inset;
 }
 
 /* 필터 그룹 */

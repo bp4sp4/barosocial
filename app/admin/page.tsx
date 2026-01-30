@@ -421,36 +421,32 @@ export default function AdminPage() {
 
   // 필터링
   const filteredConsultations = consultations.filter(consultation => {
-    // 검색 텍스트 필터 (이름, 연락처, 취득사유, 메모)
+    // 검색 텍스트 필터 (이름, 연락처, 취득사유, 메모, 유입경로)
     if (searchText) {
       const searchLower = searchText.toLowerCase();
       // 연락처는 하이픈 제거하고 비교
       const contactWithoutHyphen = consultation.contact.replace(/-/g, '');
       const searchWithoutHyphen = searchText.replace(/-/g, '');
-      
       const matchesSearch = 
         consultation.name.toLowerCase().includes(searchLower) ||
         contactWithoutHyphen.toLowerCase().includes(searchWithoutHyphen.toLowerCase()) ||
         (consultation.reason && consultation.reason.toLowerCase().includes(searchLower)) ||
-        (consultation.memo && consultation.memo.toLowerCase().includes(searchLower));
+        (consultation.memo && consultation.memo.toLowerCase().includes(searchLower)) ||
+        (consultation.click_source && consultation.click_source.toLowerCase().includes(searchLower));
       if (!matchesSearch) return false;
     }
-    
     // 상태 필터
     if (statusFilter !== 'all' && consultation.status !== statusFilter) {
       return false;
     }
-    
     // 담당자 필터
     if (managerFilter !== 'all') {
       if (managerFilter === 'none' && consultation.manager) return false;
       if (managerFilter !== 'none' && consultation.manager !== managerFilter) return false;
     }
-    
     // 날짜 필터
     if (startDate || endDate) {
       const consultationDate = new Date(consultation.created_at);
-      
       if (startDate) {
         const start = new Date(startDate);
         start.setHours(0, 0, 0, 0);
@@ -462,7 +458,6 @@ export default function AdminPage() {
         if (consultationDate > end) return false;
       }
     }
-    
     return true;
   });
 
@@ -612,6 +607,7 @@ export default function AdminPage() {
               className={styles.searchInput}
             />
           </div>
+          {/* 유입경로 검색 입력란 제거 */}
           <div className={styles.filterGroup}>
             <select
               value={statusFilter}
@@ -761,7 +757,7 @@ export default function AdminPage() {
                     <td>{highlightContact(consultation.contact, searchText)}</td>
                     <td>{consultation.education || '-'}</td>
                     <td className={styles.reasonCell}>{highlightText(consultation.reason, searchText)}</td>
-                    <td>{consultation.click_source || '-'}</td>
+                    <td>{highlightText(consultation.click_source, searchText) || '-'}</td>
                     <td>
                       <div 
                         className={`${styles.memoCell} ${!consultation.subject_cost ? styles.empty : ''}`}
