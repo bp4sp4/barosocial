@@ -19,7 +19,16 @@
   font-size: 18px;
   
 }
-
+.infoCall {
+display: flex;
+padding: 12px 0;
+justify-content: center;
+align-items: center;
+gap: 4px;
+align-self: stretch;
+border-radius: 8px;
+background: var(--Atomic-Mono-100, #F2F2F2);
+}
 
 .infoInner {
   
