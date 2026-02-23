@@ -1,16 +1,16 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import styles from './stepflow.module.css';
+import Image from "next/image";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { motion, AnimatePresence } from "framer-motion";
+import styles from "./stepflow.module.css";
 
 const formatClickSource = (
   utmSource: string,
   materialId: string | null,
   blogId: string | null = null,
-  cafeId: string | null = null
+  cafeId: string | null = null,
 ): string => {
   const sourceMap: { [key: string]: string } = {
     daangn: "당근",
@@ -41,17 +41,26 @@ const formatClickSource = (
 };
 
 // URL 파라미터를 읽는 컴포넌트
-function ClickSourceHandler({ onSourceChange }: { onSourceChange: (source: string) => void }) {
+function ClickSourceHandler({
+  onSourceChange,
+}: {
+  onSourceChange: (source: string) => void;
+}) {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const utmSource = searchParams.get('utm_source');
-    const materialId = searchParams.get('material_id');
-    const blogId = searchParams.get('blog_id');
-    const cafeId = searchParams.get('cafe_id');
+    const utmSource = searchParams.get("utm_source");
+    const materialId = searchParams.get("material_id");
+    const blogId = searchParams.get("blog_id");
+    const cafeId = searchParams.get("cafe_id");
 
     if (utmSource) {
-      const formatted = formatClickSource(utmSource, materialId, blogId, cafeId);
+      const formatted = formatClickSource(
+        utmSource,
+        materialId,
+        blogId,
+        cafeId,
+      );
       onSourceChange(formatted);
     }
   }, [searchParams, onSourceChange]);
@@ -60,39 +69,38 @@ function ClickSourceHandler({ onSourceChange }: { onSourceChange: (source: strin
 }
 
 const COURSE_OPTIONS = [
-  '사회복지사',
-  '아동학사',
-  '평생교육사',
-  '편입/대학원',
-  '건강가정사',
-  '청소년지도사',
-  '보육교사',
-  '심리상담사',
-
+  "사회복지사",
+  "아동학사",
+  "평생교육사",
+  "편입/대학원",
+  "건강가정사",
+  "청소년지도사",
+  "보육교사",
+  "심리상담사",
 ];
 
 function StepFlowContent({ clickSource }: { clickSource: string }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    name: '', // 이름
-    contact: '', // 연락처
-    education: '', // 최종학력
-    hope_course: '', // 희망과정
-    reason: '', // 취득사유
+    name: "", // 이름
+    contact: "", // 연락처
+    education: "", // 최종학력
+    hope_course: "", // 희망과정
+    reason: "", // 취득사유
   });
   const [loading, setLoading] = useState(false);
-  const [contactError, setContactError] = useState('');
+  const [contactError, setContactError] = useState("");
   const [privacyAgreed, setPrivacyAgreed] = useState(false);
   const [showPrivacyModal, setShowPrivacyModal] = useState(false);
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
-  const [customCourse, setCustomCourse] = useState('');
+  const [customCourse, setCustomCourse] = useState("");
 
   const toggleCourse = (course: string) => {
-    setSelectedCourses(prev =>
+    setSelectedCourses((prev) =>
       prev.includes(course)
-        ? prev.filter(c => c !== course)
-        : [...prev, course]
+        ? prev.filter((c) => c !== course)
+        : [...prev, course],
     );
   };
 
@@ -101,13 +109,13 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     if (customCourse.trim()) {
       all.push(customCourse.trim());
     }
-    setFormData({ ...formData, hope_course: all.join(', ') });
+    setFormData({ ...formData, hope_course: all.join(", ") });
     setShowCourseModal(false);
   };
 
   // 연락처 포맷팅 (010-XXXX-XXXX)
   const formatContact = (value: string) => {
-    const cleaned = value.replace(/[^0-9]/g, '');
+    const cleaned = value.replace(/[^0-9]/g, "");
     if (cleaned.length <= 3) {
       return cleaned;
     } else if (cleaned.length <= 7) {
@@ -119,16 +127,16 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
 
   // 연락처 검증
   const validateContact = (contact: string) => {
-    const cleaned = contact.replace(/[-\s]/g, '');
+    const cleaned = contact.replace(/[-\s]/g, "");
     if (cleaned.length === 0) {
-      setContactError('');
+      setContactError("");
       return true;
     }
-    if (!cleaned.startsWith('010') && !cleaned.startsWith('011')) {
-      setContactError('010 또는 011로 시작하는 번호를 입력해주세요');
+    if (!cleaned.startsWith("010") && !cleaned.startsWith("011")) {
+      setContactError("010 또는 011로 시작하는 번호를 입력해주세요");
       return false;
     }
-    setContactError('');
+    setContactError("");
     return true;
   };
 
@@ -136,10 +144,10 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/consultations', {
-        method: 'POST',
+      const response = await fetch("/api/consultations", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: formData.name,
@@ -153,36 +161,46 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || '저장에 실패했습니다.');
+        throw new Error(errorData.error || "저장에 실패했습니다.");
       }
 
       setStep(3);
     } catch (error) {
-      console.error('Error submitting form:', error);
-      alert(error instanceof Error ? error.message : '저장에 실패했습니다. 다시 시도해주세요.');
+      console.error("Error submitting form:", error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : "저장에 실패했습니다. 다시 시도해주세요.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
-  const isFormValid = formData.name.length > 0 && formData.contact.replace(/[-\s]/g, '').length >= 10 && !contactError && formData.education.length > 0 && formData.hope_course.length > 0 && formData.reason.length > 0 && privacyAgreed;
+  const isFormValid =
+    formData.name.length > 0 &&
+    formData.contact.replace(/[-\s]/g, "").length >= 10 &&
+    !contactError &&
+    formData.education.length > 0 &&
+    formData.hope_course.length > 0 &&
+    formData.reason.length > 0 &&
+    privacyAgreed;
 
   // 프로그레스 계산
   const totalFields = 5;
   const filledFields = [
     formData.name.length > 0,
-    formData.contact.replace(/[-\s]/g, '').length >= 10 && !contactError,
+    formData.contact.replace(/[-\s]/g, "").length >= 10 && !contactError,
     formData.education.length > 0,
     formData.hope_course.length > 0,
     formData.reason.length > 0,
   ].filter(Boolean).length;
   const progress = (filledFields / totalFields) * 100;
 
-
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <div style={{ display: 'flex', alignItems: 'center' }}>
+        <div style={{ display: "flex", alignItems: "center" }}>
           <Image
             src="/logo.png"
             alt="한평생교육"
@@ -200,67 +218,121 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className={styles.stepWrapper}
           >
             {/* 하단 안내 및 다음 버튼 */}
             <div className={styles.infoSection}>
               <div className={styles.infoInner}>
-                          <div style={{ textAlign: 'left', marginBottom: '24px' }}>
-              <h1 style={{
-                fontSize: '28px',
-                fontWeight: '700',
-                color: '#111827',
-                marginBottom: '8px',
-                lineHeight: '1.3'
-              }}>사회복지사</h1>
-              <p style={{
-                fontSize: '28px',
-                fontWeight: '700',
-                color: '#111827',
-              }}>무료 상담신청</p>
-            </div>
-                <div className={styles.infoItem}>
-                  <div className={styles.infoTitle}><div className={styles.infoNumber}>1</div> 수업료 지원 혜택</div>
-                  <div className={styles.infoDesc}>상담 완료 후 수강료 지원 혜택</div>
+                <div style={{ textAlign: "left", marginBottom: "24px" }}>
+                  <h1
+                    style={{
+                      fontSize: "28px",
+                      fontWeight: "700",
+                      color: "#111827",
+                      marginBottom: "8px",
+                      lineHeight: "1.3",
+                    }}
+                  >
+                    사회복지사
+                  </h1>
+                  <p
+                    style={{
+                      fontSize: "28px",
+                      fontWeight: "700",
+                      color: "#111827",
+                    }}
+                  >
+                    무료 상담신청
+                  </p>
                 </div>
                 <div className={styles.infoItem}>
-                  <div className={styles.infoTitle}><div className={styles.infoNumber}>2</div> 국가자격증 여부</div>
-                  <div className={styles.infoDesc}>사회복지사 자격증은 보건복지부 발급 국가자격증</div>
+                  <div className={styles.infoTitle}>
+                    <div className={styles.infoNumber}>1</div> 수업료 지원 혜택
+                  </div>
+                  <div className={styles.infoDesc}>
+                    상담 완료 후 수강료 지원 혜택
+                  </div>
                 </div>
                 <div className={styles.infoItem}>
-                  <div className={styles.infoTitle}><div className={styles.infoNumber}>3</div> 온라인 수업</div>
-                  <div className={styles.infoDesc}>모든 수업은 100% 온라인으로 진행</div>
+                  <div className={styles.infoTitle}>
+                    <div className={styles.infoNumber}>2</div> 국가자격증 여부
+                  </div>
+                  <div className={styles.infoDesc}>
+                    사회복지사 자격증은 보건복지부 발급 국가자격증
+                  </div>
                 </div>
-               <div className={styles.infoSection}>
-              <div className={styles.infoInner}>
-                <div style={{ marginBottom: '36px' }}>
-                  <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#111827', lineHeight: '1.3' }}>학점 연계 신청</h1>
+                <div className={styles.infoItem}>
+                  <div className={styles.infoTitle}>
+                    <div className={styles.infoNumber}>3</div> 온라인 수업
+                  </div>
+                  <div className={styles.infoDesc}>
+                    모든 수업은 100% 온라인으로 진행
+                  </div>
                 </div>
-                     
-                <div className={styles.infoCall}>
-                  <span style={{
-                    color: 'var(--Atomic-Blue-600, #0049E5)',
-                    fontFamily: 'Pretendard',
-                    fontSize: 18,
-                    fontWeight: 700,
-                    lineHeight: '21.6px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8
-                  }}>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" style={{marginRight: 4}}>
-                      <path fillRule="evenodd" clipRule="evenodd" d="M16.7045 21.9824C15.2645 21.9294 11.1835 21.3654 6.90947 17.0924C2.63647 12.8184 2.07347 8.73837 2.01947 7.29737C1.93947 5.10137 3.62147 2.96837 5.56447 2.13537C5.79844 2.03433 6.05467 1.99587 6.308 2.02374C6.56133 2.05162 6.80305 2.14488 7.00947 2.29437C8.60947 3.46037 9.71346 5.22437 10.6615 6.61137C10.87 6.9161 10.9592 7.28691 10.912 7.65316C10.8648 8.01941 10.6845 8.35549 10.4055 8.59737L8.45446 10.0464C8.36021 10.1144 8.29386 10.2144 8.26774 10.3277C8.24162 10.441 8.25752 10.5599 8.31246 10.6624C8.75447 11.4654 9.54046 12.6614 10.4405 13.5614C11.3405 14.4614 12.5935 15.2994 13.4525 15.7914C13.5602 15.8518 13.6869 15.8687 13.8067 15.8386C13.9265 15.8085 14.0302 15.7336 14.0965 15.6294L15.3665 13.6964C15.6 13.3862 15.9444 13.1784 16.3276 13.1165C16.7109 13.0547 17.1032 13.1435 17.4225 13.3644C18.8295 14.3384 20.4715 15.4234 21.6735 16.9624C21.8351 17.1703 21.9379 17.4178 21.9712 17.679C22.0044 17.9402 21.9669 18.2056 21.8625 18.4474C21.0255 20.4004 18.9075 22.0634 16.7045 21.9824Z" fill="#0049E5"/>
-                    </svg>
-                    빠른 문의: <a href="tel:0221354951" className={styles.infoCallLink}>02-2135-4951</a>
-                  </span>
+                <div className={styles.infoSection}>
+                  <div className={styles.infoInner}>
+                    <div style={{ marginBottom: "36px" }}>
+                      <h1
+                        style={{
+                          fontSize: "28px",
+                          fontWeight: "700",
+                          color: "#111827",
+                          lineHeight: "1.3",
+                        }}
+                      >
+                        간단 전화 상담
+                      </h1>
+                    </div>
+
+                    <div className={styles.infoCall}>
+                      <span
+                        style={{
+                          color: "var(--Atomic-Blue-600, #0049E5)",
+                          fontFamily: "Pretendard",
+                          fontSize: 18,
+                          fontWeight: 700,
+                          lineHeight: "21.6px",
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="24"
+                          height="24"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          style={{ marginRight: 4 }}
+                        >
+                          <path
+                            fillRule="evenodd"
+                            clipRule="evenodd"
+                            d="M16.7045 21.9824C15.2645 21.9294 11.1835 21.3654 6.90947 17.0924C2.63647 12.8184 2.07347 8.73837 2.01947 7.29737C1.93947 5.10137 3.62147 2.96837 5.56447 2.13537C5.79844 2.03433 6.05467 1.99587 6.308 2.02374C6.56133 2.05162 6.80305 2.14488 7.00947 2.29437C8.60947 3.46037 9.71346 5.22437 10.6615 6.61137C10.87 6.9161 10.9592 7.28691 10.912 7.65316C10.8648 8.01941 10.6845 8.35549 10.4055 8.59737L8.45446 10.0464C8.36021 10.1144 8.29386 10.2144 8.26774 10.3277C8.24162 10.441 8.25752 10.5599 8.31246 10.6624C8.75447 11.4654 9.54046 12.6614 10.4405 13.5614C11.3405 14.4614 12.5935 15.2994 13.4525 15.7914C13.5602 15.8518 13.6869 15.8687 13.8067 15.8386C13.9265 15.8085 14.0302 15.7336 14.0965 15.6294L15.3665 13.6964C15.6 13.3862 15.9444 13.1784 16.3276 13.1165C16.7109 13.0547 17.1032 13.1435 17.4225 13.3644C18.8295 14.3384 20.4715 15.4234 21.6735 16.9624C21.8351 17.1703 21.9379 17.4178 21.9712 17.679C22.0044 17.9402 21.9669 18.2056 21.8625 18.4474C21.0255 20.4004 18.9075 22.0634 16.7045 21.9824Z"
+                            fill="#0049E5"
+                          />
+                        </svg>
+                        빠른 문의:{" "}
+                        <a
+                          href="tel:0221354951"
+                          className={styles.infoCallLink}
+                        >
+                          02-2135-4951
+                        </a>
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    className={styles.bottomButton}
+                    onClick={() => setStep(2)}
+                  >
+                    다음
+                  </button>
                 </div>
-              </div>
-              <button className={styles.bottomButton} onClick={() => setStep(2)}>다음</button>
-            </div>
               </div>
               <button
-                className={styles.bottomButton + ' ' + styles.infoNextBtn}
+                className={styles.bottomButton + " " + styles.infoNextBtn}
                 onClick={() => setStep(2)}
               >
                 다음
@@ -275,47 +347,61 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
             className={styles.stepWrapper}
           >
             {/* 프로그레스 바 */}
-            <div style={{ width: '100%', marginBottom: '20px' }}>
-              <div style={{
-                height: '4px',
-                backgroundColor: '#E5E7EB',
-                borderRadius: '2px',
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  height: '100%',
-                  width: `${progress}%`,
-                  backgroundColor: '#4C85FF',
-                  transition: 'width 0.3s ease'
-                }} />
+            <div style={{ width: "100%", marginBottom: "20px" }}>
+              <div
+                style={{
+                  height: "4px",
+                  backgroundColor: "#E5E7EB",
+                  borderRadius: "2px",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    height: "100%",
+                    width: `${progress}%`,
+                    backgroundColor: "#4C85FF",
+                    transition: "width 0.3s ease",
+                  }}
+                />
               </div>
-              <p style={{
-                marginTop: '8px',
-                fontSize: '14px',
-                color: '#6B7280',
-                textAlign: 'right'
-              }}>
+              <p
+                style={{
+                  marginTop: "8px",
+                  fontSize: "14px",
+                  color: "#6B7280",
+                  textAlign: "right",
+                }}
+              >
                 {filledFields} / {totalFields}
               </p>
             </div>
 
-            <div style={{ textAlign: 'left', marginBottom: '24px' }}>
-              <h1 style={{
-                fontSize: '28px',
-                fontWeight: '700',
-                color: '#111827',
-                marginBottom: '8px',
-                lineHeight: '1.3'
-              }}>사회복지사</h1>
-              <p style={{
-                fontSize: '28px',
-                fontWeight: '700',
-                color: '#111827',
-              }}>무료 상담신청</p>
+            <div style={{ textAlign: "left", marginBottom: "24px" }}>
+              <h1
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "700",
+                  color: "#111827",
+                  marginBottom: "8px",
+                  lineHeight: "1.3",
+                }}
+              >
+                사회복지사
+              </h1>
+              <p
+                style={{
+                  fontSize: "28px",
+                  fontWeight: "700",
+                  color: "#111827",
+                }}
+              >
+                무료 상담신청
+              </p>
             </div>
 
             <div className={styles.inputGroup}>
@@ -325,14 +411,22 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 placeholder="이름을 입력해주세요"
                 className={styles.inputField}
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 autoFocus
               />
             </div>
 
             {formData.name.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={styles.inputGroup}>
-                <label className={styles.inputLabel}>연락처를 입력해주세요</label>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={styles.inputGroup}
+              >
+                <label className={styles.inputLabel}>
+                  연락처를 입력해주세요
+                </label>
                 <input
                   type="tel"
                   placeholder="010-0000-0000"
@@ -351,69 +445,121 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               </motion.div>
             )}
 
-            {formData.contact.replace(/[-\s]/g, '').length >= 10 && !contactError && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={styles.inputGroup}>
-                <label className={styles.inputLabel}>
-                  최종학력을 선택해 주세요 <span style={{ fontSize: '16px', color: '#6B7280', fontWeight: '400' }}>최종학력마다 과정이 달라져요!</span>
-                </label>
-                <select
-                  className={styles.inputField}
-                  value={formData.education}
-                  onChange={(e) => setFormData({ ...formData, education: e.target.value })}
-                  style={{ cursor: 'pointer' }}
+            {formData.contact.replace(/[-\s]/g, "").length >= 10 &&
+              !contactError && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={styles.inputGroup}
                 >
-                  <option value="">선택해주세요</option>
-                  <option value="고졸">고졸</option>
-                  <option value="전문대졸">전문대졸</option>
-                  <option value="대졸">대졸</option>
-                  <option value="대학원 이상">대학원 이상</option>
-                </select>
-              </motion.div>
-            )}
+                  <label className={styles.inputLabel}>
+                    최종학력을 선택해 주세요{" "}
+                    <span
+                      style={{
+                        fontSize: "16px",
+                        color: "#6B7280",
+                        fontWeight: "400",
+                      }}
+                    >
+                      최종학력마다 과정이 달라져요!
+                    </span>
+                  </label>
+                  <select
+                    className={styles.inputField}
+                    value={formData.education}
+                    onChange={(e) =>
+                      setFormData({ ...formData, education: e.target.value })
+                    }
+                    style={{ cursor: "pointer" }}
+                  >
+                    <option value="">선택해주세요</option>
+                    <option value="고졸">고졸</option>
+                    <option value="전문대졸">전문대졸</option>
+                    <option value="대졸">대졸</option>
+                    <option value="대학원 이상">대학원 이상</option>
+                  </select>
+                </motion.div>
+              )}
 
             {formData.education.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={styles.inputGroup}>
-                <label className={styles.inputLabel}>희망과정을 선택해주세요</label>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={styles.inputGroup}
+              >
+                <label className={styles.inputLabel}>
+                  희망과정을 선택해주세요
+                </label>
                 <div
-                  className={styles.inputField + ' ' + styles.courseSelectField}
+                  className={styles.inputField + " " + styles.courseSelectField}
                   onClick={() => {
-                    const existing = formData.hope_course ? formData.hope_course.split(', ').filter(Boolean) : [];
-                    const fromOptions = existing.filter(c => COURSE_OPTIONS.includes(c));
-                    const fromCustom = existing.filter(c => !COURSE_OPTIONS.includes(c));
+                    const existing = formData.hope_course
+                      ? formData.hope_course.split(", ").filter(Boolean)
+                      : [];
+                    const fromOptions = existing.filter((c) =>
+                      COURSE_OPTIONS.includes(c),
+                    );
+                    const fromCustom = existing.filter(
+                      (c) => !COURSE_OPTIONS.includes(c),
+                    );
                     setSelectedCourses(fromOptions);
-                    setCustomCourse(fromCustom.join(', '));
+                    setCustomCourse(fromCustom.join(", "));
                     setShowCourseModal(true);
                   }}
                 >
                   {formData.hope_course ? (
-                    <span className={styles.courseSelectedText}>{formData.hope_course}</span>
+                    <span className={styles.courseSelectedText}>
+                      {formData.hope_course}
+                    </span>
                   ) : (
-                    <span className={styles.coursePlaceholder}>과정을 선택해주세요</span>
+                    <span className={styles.coursePlaceholder}>
+                      과정을 선택해주세요
+                    </span>
                   )}
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 7.5L10 12.5L15 7.5" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 7.5L10 12.5L15 7.5"
+                      stroke="#6B7280"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
               </motion.div>
             )}
 
             {formData.hope_course.length > 0 && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={styles.inputGroup}>
-                <label className={styles.inputLabel}>취득사유가 어떻게 되시나요?</label>
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={styles.inputGroup}
+              >
+                <label className={styles.inputLabel}>
+                  취득사유가 어떻게 되시나요?
+                </label>
                 <input
                   type="text"
                   placeholder="자세히 입력해주셔야 상담 시 도움이 됩니다"
                   className={styles.inputField}
                   value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, reason: e.target.value })
+                  }
                 />
               </motion.div>
             )}
 
             {formData.reason.length > 0 && (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }} 
-                animate={{ opacity: 1, y: 0 }} 
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 className={styles.inputGroup}
               >
                 <label className={styles.checkboxLabel}>
@@ -433,8 +579,8 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                       className={styles.privacyLink}
                     >
                       개인정보처리방침
-                    </button>
-                    {' '}동의
+                    </button>{" "}
+                    동의
                   </span>
                 </label>
               </motion.div>
@@ -445,7 +591,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               disabled={!isFormValid || loading}
               onClick={handleSubmit}
             >
-              {loading ? '처리 중...' : '제출하기'}
+              {loading ? "처리 중..." : "제출하기"}
             </button>
           </motion.div>
         )}
@@ -456,7 +602,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             className={styles.stepWrapper}
-            style={{ textAlign: 'center', justifyContent: 'center' }}
+            style={{ textAlign: "center", justifyContent: "center" }}
           >
             <Image
               src="/complete-check.png"
@@ -464,17 +610,25 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               width={300}
               height={300}
               priority
-              style={{ margin: '0 auto 24px' }}
+              style={{ margin: "0 auto 24px" }}
             />
-            <h1 className={styles.title}>신청이 완료되었습니다.{"\n"}곧 연락드리겠습니다.</h1>
+            <h1 className={styles.title}>
+              신청이 완료되었습니다.{"\n"}곧 연락드리겠습니다.
+            </h1>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* 개인정보처리방침 모달 */}
       {showPrivacyModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowPrivacyModal(false)}>
-          <div className={styles.modalPrivacy} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowPrivacyModal(false)}
+        >
+          <div
+            className={styles.modalPrivacy}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalPrivacyHeader}>
               <h3 className={styles.modalPrivacyTitle}>개인정보처리방침</h3>
               <button
@@ -482,8 +636,20 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 onClick={() => setShowPrivacyModal(false)}
                 aria-label="닫기"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M18 6L6 18M6 6L18 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </button>
             </div>
@@ -494,14 +660,13 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   <br />
                   사회복지사 자격 취득 상담 진행, 문의사항 응대
                   <br />
-                  개인정보는 상담 서비스 제공을 위한 목적으로만
-                  수집 및 이용되며, 동의 없이 제3자에게 제공되지 않습니다
+                  개인정보는 상담 서비스 제공을 위한 목적으로만 수집 및
+                  이용되며, 동의 없이 제3자에게 제공되지 않습니다
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>2. 수집 및 이용하는 개인정보 항목</strong>
                   <br />
                   필수 - 이름, 연락처(휴대전화번호), 최종학력, 취득사유
-            
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>3. 보유 및 이용 기간</strong>
@@ -523,8 +688,14 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
 
       {/* 희망과정 선택 모달 */}
       {showCourseModal && (
-        <div className={styles.modalOverlay} onClick={() => setShowCourseModal(false)}>
-          <div className={styles.modalPrivacy} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.modalOverlay}
+          onClick={() => setShowCourseModal(false)}
+        >
+          <div
+            className={styles.modalPrivacy}
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className={styles.modalPrivacyHeader}>
               <h3 className={styles.modalPrivacyTitle}>희망과정 선택</h3>
               <button
@@ -532,8 +703,20 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 onClick={() => setShowCourseModal(false)}
                 aria-label="닫기"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                >
+                  <path
+                    d="M18 6L6 18M6 6L18 18"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               </button>
             </div>
@@ -543,13 +726,25 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 {COURSE_OPTIONS.map((course) => (
                   <button
                     key={course}
-                    className={`${styles.courseItem} ${selectedCourses.includes(course) ? styles.courseItemSelected : ''}`}
+                    className={`${styles.courseItem} ${selectedCourses.includes(course) ? styles.courseItemSelected : ""}`}
                     onClick={() => toggleCourse(course)}
                   >
                     <span>{course}</span>
                     {selectedCourses.includes(course) && (
-                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M4 10L8 14L16 6" stroke="#4C85FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      <svg
+                        width="20"
+                        height="20"
+                        viewBox="0 0 20 20"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="M4 10L8 14L16 6"
+                          stroke="#4C85FF"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     )}
                   </button>
@@ -572,34 +767,41 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 disabled={selectedCourses.length === 0 && !customCourse.trim()}
                 onClick={confirmCourseSelection}
               >
-                {(selectedCourses.length > 0 || customCourse.trim())
-                  ? '선택 완료'
-                  : '과정을 선택해주세요'}
+                {selectedCourses.length > 0 || customCourse.trim()
+                  ? "선택 완료"
+                  : "과정을 선택해주세요"}
               </button>
             </div>
           </div>
         </div>
       )}
-
-
     </div>
   );
 }
 
 export default function StepFlowPage() {
-  const [clickSource, setClickSource] = useState<string>('바로폼');
+  const [clickSource, setClickSource] = useState<string>("바로폼");
 
   return (
-    <Suspense fallback={
-      <div className={styles.container}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
-          <div className="text-center">
-            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-            <p className="mt-4 text-gray-600">로딩 중...</p>
+    <Suspense
+      fallback={
+        <div className={styles.container}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "100vh",
+            }}
+          >
+            <div className="text-center">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+              <p className="mt-4 text-gray-600">로딩 중...</p>
+            </div>
           </div>
         </div>
-      </div>
-    }>
+      }
+    >
       <ClickSourceHandler onSourceChange={setClickSource} />
       <StepFlowContent clickSource={clickSource} />
     </Suspense>
