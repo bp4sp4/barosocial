@@ -222,17 +222,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             <div className={styles.infoSection}>
               <div className={styles.infoInner}>
                 <div style={{ textAlign: "left", marginBottom: "24px" }}>
-                  <h1
-                    style={{
-                      fontSize: "28px",
-                      fontWeight: "700",
-                      color: "#111827",
-                      marginBottom: "8px",
-                      lineHeight: "1.3",
-                    }}
-                  >
-                    사회복지사
-                  </h1>
                   <p
                     style={{
                       fontSize: "28px",
@@ -245,26 +234,26 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 </div>
                 <div className={styles.infoItem}>
                   <div className={styles.infoTitle}>
-                    <div className={styles.infoNumber}>1</div> 수업료 지원 혜택
+                    <div className={styles.infoNumber}>1</div> 1:1 맞춤 안내
+                  </div>
+                  <div className={styles.infoDesc}>
+                    개인별 상황에 맞춰 조율 가능
+                  </div>
+                </div>
+                <div className={styles.infoItem}>
+                  <div className={styles.infoTitle}>
+                    <div className={styles.infoNumber}>2</div> 온라인 수업
+                  </div>
+                  <div className={styles.infoDesc}>
+                    모든 수업은 100% 온라인으로 진행(실습제외)
+                  </div>
+                </div>
+                <div className={styles.infoItem}>
+                  <div className={styles.infoTitle}>
+                    <div className={styles.infoNumber}>3</div> 수업료 지원 혜택
                   </div>
                   <div className={styles.infoDesc}>
                     상담 완료 후 수강료 지원 혜택
-                  </div>
-                </div>
-                <div className={styles.infoItem}>
-                  <div className={styles.infoTitle}>
-                    <div className={styles.infoNumber}>2</div> 국가자격증 여부
-                  </div>
-                  <div className={styles.infoDesc}>
-                    사회복지사 자격증은 보건복지부 발급 국가자격증
-                  </div>
-                </div>
-                <div className={styles.infoItem}>
-                  <div className={styles.infoTitle}>
-                    <div className={styles.infoNumber}>3</div> 온라인 수업
-                  </div>
-                  <div className={styles.infoDesc}>
-                    모든 수업은 100% 온라인으로 진행
                   </div>
                 </div>
                 <div className={styles.infoSection}>
@@ -333,7 +322,9 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>이름을 입력해주세요 <span style={{ color: "#EF4444" }}>*</span></label>
+              <label className={styles.inputLabel}>
+                이름을 입력해주세요 <span style={{ color: "#EF4444" }}>*</span>
+              </label>
               <input
                 type="text"
                 placeholder="이름을 입력해주세요"
@@ -353,7 +344,8 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 className={styles.inputGroup}
               >
                 <label className={styles.inputLabel}>
-                  연락처를 입력해주세요 <span style={{ color: "#EF4444" }}>*</span>
+                  연락처를 입력해주세요{" "}
+                  <span style={{ color: "#EF4444" }}>*</span>
                 </label>
                 <input
                   type="tel"
@@ -416,7 +408,8 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 className={styles.inputGroup}
               >
                 <label className={styles.inputLabel}>
-                  희망과정을 선택해주세요 <span style={{ color: "#EF4444" }}>*</span>
+                  희망과정을 선택해주세요{" "}
+                  <span style={{ color: "#EF4444" }}>*</span>
                 </label>
                 <div
                   className={styles.inputField + " " + styles.courseSelectField}
