@@ -201,12 +201,11 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     <div className={styles.container}>
       <header className={styles.header}>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <Image
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             src="/logo.png"
             alt="한평생교육"
-            width={130}
-            height={34}
-            className={styles.logo}
+            style={{ height: "34px", width: "auto" }}
           />
         </div>
       </header>
@@ -331,12 +330,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   </button>
                 </div>
               </div>
-              <button
-                className={styles.bottomButton + " " + styles.infoNextBtn}
-                onClick={() => setStep(2)}
-              >
-                다음
-              </button>
             </div>
           </motion.div>
         )}

@@ -1,0 +1,47 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-02-23T02:31:02.646Z",
+  "activeFeatures": [
+    "korhrdsocial"
+  ],
+  "primaryFeature": "korhrdsocial",
+  "features": {
+    "korhrdsocial": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-23T02:30:41.159Z",
+        "lastUpdated": "2026-02-23T02:31:02.646Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/page.tsx"
+    }
+  },
+  "pipeline": {
+    "currentPhase": 1,
+    "level": "Dynamic",
+    "phaseHistory": []
+  },
+  "session": {
+    "startedAt": "2026-02-23T02:24:27.317Z",
+    "onboardingCompleted": false,
+    "lastActivity": "2026-02-23T02:31:02.646Z"
+  },
+  "history": [
+    {
+      "timestamp": "2026-02-23T02:30:41.159Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-23T02:31:02.646Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    }
+  ]
+}

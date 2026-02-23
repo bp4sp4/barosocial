@@ -76,7 +76,8 @@ background: var(--Atomic-Mono-100, #F2F2F2);
     position: relative;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
   
   /* 헤더 */
@@ -198,12 +199,9 @@ background: var(--Atomic-Mono-100, #F2F2F2);
   
   /* 버튼 */
   .bottomButton {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: calc(100% - 48px);
-    max-width: 592px;
+    position: relative;
+    width: 100%;
+    margin-top: 24px;
     height: 56px;
     background-color: var(--Blue-500);
     color: #fff;
@@ -374,6 +372,9 @@ background: var(--Atomic-Mono-100, #F2F2F2);
   /* 희망과정 모달 */
   .courseModalContent {
     padding: 16px 24px 0;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .courseModalDesc {
