@@ -20,6 +20,12 @@ export default function Footer() {
           <p className={styles.infoLine}>
             서울시 도봉구 창동 마들로13길 61 씨드큐브 905호
           </p>
+          <p className={styles.infoLine}>
+            대표전화{" "}
+            <a href="tel:0221354951" className={styles.phoneLink}>
+              02-2135-4951
+            </a>
+          </p>
           <div className={styles.footerLinks}>
             <Link href="/terms" className={styles.footerLink}>
               이용약관
