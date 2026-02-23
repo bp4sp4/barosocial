@@ -271,7 +271,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 </div>
                 <div className={styles.infoSection}>
                   <div className={styles.infoInner}>
-                    <div style={{ marginBottom: "36px" }}>
+                    <div style={{ marginBottom: "18px" }}>
                       <h1
                         style={{
                           fontSize: "28px",
