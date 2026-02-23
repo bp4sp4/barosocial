@@ -183,17 +183,15 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     !contactError &&
     formData.education.length > 0 &&
     formData.hope_course.length > 0 &&
-    formData.reason.length > 0 &&
     privacyAgreed;
 
   // 프로그레스 계산
-  const totalFields = 5;
+  const totalFields = 4;
   const filledFields = [
     formData.name.length > 0,
     formData.contact.replace(/[-\s]/g, "").length >= 10 && !contactError,
     formData.education.length > 0,
     formData.hope_course.length > 0,
-    formData.reason.length > 0,
   ].filter(Boolean).length;
   const progress = (filledFields / totalFields) * 100;
 
@@ -375,17 +373,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             </div>
 
             <div style={{ textAlign: "left", marginBottom: "24px" }}>
-              <h1
-                style={{
-                  fontSize: "28px",
-                  fontWeight: "700",
-                  color: "#111827",
-                  marginBottom: "8px",
-                  lineHeight: "1.3",
-                }}
-              >
-                사회복지사
-              </h1>
               <p
                 style={{
                   fontSize: "28px",
@@ -393,12 +380,12 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   color: "#111827",
                 }}
               >
-                무료 상담신청
+                무료 학습 상담 신청
               </p>
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>이름을 입력해주세요</label>
+              <label className={styles.inputLabel}>이름을 입력해주세요 <span style={{ color: "#EF4444" }}>*</span></label>
               <input
                 type="text"
                 placeholder="이름을 입력해주세요"
@@ -418,7 +405,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 className={styles.inputGroup}
               >
                 <label className={styles.inputLabel}>
-                  연락처를 입력해주세요
+                  연락처를 입력해주세요 <span style={{ color: "#EF4444" }}>*</span>
                 </label>
                 <input
                   type="tel"
@@ -446,7 +433,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   className={styles.inputGroup}
                 >
                   <label className={styles.inputLabel}>
-                    최종학력을 선택해 주세요{" "}
+                    최종학력 <span style={{ color: "#EF4444" }}>*</span>{" "}
                     <span
                       style={{
                         fontSize: "16px",
@@ -481,7 +468,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 className={styles.inputGroup}
               >
                 <label className={styles.inputLabel}>
-                  희망과정을 선택해주세요
+                  희망과정을 선택해주세요 <span style={{ color: "#EF4444" }}>*</span>
                 </label>
                 <div
                   className={styles.inputField + " " + styles.courseSelectField}
@@ -539,7 +526,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 </label>
                 <input
                   type="text"
-                  placeholder="자세히 입력해주셔야 상담 시 도움이 됩니다"
+                  placeholder="자유롭게 작성해 주세요"
                   className={styles.inputField}
                   value={formData.reason}
                   onChange={(e) =>
@@ -549,7 +536,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               </motion.div>
             )}
 
-            {formData.reason.length > 0 && (
+            {formData.hope_course.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -573,7 +560,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                     >
                       개인정보처리방침
                     </button>{" "}
-                    동의
+                    동의 <span style={{ color: "#EF4444" }}>*</span>
                   </span>
                 </label>
               </motion.div>
@@ -659,7 +646,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 <p className={styles.modalPrivacyItem}>
                   <strong>2. 수집 및 이용하는 개인정보 항목</strong>
                   <br />
-                  필수 - 이름, 연락처(휴대전화번호), 최종학력, 취득사유
+                  필수 - 이름, 연락처(휴대전화번호), 최종학력
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>3. 보유 및 이용 기간</strong>
