@@ -34,6 +34,8 @@ export default function AdminPage() {
   const [showManagerModal, setShowManagerModal] = useState(false);
   const [showResidenceModal, setShowResidenceModal] = useState(false);
   const [residenceText, setResidenceText] = useState('');
+  const [showReasonModal, setShowReasonModal] = useState(false);
+  const [reasonText, setReasonText] = useState('');
     // 거주지 모달 열기/닫기
     const openResidenceModal = (consultation: Consultation) => {
       setSelectedConsultation(consultation);
@@ -218,6 +220,37 @@ export default function AdminPage() {
     setShowMemoModal(false);
     setSelectedConsultation(null);
     setMemoText('');
+  };
+
+  // 취득사유 수정
+  const handleUpdateReason = async () => {
+    if (!selectedConsultation) return;
+    try {
+      const response = await fetch('/api/consultations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedConsultation.id, reason: reasonText }),
+      });
+      if (!response.ok) throw new Error('취득사유 업데이트 실패');
+      setShowReasonModal(false);
+      setSelectedConsultation(null);
+      setReasonText('');
+      fetchConsultations();
+    } catch (error) {
+      alert('취득사유 저장에 실패했습니다.');
+    }
+  };
+
+  const openReasonModal = (consultation: Consultation) => {
+    setSelectedConsultation(consultation);
+    setReasonText(consultation.reason || '');
+    setShowReasonModal(true);
+  };
+
+  const closeReasonModal = () => {
+    setShowReasonModal(false);
+    setSelectedConsultation(null);
+    setReasonText('');
   };
 
   // 과목비용 모달 열기/닫기
@@ -805,7 +838,15 @@ export default function AdminPage() {
                     <td>{highlightContact(consultation.contact, searchText)}</td>
                     <td>{consultation.education || '-'}</td>
                     <td>{consultation.hope_course || '-'}</td>
-                    <td className={styles.reasonCell}>{highlightText(consultation.reason, searchText)}</td>
+                    <td>
+                      <div
+                        className={`${styles.memoCell} ${!consultation.reason ? styles.empty : ''}`}
+                        onClick={() => openReasonModal(consultation)}
+                        title={consultation.reason || '취득사유 입력...'}
+                      >
+                        {consultation.reason ? highlightText(consultation.reason, searchText) : '취득사유 입력...'}
+                      </div>
+                    </td>
                     <td>
                       <div 
                         className={`${styles.memoCell} ${!consultation.subject_cost ? styles.empty : ''}`}
@@ -1130,6 +1171,37 @@ export default function AdminPage() {
                 저장
               </button>
               <button onClick={closeMemoModal} className={styles.cancelButton}>
+                취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 취득사유 편집 모달 */}
+      {showReasonModal && selectedConsultation && (
+        <div className={styles.modalOverlay} onClick={closeReasonModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>취득사유 편집</h2>
+            <div className={styles.memoInfo}>
+              <p><strong>이름:</strong> {selectedConsultation.name}</p>
+              <p><strong>연락처:</strong> {selectedConsultation.contact}</p>
+            </div>
+            <div className={styles.formGroup}>
+              <label>취득사유</label>
+              <textarea
+                value={reasonText}
+                onChange={(e) => setReasonText(e.target.value)}
+                rows={5}
+                placeholder="취득사유를 입력하세요..."
+                className={styles.memoTextarea}
+              />
+            </div>
+            <div className={styles.modalActions}>
+              <button onClick={handleUpdateReason} className={styles.submitButton}>
+                저장
+              </button>
+              <button onClick={closeReasonModal} className={styles.cancelButton}>
                 취소
               </button>
             </div>
