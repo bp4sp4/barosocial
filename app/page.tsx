@@ -25,6 +25,13 @@ const formatClickSource = (
     mamcafe: "맘카페",
   };
 
+  const cafeNameMap: { [key: string]: string } = {
+    mygodsend: "화성남양애",
+    yul2moms: "율하맘",
+    chbabymom: "춘천맘",
+    seosanmom: "서산맘",
+  };
+
   const shortSource = sourceMap[utmSource] || utmSource;
   const homepageName = "바로폼";
 
@@ -32,7 +39,8 @@ const formatClickSource = (
     return `${homepageName}_${shortSource}_${blogId}`;
   }
   if (cafeId) {
-    return `${homepageName}_${shortSource}_${cafeId}`;
+    const cafeName = cafeNameMap[cafeId] || cafeId;
+    return `${homepageName}_${shortSource}_${cafeName}`;
   }
   if (materialId) {
     return `${homepageName}_${shortSource}_소재_${materialId}`;
