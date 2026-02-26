@@ -30,6 +30,7 @@ const formatClickSource = (
     yul2moms: "율하맘",
     chbabymom: "춘천맘",
     seosanmom: "서산맘",
+    redog2oi: "부천소사구",
   };
 
   const shortSource = sourceMap[utmSource] || utmSource;
