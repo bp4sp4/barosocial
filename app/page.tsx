@@ -733,7 +733,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
 }
 
 export default function StepFlowPage() {
-  const [clickSource, setClickSource] = useState<string>("바로폼");
+  const [clickSource, setClickSource] = useState<string>("");
 
   return (
     <Suspense

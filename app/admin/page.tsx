@@ -166,13 +166,28 @@ export default function AdminPage() {
     }
   };
 
+  // 카페 ID → 이름 매핑 (page.tsx와 동일하게 유지)
+  const cafeIdToName: Record<string, string> = {
+    mygodsend: '화성남양애',
+    yul2moms: '율하맘',
+    chbabymom: '춘천맘',
+    seosanmom: '서산맘',
+    redog2oi: '부천소사구',
+    cjsam: '순광맘',
+    chobomamy: '러브양산맘',
+    jinhaemam: '창원진해댁',
+    momspanggju: '광주맘스팡',
+    cjasm: '충주아사모',
+    ksn82599: '둔산맘',
+  };
+
   // 특수 케이스: 언더스코어 없이 저장된 값의 대분류/중분류 매핑
   const specialSourceMappings: Record<string, { major: string; minor: string }> = {
     '당근채팅': { major: '당근', minor: '당근채팅' },
     '대표전화(당근)': { major: '당근', minor: '대표전화(당근)' },
   };
 
-  // click_source 파싱: "바로폼_대분류_중분류" → { major, minor, display }
+  // click_source 파싱: "바로폼_대분류_중분류" 또는 "대분류_중분류" → { major, minor, display }
   const parseClickSource = (source: string | null) => {
     if (!source) return { major: '', minor: '', display: '-' };
     // 바로폼_ 접두사 제거
@@ -188,8 +203,11 @@ export default function AdminPage() {
       return { major: stripped, minor: '', display: stripped };
     }
     const major = stripped.slice(0, underscoreIdx);
-    const minor = stripped.slice(underscoreIdx + 1);
-    return { major, minor, display: stripped };
+    const rawMinor = stripped.slice(underscoreIdx + 1);
+    // 중분류가 카페 ID인 경우 이름으로 변환
+    const minor = cafeIdToName[rawMinor] || rawMinor;
+    const display = `${major}_${minor}`;
+    return { major, minor, display };
   };
 
   // 날짜 포맷팅
