@@ -36,22 +36,22 @@ const formatClickSource = (
     jinhaemam: "창원진해댁",
     momspanggju: "광주맘스팡",
     cjasm: "충주아사모",
+    ksn82599: "둔산맘",
   };
 
   const shortSource = sourceMap[utmSource] || utmSource;
-  const homepageName = "바로폼";
 
   if (blogId) {
-    return `${homepageName}_${shortSource}_${blogId}`;
+    return `${shortSource}_${blogId}`;
   }
   if (cafeId) {
     const cafeName = cafeNameMap[cafeId] || cafeId;
-    return `${homepageName}_${shortSource}_${cafeName}`;
+    return `${shortSource}_${cafeName}`;
   }
   if (materialId) {
-    return `${homepageName}_${shortSource}_소재_${materialId}`;
+    return `${shortSource}_소재_${materialId}`;
   }
-  return `${homepageName}_${shortSource}`;
+  return shortSource;
 };
 
 // URL 파라미터를 읽는 컴포넌트

@@ -1,10 +1,12 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-02-27T03:12:41.835Z",
+  "lastUpdated": "2026-02-27T09:20:14.194Z",
   "activeFeatures": [
     "korhrdsocial",
     "admin",
-    "consultations"
+    "consultations",
+    "[id]",
+    "mamcafe"
   ],
   "primaryFeature": "korhrdsocial",
   "features": {
@@ -17,7 +19,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-23T02:30:41.159Z",
-        "lastUpdated": "2026-02-27T03:12:30.358Z"
+        "lastUpdated": "2026-02-27T09:18:50.000Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/page.tsx"
     },
@@ -30,7 +32,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-25T07:35:55.325Z",
-        "lastUpdated": "2026-02-27T03:12:41.835Z"
+        "lastUpdated": "2026-02-27T09:18:54.418Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/page.tsx"
     },
@@ -46,6 +48,32 @@
         "lastUpdated": "2026-02-27T02:01:49.666Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/api/consultations/route.ts"
+    },
+    "[id]": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-27T09:17:37.633Z",
+        "lastUpdated": "2026-02-27T09:17:37.633Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/mamcafe/[id]/page.tsx"
+    },
+    "mamcafe": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-02-27T09:20:14.194Z",
+        "lastUpdated": "2026-02-27T09:20:14.194Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/mamcafe/page.tsx"
     }
   },
   "pipeline": {
@@ -56,7 +84,7 @@
   "session": {
     "startedAt": "2026-02-23T02:24:27.317Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-02-27T03:12:41.835Z"
+    "lastActivity": "2026-02-27T09:20:14.194Z"
   },
   "history": [
     {
@@ -590,6 +618,36 @@
     {
       "timestamp": "2026-02-27T03:12:41.835Z",
       "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-27T09:17:08.595Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-27T09:17:37.633Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-27T09:18:50.000Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-27T09:18:54.418Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-02-27T09:20:14.194Z",
+      "feature": "mamcafe",
       "phase": "do",
       "action": "updated"
     }
