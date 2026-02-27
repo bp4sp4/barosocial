@@ -84,6 +84,8 @@ export default function AdminPage() {
   const [managerFilter, setManagerFilter] = useState('all');
   const [majorCategoryFilter, setMajorCategoryFilter] = useState('all');
   const [minorCategoryFilter, setMinorCategoryFilter] = useState('all');
+  const [reasonFilter, setReasonFilter] = useState('all');
+  const [counselCheckFilter, setCounselCheckFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [openFilterColumn, setOpenFilterColumn] = useState<string | null>(null);
@@ -164,11 +166,22 @@ export default function AdminPage() {
     }
   };
 
+  // 특수 케이스: 언더스코어 없이 저장된 값의 대분류/중분류 매핑
+  const specialSourceMappings: Record<string, { major: string; minor: string }> = {
+    '당근채팅': { major: '당근', minor: '당근채팅' },
+    '대표전화(당근)': { major: '당근', minor: '대표전화(당근)' },
+  };
+
   // click_source 파싱: "바로폼_대분류_중분류" → { major, minor, display }
   const parseClickSource = (source: string | null) => {
     if (!source) return { major: '', minor: '', display: '-' };
     // 바로폼_ 접두사 제거
     const stripped = source.startsWith('바로폼_') ? source.slice(4) : source;
+    // 특수 케이스 매핑 확인
+    if (specialSourceMappings[stripped]) {
+      const { major, minor } = specialSourceMappings[stripped];
+      return { major, minor, display: stripped };
+    }
     // 첫 번째 _ 기준으로 대분류 / 중분류 분리
     const underscoreIdx = stripped.indexOf('_');
     if (underscoreIdx === -1) {
@@ -607,6 +620,20 @@ export default function AdminPage() {
       const { minor } = parseClickSource(consultation.click_source);
       if (minor !== minorCategoryFilter) return false;
     }
+    // 취득사유 필터
+    if (reasonFilter !== 'all') {
+      const reasons = (consultation.reason || '').split(', ').map(r => r.trim()).filter(Boolean);
+      if (!reasons.includes(reasonFilter)) return false;
+    }
+    // 고민 필터
+    if (counselCheckFilter !== 'all') {
+      const checks = (consultation.counsel_check || '').split(', ').map(c => c.trim()).filter(Boolean);
+      const matchesCounsel = checks.some(c => {
+        if (counselCheckFilter === '기타') return c.startsWith('기타');
+        return c === counselCheckFilter;
+      });
+      if (!matchesCounsel) return false;
+    }
     // 날짜 필터
     if (startDate || endDate) {
       const consultationDate = new Date(consultation.created_at);
@@ -638,17 +665,30 @@ export default function AdminPage() {
     new Set(consultations.map(c => parseClickSource(c.click_source).major).filter(Boolean))
   ).sort() as string[];
 
-  // 대분류 선택 시 해당하는 중분류만 표시
+  // 고유 취득사유 목록
+  const uniqueReasons = ['즉시취업', '이직', '미래', '취미', '준비'];
+
+  // 고유 고민(상담체크) 목록
+  const uniqueCounselChecks = ['타기관', '자체가격', '직장', '육아', '가격비교', '기타'];
+
+  // 대분류별 사전 정의 중분류
+  const predefinedMinorCategories: Record<string, string[]> = {
+    '당근': ['당근채팅', '대표전화(당근)'],
+    '맘카페': ['순광맘', '러브양산맘', '창원진해댁', '광주맘스팡', '충주아사모', '화성남양애', '율하맘', '춘천맘', '서산맘', '부천소사구'],
+  };
+
+  // 대분류 선택 시 해당하는 중분류만 표시 (사전 정의 값 포함)
   const uniqueMinorCategories = Array.from(
-    new Set(
-      consultations
+    new Set([
+      ...(majorCategoryFilter !== 'all' ? (predefinedMinorCategories[majorCategoryFilter] || []) : []),
+      ...consultations
         .filter(c => {
           if (majorCategoryFilter === 'all') return true;
           return parseClickSource(c.click_source).major === majorCategoryFilter;
         })
         .map(c => parseClickSource(c.click_source).minor)
-        .filter(Boolean)
-    )
+        .filter(Boolean),
+    ])
   ).sort() as string[];
 
   const goToPage = (page: number) => {
@@ -812,7 +852,7 @@ export default function AdminPage() {
               className={styles.dateInput}
             />
           </div>
-          {(searchText || statusFilter !== 'all' || managerFilter !== 'all' || majorCategoryFilter !== 'all' || minorCategoryFilter !== 'all' || startDate || endDate) && (
+          {(searchText || statusFilter !== 'all' || managerFilter !== 'all' || majorCategoryFilter !== 'all' || minorCategoryFilter !== 'all' || reasonFilter !== 'all' || counselCheckFilter !== 'all' || startDate || endDate) && (
             <button
               onClick={() => {
                 setSearchText('');
@@ -820,6 +860,8 @@ export default function AdminPage() {
                 setManagerFilter('all');
                 setMajorCategoryFilter('all');
                 setMinorCategoryFilter('all');
+                setReasonFilter('all');
+                setCounselCheckFilter('all');
                 setStartDate('');
                 setEndDate('');
                 setCurrentPage(1);
@@ -892,7 +934,21 @@ export default function AdminPage() {
                 <th>연락처</th>
                 <th>최종학력</th>
                 <th>희망과정</th>
-                <th>취득사유</th>
+                {/* 취득사유 */}
+                <th className={`${styles.thFilterable} ${reasonFilter !== 'all' ? styles.thFiltered : ''}`}>
+                  <div className={styles.thInner}>
+                    <span>취득사유</span>
+                    <button
+                      className={`${styles.thFilterBtn} ${reasonFilter !== 'all' ? styles.thFilterBtnActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                        setOpenFilterColumn(openFilterColumn === 'reason' ? null : 'reason');
+                      }}
+                    >▾</button>
+                  </div>
+                </th>
                 <th>과목비용</th>
                 {/* 담당자 */}
                 <th className={`${styles.thFilterable} ${managerFilter !== 'all' ? styles.thFiltered : ''}`}>
@@ -911,7 +967,21 @@ export default function AdminPage() {
                 </th>
                 <th>거주지</th>
                 <th>메모</th>
-                <th>상담체크</th>
+                {/* 고민 */}
+                <th className={`${styles.thFilterable} ${counselCheckFilter !== 'all' ? styles.thFiltered : ''}`}>
+                  <div className={styles.thInner}>
+                    <span>고민</span>
+                    <button
+                      className={`${styles.thFilterBtn} ${counselCheckFilter !== 'all' ? styles.thFilterBtnActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                        setOpenFilterColumn(openFilterColumn === 'counselCheck' ? null : 'counselCheck');
+                      }}
+                    >▾</button>
+                  </div>
+                </th>
                 <th>신청일시</th>
                 {/* 상태 */}
                 <th className={`${styles.thFilterable} ${statusFilter !== 'all' ? styles.thFiltered : ''}`}>
@@ -986,27 +1056,6 @@ export default function AdminPage() {
                         {consultation.residence ? highlightText(consultation.residence, searchText) : '거주지 입력...'}
                       </div>
                     </td>
-                          {/* 거주지 수정 모달 - 항상 최상단에 렌더 */}
-                          {showResidenceModal && selectedConsultation && (
-                            <div className={styles.modalOverlay} onClick={closeResidenceModal}>
-                              <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-                                <h2 className={styles.modalTitle}>거주지 수정</h2>
-                                <div className={styles.formGroup}>
-                                  <label>거주지</label>
-                                  <input
-                                    type="text"
-                                    value={residenceText}
-                                    onChange={e => setResidenceText(e.target.value)}
-                                    placeholder="거주지 입력"
-                                  />
-                                </div>
-                                <div className={styles.modalActions}>
-                                  <button type="button" className={styles.submitButton} onClick={handleUpdateResidence}>저장</button>
-                                  <button type="button" className={styles.cancelButton} onClick={closeResidenceModal}>취소</button>
-                                </div>
-                              </div>
-                            </div>
-                          )}
                     <td>
                       <div
                         className={`${styles.memoCell} ${!consultation.memo ? styles.empty : ''}`}
@@ -1159,10 +1208,26 @@ export default function AdminPage() {
                 <label>유입 경로</label>
                 <input
                   type="text"
+                  list="clickSourceOptions"
                   value={formData.click_source}
                   onChange={(e) => setFormData({ ...formData, click_source: e.target.value })}
-                  placeholder="예: naver, google 등 (선택사항)"
+                  placeholder="예: 당근_당근채팅, 네이버_검색 등 (선택사항)"
                 />
+                <datalist id="clickSourceOptions">
+                  <option value="당근" />
+                  <option value="당근채팅" />
+                  <option value="대표전화(당근)" />
+                  <option value="맘카페_순광맘" />
+                  <option value="맘카페_러브양산맘" />
+                  <option value="맘카페_창원진해댁" />
+                  <option value="맘카페_광주맘스팡" />
+                  <option value="맘카페_충주아사모" />
+                  <option value="맘카페_화성남양애" />
+                  <option value="맘카페_율하맘" />
+                  <option value="맘카페_춘천맘" />
+                  <option value="맘카페_서산맘" />
+                  <option value="맘카페_부천소사구" />
+                </datalist>
               </div>
               <div className={styles.formGroup}>
                 <label>과목비용</label>
@@ -1270,9 +1335,10 @@ export default function AdminPage() {
                 <label>유입 경로</label>
                 <input
                   type="text"
+                  list="clickSourceOptions"
                   value={formData.click_source}
                   onChange={(e) => setFormData({ ...formData, click_source: e.target.value })}
-                  placeholder="예: naver, google 등 (선택사항)"
+                  placeholder="예: 당근_당근채팅, 네이버_검색 등 (선택사항)"
                 />
               </div>
               <div className={styles.formGroup}>
@@ -1300,6 +1366,32 @@ export default function AdminPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* 거주지 수정 모달 */}
+      {showResidenceModal && selectedConsultation && (
+        <div className={styles.modalOverlay} onClick={closeResidenceModal}>
+          <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>거주지 수정</h2>
+            <div className={styles.memoInfo}>
+              <p><strong>이름:</strong> {selectedConsultation.name}</p>
+              <p><strong>연락처:</strong> {selectedConsultation.contact}</p>
+            </div>
+            <div className={styles.formGroup}>
+              <label>거주지</label>
+              <input
+                type="text"
+                value={residenceText}
+                onChange={e => setResidenceText(e.target.value)}
+                placeholder="거주지 입력"
+              />
+            </div>
+            <div className={styles.modalActions}>
+              <button type="button" className={styles.submitButton} onClick={handleUpdateResidence}>저장</button>
+              <button type="button" className={styles.cancelButton} onClick={closeResidenceModal}>취소</button>
+            </div>
           </div>
         </div>
       )}
@@ -1379,11 +1471,11 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* 상담체크 모달 */}
+      {/* 고민 모달 */}
       {showCounselCheckModal && selectedConsultation && (
         <div className={styles.modalOverlay} onClick={closeCounselCheckModal}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <h2 className={styles.modalTitle}>상담체크</h2>
+            <h2 className={styles.modalTitle}>고민</h2>
             <div className={styles.memoInfo}>
               <p><strong>이름:</strong> {selectedConsultation.name}</p>
               <p><strong>연락처:</strong> {selectedConsultation.contact}</p>
@@ -1562,6 +1654,28 @@ export default function AdminPage() {
                   key={opt}
                   className={`${styles.thFilterItem} ${statusFilter === opt ? styles.thFilterItemSelected : ''}`}
                   onClick={() => { setStatusFilter(opt as ConsultationStatus | 'all'); setCurrentPage(1); }}
+                >{opt === 'all' ? '전체' : opt}</div>
+              ))}
+            </div>
+          )}
+          {openFilterColumn === 'reason' && (
+            <div className={styles.thFilterSection}>
+              {['all', ...uniqueReasons].map(opt => (
+                <div
+                  key={opt}
+                  className={`${styles.thFilterItem} ${reasonFilter === opt ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setReasonFilter(opt); setCurrentPage(1); }}
+                >{opt === 'all' ? '전체' : opt}</div>
+              ))}
+            </div>
+          )}
+          {openFilterColumn === 'counselCheck' && (
+            <div className={styles.thFilterSection}>
+              {['all', ...uniqueCounselChecks].map(opt => (
+                <div
+                  key={opt}
+                  className={`${styles.thFilterItem} ${counselCheckFilter === opt ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setCounselCheckFilter(opt); setCurrentPage(1); }}
                 >{opt === 'all' ? '전체' : opt}</div>
               ))}
             </div>

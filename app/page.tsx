@@ -31,6 +31,11 @@ const formatClickSource = (
     chbabymom: "춘천맘",
     seosanmom: "서산맘",
     redog2oi: "부천소사구",
+    cjsam: "순광맘",
+    chobomamy: "러브양산맘",
+    jinhaemam: "창원진해댁",
+    momspanggju: "광주맘스팡",
+    cjasm: "충주아사모",
   };
 
   const shortSource = sourceMap[utmSource] || utmSource;
