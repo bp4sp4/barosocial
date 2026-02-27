@@ -472,17 +472,35 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 className={styles.inputGroup}
               >
                 <label className={styles.inputLabel}>
-                  취득사유가 어떻게 되시나요?
+                  취득사유가 어떻게 되시나요?{" "}
+                  <span style={{ color: "#9ca3af", fontWeight: 400, fontSize: "13px" }}>(복수선택 가능)</span>
                 </label>
-                <input
-                  type="text"
-                  placeholder="자유롭게 작성해 주세요"
-                  className={styles.inputField}
-                  value={formData.reason}
-                  onChange={(e) =>
-                    setFormData({ ...formData, reason: e.target.value })
-                  }
-                />
+                <div className={styles.reasonCheckGroup}>
+                  {["즉시취업", "이직", "미래", "취미", "준비"].map((opt) => {
+                    const selected = formData.reason
+                      ? formData.reason.split(", ").filter(Boolean).includes(opt)
+                      : false;
+                    return (
+                      <label key={opt} className={`${styles.reasonCheckItem} ${selected ? styles.reasonCheckItemSelected : ""}`}>
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => {
+                            const current = formData.reason
+                              ? formData.reason.split(", ").filter(Boolean)
+                              : [];
+                            const updated = selected
+                              ? current.filter((r) => r !== opt)
+                              : [...current, opt];
+                            setFormData({ ...formData, reason: updated.join(", ") });
+                          }}
+                          style={{ display: "none" }}
+                        />
+                        {opt}
+                      </label>
+                    );
+                  })}
+                </div>
               </motion.div>
             )}
 
@@ -596,7 +614,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 <p className={styles.modalPrivacyItem}>
                   <strong>2. 수집 및 이용하는 개인정보 항목</strong>
                   <br />
-                  필수 - 이름, 연락처(휴대전화번호), 최종학력
+                  필수 - 이름, 연락처(휴대전화번호), 최종학력, 희망과정, 취득사유
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>3. 보유 및 이용 기간</strong>

@@ -488,7 +488,7 @@
 
 .empty {
   text-align: center;
-  padding: 64px 16px;
+  padding: 30px 16px;
   color: #8b95a1;
   font-size: 14px;
 }
@@ -773,4 +773,195 @@
 
 .cancelButton:hover {
   background: #e5e8eb;
+}
+
+/* 체크박스 그룹 (취득사유, 상담체크) */
+.checkboxGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.checkboxOption {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 14px;
+  border-radius: 16px;
+  border: 1.5px solid #d1d5db;
+  background: #fff;
+  font-size: 13px;
+  color: #6b7280;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.checkboxOption:hover {
+  border-color: #3182f6;
+  color: #3182f6;
+}
+
+.checkboxOptionSelected {
+  border-color: #3182f6;
+  background: #eff6ff;
+  color: #3182f6;
+  font-weight: 600;
+}
+
+/* 기타 입력창 */
+.etcInput {
+  margin-top: 10px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 1.5px solid #3182f6;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #191f28;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.etcInput::placeholder {
+  color: #9ca3af;
+}
+
+/* 상담체크 셀 */
+.counselCheckCell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  cursor: pointer;
+  min-width: 80px;
+  padding: 2px 0;
+}
+
+.counselCheckTag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 날짜 구분자 */
+.dateSeparator {
+  color: #9ca3af;
+  font-size: 14px;
+  padding: 0 2px;
+  line-height: 34px;
+}
+
+/* 엑셀식 TH 필터 */
+.thFilterable {
+  position: relative;
+  white-space: nowrap;
+}
+
+.thInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.thFilterBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  background: #454545;
+  
+  border-radius: 3px;
+  color: #f9fafb;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.thFilterBtn:hover {
+  background: #1f2937;
+  color: #fff;
+}
+
+
+/* 필터 활성 상태인 TH 헤더 - 노란 밑줄로 표시 */
+.thFiltered {
+  position: relative;
+}
+
+
+
+.thFilterDropdown {
+  position: fixed;
+  z-index: 9999;
+  background: #fff;
+  border: 1px solid #e5e8eb;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.14);
+  min-width: 150px;
+  overflow: hidden;
+}
+
+.thFilterSection {
+  padding: 6px 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.thFilterSection:last-child {
+  border-bottom: none;
+}
+
+.thFilterSectionTitle {
+  padding: 4px 12px 2px;
+  font-size: 10px;
+  font-weight: 700;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.thFilterItem {
+  padding: 7px 12px;
+  font-size: 13px;
+  color: #374151;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background 0.1s;
+  font-weight: 400;
+}
+
+.thFilterItem::before {
+  content: '';
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: all 0.1s;
+}
+
+.thFilterItem:hover {
+  background: #f9fafb;
+}
+
+.thFilterItemSelected {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+.thFilterItemSelected::before {
+  background: #3182f6;
+  border-color: #3182f6;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 10 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4l3 3 5-6' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-size: 10px 8px;
+  background-repeat: no-repeat;
+  background-position: center;
 }

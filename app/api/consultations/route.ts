@@ -287,7 +287,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { id, is_completed, notes, status, memo, name, contact, education, reason, click_source, subject_cost, manager, residence } = body;
+    const { id, is_completed, notes, status, memo, name, contact, education, reason, click_source, subject_cost, manager, residence, counsel_check } = body;
 
     if (!id) {
       return NextResponse.json({ error: 'ID is required' }, { status: 400 });
@@ -307,6 +307,7 @@ export async function PATCH(request: NextRequest) {
       subject_cost?: number | null;
       manager?: string | null;
       residence?: string | null;
+      counsel_check?: string | null;
     } = {};
 
     if (typeof is_completed === 'boolean') {
@@ -361,6 +362,10 @@ export async function PATCH(request: NextRequest) {
     }
     if (residence !== undefined) {
       updateData.residence = residence || null;
+    }
+
+    if (counsel_check !== undefined) {
+      updateData.counsel_check = counsel_check || null;
     }
 
     if (Object.keys(updateData).length === 0) {

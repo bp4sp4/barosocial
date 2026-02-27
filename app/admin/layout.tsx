@@ -3,5 +3,10 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <>
+      {children}
+      <style>{`footer { display: none !important; }`}</style>
+    </>
+  );
 }

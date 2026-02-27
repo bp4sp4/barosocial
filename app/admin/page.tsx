@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import styles from './admin.module.css';
@@ -16,6 +16,7 @@ interface Consultation {
   reason: string;
   click_source: string | null;
   memo: string | null;
+  counsel_check: string | null;
   status: ConsultationStatus;
   subject_cost: number | null;
   manager: string | null;
@@ -36,6 +37,9 @@ export default function AdminPage() {
   const [residenceText, setResidenceText] = useState('');
   const [showReasonModal, setShowReasonModal] = useState(false);
   const [reasonText, setReasonText] = useState('');
+  const [showCounselCheckModal, setShowCounselCheckModal] = useState(false);
+  const [counselCheckText, setCounselCheckText] = useState('');
+  const [counselCheckEtcInput, setCounselCheckEtcInput] = useState('');
     // 거주지 모달 열기/닫기
     const openResidenceModal = (consultation: Consultation) => {
       setSelectedConsultation(consultation);
@@ -78,8 +82,13 @@ export default function AdminPage() {
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<ConsultationStatus | 'all'>('all');
   const [managerFilter, setManagerFilter] = useState('all');
+  const [majorCategoryFilter, setMajorCategoryFilter] = useState('all');
+  const [minorCategoryFilter, setMinorCategoryFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [openFilterColumn, setOpenFilterColumn] = useState<string | null>(null);
+  const [dropdownPos, setDropdownPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  const filterDropdownRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({
     name: '',
     contact: '',
@@ -96,6 +105,23 @@ export default function AdminPage() {
   // 인증 상태 확인
   useEffect(() => {
     checkAuth();
+  }, []);
+
+  // 드롭다운 외부 클릭 닫기
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // filterDropdownRef(드롭다운 패널) 또는 .thFilterBtn 클래스가 아니면 닫기
+      if (
+        filterDropdownRef.current &&
+        !filterDropdownRef.current.contains(target) &&
+        !target.closest(`.${styles.thFilterBtn}`)
+      ) {
+        setOpenFilterColumn(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   const checkAuth = async () => {
@@ -136,6 +162,21 @@ export default function AdminPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // click_source 파싱: "바로폼_대분류_중분류" → { major, minor, display }
+  const parseClickSource = (source: string | null) => {
+    if (!source) return { major: '', minor: '', display: '-' };
+    // 바로폼_ 접두사 제거
+    const stripped = source.startsWith('바로폼_') ? source.slice(4) : source;
+    // 첫 번째 _ 기준으로 대분류 / 중분류 분리
+    const underscoreIdx = stripped.indexOf('_');
+    if (underscoreIdx === -1) {
+      return { major: stripped, minor: '', display: stripped };
+    }
+    const major = stripped.slice(0, underscoreIdx);
+    const minor = stripped.slice(underscoreIdx + 1);
+    return { major, minor, display: stripped };
   };
 
   // 날짜 포맷팅
@@ -251,6 +292,41 @@ export default function AdminPage() {
     setShowReasonModal(false);
     setSelectedConsultation(null);
     setReasonText('');
+  };
+
+  // 상담체크 모달 열기/닫기
+  const openCounselCheckModal = (consultation: Consultation) => {
+    setSelectedConsultation(consultation);
+    const raw = consultation.counsel_check || '';
+    setCounselCheckText(raw);
+    // "기타:내용" 에서 내용 파싱
+    const etcItem = raw.split(', ').find(i => i.startsWith('기타:'));
+    setCounselCheckEtcInput(etcItem ? etcItem.slice(3) : '');
+    setShowCounselCheckModal(true);
+  };
+
+  const closeCounselCheckModal = () => {
+    setShowCounselCheckModal(false);
+    setSelectedConsultation(null);
+    setCounselCheckText('');
+    setCounselCheckEtcInput('');
+  };
+
+  // 상담체크 업데이트
+  const handleUpdateCounselCheck = async (newValue: string) => {
+    if (!selectedConsultation) return;
+    try {
+      const response = await fetch('/api/consultations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedConsultation.id, counsel_check: newValue || null }),
+      });
+      if (!response.ok) throw new Error('상담체크 업데이트 실패');
+      setCounselCheckText(newValue);
+      fetchConsultations();
+    } catch (error) {
+      alert('상담체크 저장에 실패했습니다.');
+    }
   };
 
   // 과목비용 모달 열기/닫기
@@ -521,6 +597,16 @@ export default function AdminPage() {
       if (managerFilter === 'none' && consultation.manager) return false;
       if (managerFilter !== 'none' && consultation.manager !== managerFilter) return false;
     }
+    // 대분류 필터
+    if (majorCategoryFilter !== 'all') {
+      const { major } = parseClickSource(consultation.click_source);
+      if (major !== majorCategoryFilter) return false;
+    }
+    // 중분류 필터
+    if (minorCategoryFilter !== 'all') {
+      const { minor } = parseClickSource(consultation.click_source);
+      if (minor !== minorCategoryFilter) return false;
+    }
     // 날짜 필터
     if (startDate || endDate) {
       const consultationDate = new Date(consultation.created_at);
@@ -546,6 +632,24 @@ export default function AdminPage() {
 
   // 고유 담당자 목록
   const uniqueManagers = Array.from(new Set(consultations.map(c => c.manager).filter(Boolean))) as string[];
+
+  // 고유 대분류 / 중분류 목록
+  const uniqueMajorCategories = Array.from(
+    new Set(consultations.map(c => parseClickSource(c.click_source).major).filter(Boolean))
+  ).sort() as string[];
+
+  // 대분류 선택 시 해당하는 중분류만 표시
+  const uniqueMinorCategories = Array.from(
+    new Set(
+      consultations
+        .filter(c => {
+          if (majorCategoryFilter === 'all') return true;
+          return parseClickSource(c.click_source).major === majorCategoryFilter;
+        })
+        .map(c => parseClickSource(c.click_source).minor)
+        .filter(Boolean)
+    )
+  ).sort() as string[];
 
   const goToPage = (page: number) => {
     setCurrentPage(page);
@@ -685,40 +789,6 @@ export default function AdminPage() {
               className={styles.searchInput}
             />
           </div>
-          {/* 유입경로 검색 입력란 제거 */}
-          <div className={styles.filterGroup}>
-            <select
-              value={statusFilter}
-              onChange={(e) => {
-                setStatusFilter(e.target.value as ConsultationStatus | 'all');
-                setCurrentPage(1);
-              }}
-              className={styles.filterSelect}
-            >
-              <option value="all">전체 상태</option>
-              <option value="상담대기">상담대기</option>
-              <option value="상담중">상담중</option>
-              <option value="보류">보류</option>
-              <option value="등록대기">등록대기</option>
-              <option value="등록완료">등록완료</option>
-            </select>
-          </div>
-          <div className={styles.filterGroup}>
-            <select
-              value={managerFilter}
-              onChange={(e) => {
-                setManagerFilter(e.target.value);
-                setCurrentPage(1);
-              }}
-              className={styles.filterSelect}
-            >
-              <option value="all">전체 담당자</option>
-              <option value="none">담당자 없음</option>
-              {uniqueManagers.map(manager => (
-                <option key={manager} value={manager}>{manager}</option>
-              ))}
-            </select>
-          </div>
           <div className={styles.filterGroup}>
             <input
               type="date"
@@ -728,9 +798,9 @@ export default function AdminPage() {
                 setCurrentPage(1);
               }}
               className={styles.dateInput}
-              placeholder="시작일"
             />
           </div>
+          <span className={styles.dateSeparator}>~</span>
           <div className={styles.filterGroup}>
             <input
               type="date"
@@ -740,15 +810,16 @@ export default function AdminPage() {
                 setCurrentPage(1);
               }}
               className={styles.dateInput}
-              placeholder="종료일"
             />
           </div>
-          {(searchText || statusFilter !== 'all' || managerFilter !== 'all' || startDate || endDate) && (
-            <button 
+          {(searchText || statusFilter !== 'all' || managerFilter !== 'all' || majorCategoryFilter !== 'all' || minorCategoryFilter !== 'all' || startDate || endDate) && (
+            <button
               onClick={() => {
                 setSearchText('');
                 setStatusFilter('all');
                 setManagerFilter('all');
+                setMajorCategoryFilter('all');
+                setMinorCategoryFilter('all');
                 setStartDate('');
                 setEndDate('');
                 setCurrentPage(1);
@@ -802,24 +873,67 @@ export default function AdminPage() {
                     onChange={toggleSelectAll}
                   />
                 </th>
-                <th>유입 경로</th>
+                {/* 유입경로 */}
+                <th className={`${styles.thFilterable} ${(majorCategoryFilter !== 'all' || minorCategoryFilter !== 'all') ? styles.thFiltered : ''}`}>
+                  <div className={styles.thInner}>
+                    <span>유입 경로</span>
+                    <button
+                      className={`${styles.thFilterBtn} ${(majorCategoryFilter !== 'all' || minorCategoryFilter !== 'all') ? styles.thFilterBtnActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                        setOpenFilterColumn(openFilterColumn === 'source' ? null : 'source');
+                      }}
+                    >▾</button>
+                  </div>
+                </th>
                 <th>이름</th>
                 <th>연락처</th>
                 <th>최종학력</th>
                 <th>희망과정</th>
                 <th>취득사유</th>
                 <th>과목비용</th>
-                <th>담당자</th>
+                {/* 담당자 */}
+                <th className={`${styles.thFilterable} ${managerFilter !== 'all' ? styles.thFiltered : ''}`}>
+                  <div className={styles.thInner}>
+                    <span>담당자</span>
+                    <button
+                      className={`${styles.thFilterBtn} ${managerFilter !== 'all' ? styles.thFilterBtnActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                        setOpenFilterColumn(openFilterColumn === 'manager' ? null : 'manager');
+                      }}
+                    >▾</button>
+                  </div>
+                </th>
                 <th>거주지</th>
                 <th>메모</th>
+                <th>상담체크</th>
                 <th>신청일시</th>
-                <th>상태</th>
+                {/* 상태 */}
+                <th className={`${styles.thFilterable} ${statusFilter !== 'all' ? styles.thFiltered : ''}`}>
+                  <div className={styles.thInner}>
+                    <span>상태</span>
+                    <button
+                      className={`${styles.thFilterBtn} ${statusFilter !== 'all' ? styles.thFilterBtnActive : ''}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                        setDropdownPos({ top: rect.bottom + 4, left: rect.left - 60 });
+                        setOpenFilterColumn(openFilterColumn === 'status' ? null : 'status');
+                      }}
+                    >▾</button>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody>
               {paginatedConsultations.length === 0 ? (
                 <tr>
-                  <td colSpan={11} className={styles.empty}>
+                  <td colSpan={12} className={styles.empty}>
                     신청 내역이 없습니다.
                   </td>
                 </tr>
@@ -833,7 +947,7 @@ export default function AdminPage() {
                         onChange={() => toggleSelect(consultation.id)}
                       />
                     </td>
-                    <td>{highlightText(consultation.click_source, searchText) || '-'}</td>
+                    <td>{highlightText(parseClickSource(consultation.click_source).display, searchText) || '-'}</td>
                     <td>{highlightText(consultation.name, searchText)}</td>
                     <td>{highlightContact(consultation.contact, searchText)}</td>
                     <td>{consultation.education || '-'}</td>
@@ -894,12 +1008,27 @@ export default function AdminPage() {
                             </div>
                           )}
                     <td>
-                      <div 
+                      <div
                         className={`${styles.memoCell} ${!consultation.memo ? styles.empty : ''}`}
                         onClick={() => openMemoModal(consultation)}
                         title={consultation.memo || '메모 추가...'}
                       >
                         {consultation.memo ? highlightText(consultation.memo, searchText) : '메모 추가...'}
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        className={styles.counselCheckCell}
+                        onClick={() => openCounselCheckModal(consultation)}
+                      >
+                        {consultation.counsel_check
+                          ? consultation.counsel_check.split(', ').filter(Boolean).map((item) => (
+                              <span key={item} className={styles.counselCheckTag}>
+                                {item.startsWith('기타:') ? `기타: ${item.slice(3)}` : item}
+                              </span>
+                            ))
+                          : <span className={styles.empty}>체크...</span>
+                        }
                       </div>
                     </td>
                     <td>{formatDate(consultation.created_at)}</td>
@@ -1004,13 +1133,27 @@ export default function AdminPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>취득사유</label>
-                <textarea
-                  value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  rows={3}
-                  placeholder="취득사유를 입력하세요 (선택사항)"
-                />
+                <label>취득사유 (복수 선택 가능)</label>
+                <div className={styles.checkboxGroup}>
+                  {['즉시취업', '이직', '미래', '취미', '준비'].map((opt) => {
+                    const selected = formData.reason.split(', ').filter(Boolean).includes(opt);
+                    return (
+                      <label key={opt} className={`${styles.checkboxOption} ${selected ? styles.checkboxOptionSelected : ''}`}>
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => {
+                            const current = formData.reason.split(', ').filter(Boolean);
+                            const updated = selected ? current.filter(r => r !== opt) : [...current, opt];
+                            setFormData({ ...formData, reason: updated.join(', ') });
+                          }}
+                          style={{ display: 'none' }}
+                        />
+                        {opt}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
               <div className={styles.formGroup}>
                 <label>유입 경로</label>
@@ -1101,13 +1244,27 @@ export default function AdminPage() {
                 </select>
               </div>
               <div className={styles.formGroup}>
-                <label>취득사유</label>
-                <textarea
-                  value={formData.reason}
-                  onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                  rows={3}
-                  placeholder="취득사유를 입력하세요 (선택사항)"
-                />
+                <label>취득사유 (복수 선택 가능)</label>
+                <div className={styles.checkboxGroup}>
+                  {['즉시취업', '이직', '미래', '취미', '준비'].map((opt) => {
+                    const selected = formData.reason.split(', ').filter(Boolean).includes(opt);
+                    return (
+                      <label key={opt} className={`${styles.checkboxOption} ${selected ? styles.checkboxOptionSelected : ''}`}>
+                        <input
+                          type="checkbox"
+                          checked={selected}
+                          onChange={() => {
+                            const current = formData.reason.split(', ').filter(Boolean);
+                            const updated = selected ? current.filter(r => r !== opt) : [...current, opt];
+                            setFormData({ ...formData, reason: updated.join(', ') });
+                          }}
+                          style={{ display: 'none' }}
+                        />
+                        {opt}
+                      </label>
+                    );
+                  })}
+                </div>
               </div>
               <div className={styles.formGroup}>
                 <label>유입 경로</label>
@@ -1188,14 +1345,27 @@ export default function AdminPage() {
               <p><strong>연락처:</strong> {selectedConsultation.contact}</p>
             </div>
             <div className={styles.formGroup}>
-              <label>취득사유</label>
-              <textarea
-                value={reasonText}
-                onChange={(e) => setReasonText(e.target.value)}
-                rows={5}
-                placeholder="취득사유를 입력하세요..."
-                className={styles.memoTextarea}
-              />
+              <label>취득사유 (복수 선택 가능)</label>
+              <div className={styles.checkboxGroup}>
+                {['즉시취업', '이직', '미래', '취미', '준비'].map((opt) => {
+                  const selected = reasonText.split(', ').filter(Boolean).includes(opt);
+                  return (
+                    <label key={opt} className={`${styles.checkboxOption} ${selected ? styles.checkboxOptionSelected : ''}`}>
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => {
+                          const current = reasonText.split(', ').filter(Boolean);
+                          const updated = selected ? current.filter(r => r !== opt) : [...current, opt];
+                          setReasonText(updated.join(', '));
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                      {opt}
+                    </label>
+                  );
+                })}
+              </div>
             </div>
             <div className={styles.modalActions}>
               <button onClick={handleUpdateReason} className={styles.submitButton}>
@@ -1203,6 +1373,77 @@ export default function AdminPage() {
               </button>
               <button onClick={closeReasonModal} className={styles.cancelButton}>
                 취소
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 상담체크 모달 */}
+      {showCounselCheckModal && selectedConsultation && (
+        <div className={styles.modalOverlay} onClick={closeCounselCheckModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>상담체크</h2>
+            <div className={styles.memoInfo}>
+              <p><strong>이름:</strong> {selectedConsultation.name}</p>
+              <p><strong>연락처:</strong> {selectedConsultation.contact}</p>
+            </div>
+            <div className={styles.formGroup}>
+              <label>항목 선택 (복수 선택 가능)</label>
+              <div className={styles.checkboxGroup}>
+                {['타기관', '자체가격', '직장', '육아', '가격비교', '기타'].map((opt) => {
+                  // 기타는 "기타" 또는 "기타:xxx" 형태로 저장되므로 prefix 체크
+                  const selected = opt === '기타'
+                    ? counselCheckText.split(', ').some(i => i === '기타' || i.startsWith('기타:'))
+                    : counselCheckText.split(', ').filter(Boolean).includes(opt);
+                  return (
+                    <label key={opt} className={`${styles.checkboxOption} ${selected ? styles.checkboxOptionSelected : ''}`}>
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => {
+                          // 기타 제외한 현재 항목들
+                          const current = counselCheckText.split(', ').filter(Boolean).filter(i => opt === '기타' ? !(i === '기타' || i.startsWith('기타:')) : i !== opt);
+                          let updated: string[];
+                          if (selected) {
+                            updated = current;
+                            if (opt === '기타') setCounselCheckEtcInput('');
+                          } else {
+                            updated = [...current, opt === '기타' ? (counselCheckEtcInput ? `기타:${counselCheckEtcInput}` : '기타') : opt];
+                          }
+                          const newVal = updated.join(', ');
+                          setCounselCheckText(newVal);
+                          handleUpdateCounselCheck(newVal);
+                        }}
+                        style={{ display: 'none' }}
+                      />
+                      {opt}
+                    </label>
+                  );
+                })}
+              </div>
+              {/* 기타 선택 시 텍스트 입력 */}
+              {counselCheckText.split(', ').some(i => i === '기타' || i.startsWith('기타:')) && (
+                <input
+                  type="text"
+                  className={styles.etcInput}
+                  placeholder="기타 내용을 입력하세요..."
+                  value={counselCheckEtcInput}
+                  onChange={(e) => setCounselCheckEtcInput(e.target.value)}
+                  onBlur={() => {
+                    const current = counselCheckText.split(', ').filter(Boolean).filter(i => !(i === '기타' || i.startsWith('기타:')));
+                    const etcVal = counselCheckEtcInput ? `기타:${counselCheckEtcInput}` : '기타';
+                    const newVal = [...current, etcVal].join(', ');
+                    setCounselCheckText(newVal);
+                    handleUpdateCounselCheck(newVal);
+                  }}
+                  autoFocus
+                />
+              )}
+            </div>
+            <div className={styles.modalActions}>
+              <button onClick={closeCounselCheckModal} className={styles.cancelButton}>
+                닫기
               </button>
             </div>
           </div>
@@ -1266,6 +1507,65 @@ export default function AdminPage() {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ───── TH 필터 드롭다운 (position: fixed) ───── */}
+      {openFilterColumn && (
+        <div
+          ref={filterDropdownRef}
+          className={styles.thFilterDropdown}
+          style={{ top: dropdownPos.top, left: dropdownPos.left }}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          {openFilterColumn === 'source' && (
+            <>
+              <div className={styles.thFilterSection}>
+                <div className={styles.thFilterSectionTitle}>대분류</div>
+                {['all', ...uniqueMajorCategories].map(cat => (
+                  <div
+                    key={cat}
+                    className={`${styles.thFilterItem} ${majorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
+                    onClick={() => { setMajorCategoryFilter(cat); setMinorCategoryFilter('all'); setCurrentPage(1); }}
+                  >{cat === 'all' ? '전체' : cat}</div>
+                ))}
+              </div>
+              {majorCategoryFilter !== 'all' && uniqueMinorCategories.length > 0 && (
+                <div className={styles.thFilterSection}>
+                  <div className={styles.thFilterSectionTitle}>중분류</div>
+                  {['all', ...uniqueMinorCategories].map(cat => (
+                    <div
+                      key={cat}
+                      className={`${styles.thFilterItem} ${minorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
+                      onClick={() => { setMinorCategoryFilter(cat); setCurrentPage(1); }}
+                    >{cat === 'all' ? '전체' : cat}</div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+          {openFilterColumn === 'manager' && (
+            <div className={styles.thFilterSection}>
+              {[{ val: 'all', label: '전체' }, { val: 'none', label: '담당자 없음' }, ...uniqueManagers.map(m => ({ val: m, label: m }))].map(({ val, label }) => (
+                <div
+                  key={val}
+                  className={`${styles.thFilterItem} ${managerFilter === val ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setManagerFilter(val); setCurrentPage(1); }}
+                >{label}</div>
+              ))}
+            </div>
+          )}
+          {openFilterColumn === 'status' && (
+            <div className={styles.thFilterSection}>
+              {['all', '상담대기', '상담중', '보류', '등록대기', '등록완료'].map(opt => (
+                <div
+                  key={opt}
+                  className={`${styles.thFilterItem} ${statusFilter === opt ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setStatusFilter(opt as ConsultationStatus | 'all'); setCurrentPage(1); }}
+                >{opt === 'all' ? '전체' : opt}</div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>

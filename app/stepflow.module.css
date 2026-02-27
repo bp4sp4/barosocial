@@ -344,6 +344,35 @@
   font-size: 16px;
 }
 
+/* 취득사유 체크박스 */
+.reasonCheckGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.reasonCheckItem {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  font-size: 15px;
+  color: #6b7280;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.reasonCheckItemSelected {
+  border-color: #4f46e5;
+  background: #eef2ff;
+  color: #4f46e5;
+  font-weight: 600;
+}
+
 /* 희망과정 모달 */
 .courseModalContent {
   padding: 16px 24px 0;
