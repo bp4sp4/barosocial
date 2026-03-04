@@ -196,7 +196,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await fetch("/api/consultations", {
+      const response = await fetch("/api/private-cert", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
