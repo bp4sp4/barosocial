@@ -6,7 +6,6 @@ import { supabase } from '@/lib/supabase';
 import styles from '../admin.module.css';
 import Link from 'next/link';
 
-const EDUCATION_OPTIONS = ['고등학교 졸업', '전문대 졸업', '대학교 재학', '대학교 졸업', '대학원 이상'];
 const COURSE_OPTIONS = ['심리상담사'];
 
 type ConsultationStatus = '상담대기' | '상담중' | '보류' | '등록대기' | '등록완료';
@@ -15,7 +14,6 @@ interface PrivateCert {
   id: number;
   name: string;
   contact: string;
-  education: string | null;
   major_category: string | null;
   hope_course: string | null;
   reason: string | null;
@@ -56,6 +54,15 @@ function formatCost(value: string) {
   return parseInt(numbers).toLocaleString();
 }
 
+// click_source 파싱: "바로폼_대분류_중분류" 또는 "대분류_중분류" → { major, minor }
+function parseClickSource(source: string | null) {
+  if (!source) return { major: '', minor: '' };
+  const stripped = source.startsWith('바로폼_') ? source.slice(4) : source;
+  const idx = stripped.indexOf('_');
+  if (idx === -1) return { major: stripped, minor: '' };
+  return { major: stripped.slice(0, idx), minor: stripped.slice(idx + 1) };
+}
+
 export default function PrivateCertAdminPage() {
   const router = useRouter();
   const [items, setItems] = useState<PrivateCert[]>([]);
@@ -69,6 +76,8 @@ export default function PrivateCertAdminPage() {
   const [searchText, setSearchText] = useState('');
   const [statusFilter, setStatusFilter] = useState<ConsultationStatus | 'all'>('all');
   const [managerFilter, setManagerFilter] = useState('all');
+  const [majorCategoryFilter, setMajorCategoryFilter] = useState('all');
+  const [minorCategoryFilter, setMinorCategoryFilter] = useState('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [openFilterColumn, setOpenFilterColumn] = useState<string | null>(null);
@@ -95,11 +104,9 @@ export default function PrivateCertAdminPage() {
   const [counselCheckEtcInput, setCounselCheckEtcInput] = useState('');
 
   // 추가/수정 폼
-  const emptyForm = { name: '', contact: '', education: '', hope_course: '', reason: '', click_source: '', subject_cost: '', manager: '', residence: '' };
+  const emptyForm = { name: '', contact: '', hope_course: '', reason: '', click_source: '', subject_cost: '', manager: '', residence: '', major_category: '' };
   const [formData, setFormData] = useState(emptyForm);
-  const addEduRef = useRef<HTMLDivElement>(null);
   const addCourseRef = useRef<HTMLDivElement>(null);
-  const [addEduOpen, setAddEduOpen] = useState(false);
   const [addCourseOpen, setAddCourseOpen] = useState(false);
 
   // 인증 확인
@@ -117,7 +124,6 @@ export default function PrivateCertAdminPage() {
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(target) && !target.closest(`.${styles.thFilterBtn}`)) {
         setOpenFilterColumn(null);
       }
-      if (addEduRef.current && !addEduRef.current.contains(e.target as Node)) setAddEduOpen(false);
       if (addCourseRef.current && !addCourseRef.current.contains(e.target as Node)) setAddCourseOpen(false);
     };
     document.addEventListener('mousedown', handle);
@@ -207,7 +213,7 @@ export default function PrivateCertAdminPage() {
     setFormData({
       name: item.name,
       contact: item.contact,
-      education: item.education || '',
+      major_category: item.major_category || '',
       hope_course: item.hope_course || '',
       reason: item.reason || '',
       click_source: item.click_source || '',
@@ -284,6 +290,12 @@ export default function PrivateCertAdminPage() {
     }
     if (statusFilter !== 'all' && item.status !== statusFilter) return false;
     if (managerFilter !== 'all' && item.manager !== managerFilter) return false;
+    if (majorCategoryFilter !== 'all') {
+      if (parseClickSource(item.click_source).major !== majorCategoryFilter) return false;
+    }
+    if (minorCategoryFilter !== 'all') {
+      if (parseClickSource(item.click_source).minor !== minorCategoryFilter) return false;
+    }
     if (startDate || endDate) {
       const dt = new Date(item.created_at);
       if (startDate) { const s = new Date(startDate); s.setHours(0,0,0,0); if (dt < s) return false; }
@@ -295,6 +307,20 @@ export default function PrivateCertAdminPage() {
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const uniqueManagers = Array.from(new Set(items.map(i => i.manager).filter(Boolean))) as string[];
+
+  // 고유 대분류 / 중분류 목록 (click_source 파싱)
+  const uniqueMajorCategories = Array.from(
+    new Set(items.map(i => parseClickSource(i.click_source).major).filter(Boolean))
+  ).sort() as string[];
+
+  const uniqueMinorCategories = Array.from(
+    new Set(
+      items
+        .filter(i => majorCategoryFilter === 'all' || parseClickSource(i.click_source).major === majorCategoryFilter)
+        .map(i => parseClickSource(i.click_source).minor)
+        .filter(Boolean)
+    )
+  ).sort() as string[];
 
   const toggleSelect = (id: number) => setSelectedIds(prev => prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]);
   const toggleSelectAll = () => setSelectedIds(selectedIds.length === paginatedItems.length && paginatedItems.length > 0 ? [] : paginatedItems.map(i => i.id));
@@ -311,9 +337,10 @@ export default function PrivateCertAdminPage() {
 
   const handleExcelDownload = () => {
     const targets = selectedIds.length > 0 ? filteredItems.filter(i => selectedIds.includes(i.id)) : filteredItems;
-    const headers = ['이름', '연락처', '최종학력', '대분류', '중분류(희망과정)', '취득사유', '유입경로', '과목비용', '담당자', '거주지', '메모', '고민', '신청일시', '상태'];
+    const headers = ['대분류', '중분류', '이름', '연락처', '희망과정', '취득사유', '유입경로', '과목비용', '담당자', '거주지', '메모', '고민', '신청일시', '상태'];
     const rows = targets.map(i => [
-      i.name, i.contact, i.education || '', i.major_category || '', i.hope_course || '',
+      parseClickSource(i.click_source).major, parseClickSource(i.click_source).minor,
+      i.name, i.contact, i.hope_course || '',
       i.reason || '', i.click_source || '',
       i.subject_cost ? i.subject_cost.toLocaleString() : '',
       i.manager || '', i.residence || '', i.memo || '', i.counsel_check || '',
@@ -367,35 +394,11 @@ export default function PrivateCertAdminPage() {
               placeholder="010-1234-5678" maxLength={13} />
           </div>
           <div className={styles.formGroup}>
-            <label>최종학력</label>
-            <div className={styles.tossDropdown} ref={addEduRef}>
-              <button type="button" className={styles.tossDropdownTrigger} onClick={() => setAddEduOpen(o => !o)}>
-                <span className={formData.education ? '' : styles.tossDropdownPlaceholder}>
-                  {formData.education || '선택하세요 (선택사항)'}
-                </span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                  <path d={addEduOpen ? 'M4 10l4-4 4 4' : 'M4 6l4 4 4-4'} stroke="#8b95a1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </button>
-              {addEduOpen && (
-                <div className={styles.tossDropdownMenu}>
-                  <button type="button" className={`${styles.tossDropdownItem} ${!formData.education ? styles.tossDropdownItemActive : ''}`}
-                    onClick={() => { setFormData(p => ({ ...p, education: '' })); setAddEduOpen(false); }}>
-                    <span>선택 안 함</span>
-                  </button>
-                  {EDUCATION_OPTIONS.map(opt => (
-                    <button type="button" key={opt}
-                      className={`${styles.tossDropdownItem} ${formData.education === opt ? styles.tossDropdownItemActive : ''}`}
-                      onClick={() => { setFormData(p => ({ ...p, education: opt })); setAddEduOpen(false); }}>
-                      <span>{opt}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+            <label>대분류</label>
+            <input type="text" value={formData.major_category} onChange={e => setFormData(p => ({ ...p, major_category: e.target.value }))} placeholder="대분류 입력" />
           </div>
           <div className={styles.formGroup}>
-            <label>희망과정</label>
+            <label>중분류(희망과정)</label>
             <div className={styles.tossDropdown} ref={addCourseRef}>
               <button type="button" className={styles.tossDropdownTrigger} onClick={() => setAddCourseOpen(o => !o)}>
                 <span className={formData.hope_course ? '' : styles.tossDropdownPlaceholder}>
@@ -488,8 +491,8 @@ export default function PrivateCertAdminPage() {
           <div className={styles.filterGroup}>
             <input type="date" value={endDate} onChange={e => { setEndDate(e.target.value); setCurrentPage(1); }} className={styles.dateInput} />
           </div>
-          {(searchText || statusFilter !== 'all' || managerFilter !== 'all' || startDate || endDate) && (
-            <button onClick={() => { setSearchText(''); setStatusFilter('all'); setManagerFilter('all'); setStartDate(''); setEndDate(''); setCurrentPage(1); }} className={styles.clearFilterButton}>
+          {(searchText || statusFilter !== 'all' || managerFilter !== 'all' || majorCategoryFilter !== 'all' || minorCategoryFilter !== 'all' || startDate || endDate) && (
+            <button onClick={() => { setSearchText(''); setStatusFilter('all'); setManagerFilter('all'); setMajorCategoryFilter('all'); setMinorCategoryFilter('all'); setStartDate(''); setEndDate(''); setCurrentPage(1); }} className={styles.clearFilterButton}>
               필터 초기화
             </button>
           )}
@@ -520,13 +523,36 @@ export default function PrivateCertAdminPage() {
                   checked={selectedIds.length === paginatedItems.length && paginatedItems.length > 0}
                   onChange={toggleSelectAll} />
               </th>
+              {/* 대분류 */}
+              <th className={`${styles.thFilterable} ${majorCategoryFilter !== 'all' ? styles.thFiltered : ''}`}>
+                <div className={styles.thInner}>
+                  <span>대분류</span>
+                  <button className={`${styles.thFilterBtn} ${majorCategoryFilter !== 'all' ? styles.thFilterBtnActive : ''}`}
+                    onClick={e => {
+                      e.stopPropagation();
+                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                      setOpenFilterColumn(openFilterColumn === 'major' ? null : 'major');
+                    }}>▾</button>
+                </div>
+              </th>
+              {/* 중분류 */}
+              <th className={`${styles.thFilterable} ${minorCategoryFilter !== 'all' ? styles.thFiltered : ''}`}>
+                <div className={styles.thInner}>
+                  <span>중분류</span>
+                  <button className={`${styles.thFilterBtn} ${minorCategoryFilter !== 'all' ? styles.thFilterBtnActive : ''}`}
+                    onClick={e => {
+                      e.stopPropagation();
+                      const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                      setDropdownPos({ top: rect.bottom + 4, left: rect.left });
+                      setOpenFilterColumn(openFilterColumn === 'minor' ? null : 'minor');
+                    }}>▾</button>
+                </div>
+              </th>
               <th style={{ minWidth: 80 }}>이름</th>
               <th>연락처</th>
-              <th>최종학력</th>
-              <th>대분류</th>
-              <th>중분류(희망과정)</th>
+              <th>희망과정</th>
               <th>취득사유</th>
-              <th>유입경로</th>
               <th>과목비용</th>
               {/* 담당자 필터 */}
               <th className={`${styles.thFilterable} ${managerFilter !== 'all' ? styles.thFiltered : ''}`}>
@@ -562,17 +588,17 @@ export default function PrivateCertAdminPage() {
           </thead>
           <tbody>
             {paginatedItems.length === 0 ? (
-              <tr><td colSpan={15} className={styles.empty}>신청 내역이 없습니다.</td></tr>
+              <tr><td colSpan={14} className={styles.empty}>신청 내역이 없습니다.</td></tr>
             ) : (
               paginatedItems.map(item => (
                 <tr key={item.id} className={selectedIds.includes(item.id) ? styles.selectedRow : ''}>
                   <td className={styles.checkboxCell}>
                     <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={() => toggleSelect(item.id)} />
                   </td>
+                  <td>{parseClickSource(item.click_source).major || '-'}</td>
+                  <td>{parseClickSource(item.click_source).minor || '-'}</td>
                   <td>{highlightText(item.name, searchText)}</td>
                   <td>{item.contact}</td>
-                  <td>{item.education || '-'}</td>
-                  <td>{item.major_category || '-'}</td>
                   <td>{item.hope_course || '-'}</td>
                   <td>
                     <div className={`${styles.memoCell} ${!item.reason ? styles.empty : ''}`}
@@ -581,7 +607,6 @@ export default function PrivateCertAdminPage() {
                       {item.reason ? highlightText(item.reason, searchText) : '취득사유 입력...'}
                     </div>
                   </td>
-                  <td>{item.click_source || '-'}</td>
                   <td>
                     <div className={`${styles.memoCell} ${!item.subject_cost ? styles.empty : ''}`}
                       onClick={() => { setSelectedItem(item); setSubjectCostText(item.subject_cost ? item.subject_cost.toLocaleString() : ''); setShowSubjectCostModal(true); }}>
@@ -655,18 +680,31 @@ export default function PrivateCertAdminPage() {
         )}
       </div>
 
-      {/* 필터 드롭다운 */}
+      {/* TH 필터 드롭다운 */}
       {openFilterColumn && (
-        <div ref={filterDropdownRef} className={styles.filterDropdown} style={{ top: dropdownPos.top, left: dropdownPos.left }}>
-          {openFilterColumn === 'status' && (
-            <>
-              <button className={`${styles.filterOption} ${statusFilter === 'all' ? styles.filterOptionActive : ''}`}
-                onClick={() => { setStatusFilter('all'); setOpenFilterColumn(null); setCurrentPage(1); }}>전체</button>
-              {STATUS_OPTIONS.map(s => (
-                <button key={s} className={`${styles.filterOption} ${statusFilter === s ? styles.filterOptionActive : ''}`}
-                  onClick={() => { setStatusFilter(s); setOpenFilterColumn(null); setCurrentPage(1); }}>{s}</button>
+        <div ref={filterDropdownRef} className={styles.thFilterDropdown} style={{ top: dropdownPos.top, left: dropdownPos.left }}
+          onMouseDown={e => e.stopPropagation()}>
+          {openFilterColumn === 'major' && (
+            <div className={styles.thFilterSection}>
+              {['all', ...uniqueMajorCategories].map(cat => (
+                <div key={cat}
+                  className={`${styles.thFilterItem} ${majorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setMajorCategoryFilter(cat); setMinorCategoryFilter('all'); setCurrentPage(1); setOpenFilterColumn(null); }}>
+                  {cat === 'all' ? '전체' : cat}
+                </div>
               ))}
-            </>
+            </div>
+          )}
+          {openFilterColumn === 'minor' && (
+            <div className={styles.thFilterSection}>
+              {['all', ...uniqueMinorCategories].map(cat => (
+                <div key={cat}
+                  className={`${styles.thFilterItem} ${minorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setMinorCategoryFilter(cat); setCurrentPage(1); setOpenFilterColumn(null); }}>
+                  {cat === 'all' ? '전체' : cat}
+                </div>
+              ))}
+            </div>
           )}
           {openFilterColumn === 'manager' && (
             <>
@@ -675,6 +713,16 @@ export default function PrivateCertAdminPage() {
               {uniqueManagers.map(m => (
                 <button key={m} className={`${styles.filterOption} ${managerFilter === m ? styles.filterOptionActive : ''}`}
                   onClick={() => { setManagerFilter(m); setOpenFilterColumn(null); setCurrentPage(1); }}>{m}</button>
+              ))}
+            </>
+          )}
+          {openFilterColumn === 'status' && (
+            <>
+              <button className={`${styles.filterOption} ${statusFilter === 'all' ? styles.filterOptionActive : ''}`}
+                onClick={() => { setStatusFilter('all'); setOpenFilterColumn(null); setCurrentPage(1); }}>전체</button>
+              {STATUS_OPTIONS.map(s => (
+                <button key={s} className={`${styles.filterOption} ${statusFilter === s ? styles.filterOptionActive : ''}`}
+                  onClick={() => { setStatusFilter(s); setOpenFilterColumn(null); setCurrentPage(1); }}>{s}</button>
               ))}
             </>
           )}
