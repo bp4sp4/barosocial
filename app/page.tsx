@@ -519,7 +519,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                   <span style={{ color: "#9ca3af", fontWeight: 400, fontSize: "13px" }}>(복수선택 가능)</span>
                 </label>
                 <div className={styles.reasonCheckGroup}>
-                  {["즉시취업", "이직", "미래준비", "취업"].map((opt) => {
+                  {["즉시취업", "이직", "미래준비", "취미"].map((opt) => {
                     const selected = formData.reason
                       ? formData.reason.split(", ").filter(Boolean).includes(opt)
                       : false;
