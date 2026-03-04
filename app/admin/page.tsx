@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import styles from './admin.module.css';
 import { CAFE_NAMES } from '@/lib/cafe-names';
+import Link from 'next/link';
 
 const EDUCATION_OPTIONS = ['고등학교 졸업', '전문대 졸업', '대학교 재학', '대학교 졸업', '대학원 이상'];
 const ADMIN_COURSE_OPTIONS = ['사회복지사', '아동학사', '평생교육사', '편입/대학원', '건강가정사', '청소년지도사', '보육교사', '심리상담사'];
@@ -1015,6 +1016,16 @@ export default function AdminPage() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
+        {/* 메인 탭 */}
+        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+          <span style={{ padding: '8px 20px', borderRadius: 8, background: '#3182f6', color: '#fff', fontWeight: 700, fontSize: 15 }}>
+            학점은행제
+          </span>
+          <Link href="/admin/private-cert" style={{ padding: '8px 20px', borderRadius: 8, background: '#f2f4f6', color: '#4e5968', fontWeight: 500, textDecoration: 'none', fontSize: 15 }}>
+            민간자격증
+          </Link>
+        </div>
+
         <div className={styles.titleRow}>
           <h1 className={styles.title}>상담 신청 관리 ({filteredConsultations.length}건)</h1>
           <button onClick={handleLogout} className={styles.logoutButton}>로그아웃</button>

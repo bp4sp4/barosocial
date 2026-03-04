@@ -237,16 +237,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     formData.hope_course.length > 0 &&
     privacyAgreed;
 
-  // 프로그레스 계산
-  const totalFields = 4;
-  const filledFields = [
-    formData.name.length > 0,
-    formData.contact.replace(/[-\s]/g, "").length >= 10 && !contactError,
-    formData.education.length > 0,
-    formData.hope_course.length > 0,
-  ].filter(Boolean).length;
-  const progress = (filledFields / totalFields) * 100;
-
   return (
     <div className={styles.container}>
       <header className={styles.header}>
@@ -330,37 +320,6 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             transition={{ duration: 0.3, ease: "easeOut" }}
             className={styles.stepWrapper}
           >
-            {/* 프로그레스 바 */}
-            <div style={{ width: "100%", marginBottom: "20px" }}>
-              <div
-                style={{
-                  height: "4px",
-                  backgroundColor: "#E5E7EB",
-                  borderRadius: "2px",
-                  overflow: "hidden",
-                }}
-              >
-                <div
-                  style={{
-                    height: "100%",
-                    width: `${progress}%`,
-                    backgroundColor: "#4C85FF",
-                    transition: "width 0.3s ease",
-                  }}
-                />
-              </div>
-              <p
-                style={{
-                  marginTop: "8px",
-                  fontSize: "14px",
-                  color: "#6B7280",
-                  textAlign: "right",
-                }}
-              >
-                {filledFields} / {totalFields}
-              </p>
-            </div>
-
             <div style={{ textAlign: "left", marginBottom: "24px" }}>
               <p
                 style={{
@@ -389,193 +348,162 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
               />
             </div>
 
-            {formData.name.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={styles.inputGroup}
-              >
-                <label className={styles.inputLabel}>
-                  연락처를 입력해주세요{" "}
-                  <span style={{ color: "#EF4444" }}>*</span>
-                </label>
-                <input
-                  type="tel"
-                  placeholder="010-0000-0000"
-                  className={styles.inputField}
-                  value={formData.contact}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    const formatted = formatContact(value);
-                    setFormData({ ...formData, contact: formatted });
-                    validateContact(formatted);
-                  }}
-                />
-                {contactError && (
-                  <p className={styles.errorMessage}>{contactError}</p>
-                )}
-              </motion.div>
-            )}
-
-            {formData.contact.replace(/[-\s]/g, "").length >= 10 &&
-              !contactError && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className={styles.inputGroup}
-                >
-                  <label className={styles.inputLabel}>
-                    최종학력 <span style={{ color: "#EF4444" }}>*</span>{" "}
-                    <span
-                      style={{
-                        fontSize: "16px",
-                        color: "#6B7280",
-                        fontWeight: "400",
-                      }}
-                    >
-                      최종학력마다 과정이 달라져요!
-                    </span>
-                  </label>
-                  <select
-                    className={styles.inputField}
-                    value={formData.education}
-                    onChange={(e) =>
-                      setFormData({ ...formData, education: e.target.value })
-                    }
-                    style={{ cursor: "pointer" }}
-                  >
-                    <option value="">선택해주세요</option>
-                    <option value="고졸">고졸</option>
-                    <option value="전문대졸">전문대졸</option>
-                    <option value="대졸">대졸</option>
-                    <option value="대학원 이상">대학원 이상</option>
-                  </select>
-                </motion.div>
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                연락처를 입력해주세요{" "}
+                <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <input
+                type="tel"
+                placeholder="010-0000-0000"
+                className={styles.inputField}
+                value={formData.contact}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const formatted = formatContact(value);
+                  setFormData({ ...formData, contact: formatted });
+                  validateContact(formatted);
+                }}
+              />
+              {contactError && (
+                <p className={styles.errorMessage}>{contactError}</p>
               )}
+            </div>
 
-            {formData.education.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={styles.inputGroup}
-              >
-                <label className={styles.inputLabel}>
-                  희망과정을 선택해주세요{" "}
-                  <span style={{ color: "#EF4444" }}>*</span>
-                </label>
-                <div
-                  className={styles.inputField + " " + styles.courseSelectField}
-                  onClick={() => {
-                    const existing = formData.hope_course
-                      ? formData.hope_course.split(", ").filter(Boolean)
-                      : [];
-                    const fromOptions = existing.filter((c) =>
-                      COURSE_OPTIONS.includes(c),
-                    );
-                    const fromCustom = existing.filter(
-                      (c) => !COURSE_OPTIONS.includes(c),
-                    );
-                    setSelectedCourses(fromOptions);
-                    setCustomCourse(fromCustom.join(", "));
-                    setShowCourseModal(true);
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                최종학력 <span style={{ color: "#EF4444" }}>*</span>{" "}
+                <span
+                  style={{
+                    fontSize: "16px",
+                    color: "#6B7280",
+                    fontWeight: "400",
                   }}
                 >
-                  {formData.hope_course ? (
-                    <span className={styles.courseSelectedText}>
-                      {formData.hope_course}
-                    </span>
-                  ) : (
-                    <span className={styles.coursePlaceholder}>
-                      과정을 선택해주세요
-                    </span>
-                  )}
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 20 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M5 7.5L10 12.5L15 7.5"
-                      stroke="#6B7280"
-                      strokeWidth="1.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                </div>
-              </motion.div>
-            )}
-
-            {formData.hope_course.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={styles.inputGroup}
+                  최종학력마다 과정이 달라져요!
+                </span>
+              </label>
+              <select
+                className={styles.inputField}
+                value={formData.education}
+                onChange={(e) =>
+                  setFormData({ ...formData, education: e.target.value })
+                }
+                style={{ cursor: "pointer" }}
               >
-                <label className={styles.inputLabel}>
-                  취득사유가 어떻게 되시나요?{" "}
-                  <span style={{ color: "#9ca3af", fontWeight: 400, fontSize: "13px" }}>(복수선택 가능)</span>
-                </label>
-                <div className={styles.reasonCheckGroup}>
-                  {["즉시취업", "이직", "미래준비", "취미"].map((opt) => {
-                    const selected = formData.reason
-                      ? formData.reason.split(", ").filter(Boolean).includes(opt)
-                      : false;
-                    return (
-                      <label key={opt} className={`${styles.reasonCheckItem} ${selected ? styles.reasonCheckItemSelected : ""}`}>
-                        <input
-                          type="checkbox"
-                          checked={selected}
-                          onChange={() => {
-                            const current = formData.reason
-                              ? formData.reason.split(", ").filter(Boolean)
-                              : [];
-                            const updated = selected
-                              ? current.filter((r) => r !== opt)
-                              : [...current, opt];
-                            setFormData({ ...formData, reason: updated.join(", ") });
-                          }}
-                          style={{ display: "none" }}
-                        />
-                        {opt}
-                      </label>
-                    );
-                  })}
-                </div>
-              </motion.div>
-            )}
+                <option value="">선택해주세요</option>
+                <option value="고졸">고졸</option>
+                <option value="전문대졸">전문대졸</option>
+                <option value="대졸">대졸</option>
+                <option value="대학원 이상">대학원 이상</option>
+              </select>
+            </div>
 
-            {formData.hope_course.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={styles.inputGroup}
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                희망과정을 선택해주세요{" "}
+                <span style={{ color: "#EF4444" }}>*</span>
+              </label>
+              <div
+                className={styles.inputField + " " + styles.courseSelectField}
+                onClick={() => {
+                  const existing = formData.hope_course
+                    ? formData.hope_course.split(", ").filter(Boolean)
+                    : [];
+                  const fromOptions = existing.filter((c) =>
+                    COURSE_OPTIONS.includes(c),
+                  );
+                  const fromCustom = existing.filter(
+                    (c) => !COURSE_OPTIONS.includes(c),
+                  );
+                  setSelectedCourses(fromOptions);
+                  setCustomCourse(fromCustom.join(", "));
+                  setShowCourseModal(true);
+                }}
               >
-                <label className={styles.checkboxLabel}>
-                  <input
-                    type="checkbox"
-                    checked={privacyAgreed}
-                    onChange={(e) => setPrivacyAgreed(e.target.checked)}
-                    className={styles.checkbox}
-                  />
-                  <span>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        setShowPrivacyModal(true);
-                      }}
-                      className={styles.privacyLink}
-                    >
-                      개인정보처리방침
-                    </button>{" "}
-                    동의 <span style={{ color: "#EF4444" }}>*</span>
+                {formData.hope_course ? (
+                  <span className={styles.courseSelectedText}>
+                    {formData.hope_course}
                   </span>
-                </label>
-              </motion.div>
-            )}
+                ) : (
+                  <span className={styles.coursePlaceholder}>
+                    과정을 선택해주세요
+                  </span>
+                )}
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 20 20"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 7.5L10 12.5L15 7.5"
+                    stroke="#6B7280"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </div>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
+                취득사유가 어떻게 되시나요?{" "}
+                <span style={{ color: "#9ca3af", fontWeight: 400, fontSize: "13px" }}>(복수선택 가능)</span>
+              </label>
+              <div className={styles.reasonCheckGroup}>
+                {["즉시취업", "이직", "미래준비", "취미"].map((opt) => {
+                  const selected = formData.reason
+                    ? formData.reason.split(", ").filter(Boolean).includes(opt)
+                    : false;
+                  return (
+                    <label key={opt} className={`${styles.reasonCheckItem} ${selected ? styles.reasonCheckItemSelected : ""}`}>
+                      <input
+                        type="checkbox"
+                        checked={selected}
+                        onChange={() => {
+                          const current = formData.reason
+                            ? formData.reason.split(", ").filter(Boolean)
+                            : [];
+                          const updated = selected
+                            ? current.filter((r) => r !== opt)
+                            : [...current, opt];
+                          setFormData({ ...formData, reason: updated.join(", ") });
+                        }}
+                        style={{ display: "none" }}
+                      />
+                      {opt}
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.checkboxLabel}>
+                <input
+                  type="checkbox"
+                  checked={privacyAgreed}
+                  onChange={(e) => setPrivacyAgreed(e.target.checked)}
+                  className={styles.checkbox}
+                />
+                <span>
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowPrivacyModal(true);
+                    }}
+                    className={styles.privacyLink}
+                  >
+                    개인정보처리방침
+                  </button>{" "}
+                  동의 <span style={{ color: "#EF4444" }}>*</span>
+                </span>
+              </label>
+            </div>
 
             <button
               className={styles.bottomButton}
