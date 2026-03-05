@@ -347,6 +347,26 @@ export default function PrivateCertAdminPage() {
   const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const uniqueManagers = Array.from(new Set(items.map(i => i.manager).filter(Boolean))) as string[];
 
+  // 등록률 통계
+  const calcRegRate = (list: PrivateCert[]) => {
+    const total = list.length;
+    const registered = list.filter(c => c.status === '등록완료').length;
+    const rate = total > 0 ? Math.round((registered / total) * 100) : 0;
+    return { total, registered, rate };
+  };
+  const managerStats = uniqueManagers.map(name => {
+    const all = items.filter(i => i.manager === name);
+    const recent30 = [...all]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 30);
+    return { name, overall: calcRegRate(all), recent: calcRegRate(recent30) };
+  });
+  const privateCertAll = items.filter(i => i.manager && uniqueManagers.includes(i.manager));
+  const privateCertRecent30 = [...privateCertAll]
+    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .slice(0, 30);
+  const privateCertStats = { overall: calcRegRate(privateCertAll), recent: calcRegRate(privateCertRecent30) };
+
   // 고유 대분류 / 중분류 목록 (click_source 파싱)
   const uniqueMajorCategories = Array.from(
     new Set(items.map(i => parseClickSource(i.click_source).major).filter(Boolean))
@@ -556,6 +576,33 @@ export default function PrivateCertAdminPage() {
             {selectedIds.length > 0 ? `선택 항목 다운로드 (${selectedIds.length})` : '엑셀 다운로드'}
           </button>
         </div>
+        <div className={styles.statsTable}>
+          <div className={styles.statsHeader}>
+            <span className={styles.statsColName} />
+            <span className={styles.statsColLabel}>최근 30건</span>
+            <span className={styles.statsColLabel}>전체</span>
+          </div>
+          <div className={`${styles.statsRow} ${styles.statsRowGroup}`}>
+            <span className={styles.statsName}>민간사업부</span>
+            <div className={styles.statsCell}>
+              <span className={styles.statsRate}>{privateCertStats.recent.rate}%</span>
+            </div>
+            <div className={styles.statsCell}>
+              <span className={styles.statsRate}>{privateCertStats.overall.rate}%</span>
+            </div>
+          </div>
+          {managerStats.map(m => (
+            <div key={m.name} className={styles.statsRow}>
+              <span className={styles.statsName}>{m.name}</span>
+              <div className={styles.statsCell}>
+                <span className={styles.statsRate}>{m.recent.rate}%</span>
+              </div>
+              <div className={styles.statsCell}>
+                <span className={styles.statsRate}>{m.overall.rate}%</span>
+              </div>
+            </div>
+          ))}
+        </div>
       </header>
 
       {/* 테이블 */}
@@ -752,24 +799,26 @@ export default function PrivateCertAdminPage() {
             </div>
           )}
           {openFilterColumn === 'manager' && (
-            <>
-              <button className={`${styles.filterOption} ${managerFilter === 'all' ? styles.filterOptionActive : ''}`}
-                onClick={() => { setManagerFilter('all'); setOpenFilterColumn(null); setCurrentPage(1); }}>전체</button>
-              {uniqueManagers.map(m => (
-                <button key={m} className={`${styles.filterOption} ${managerFilter === m ? styles.filterOptionActive : ''}`}
-                  onClick={() => { setManagerFilter(m); setOpenFilterColumn(null); setCurrentPage(1); }}>{m}</button>
+            <div className={styles.thFilterSection}>
+              {[{ val: 'all', label: '전체' }, ...uniqueManagers.map(m => ({ val: m, label: m }))].map(({ val, label }) => (
+                <div key={val}
+                  className={`${styles.thFilterItem} ${managerFilter === val ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setManagerFilter(val); setCurrentPage(1); setOpenFilterColumn(null); }}>
+                  {label}
+                </div>
               ))}
-            </>
+            </div>
           )}
           {openFilterColumn === 'status' && (
-            <>
-              <button className={`${styles.filterOption} ${statusFilter === 'all' ? styles.filterOptionActive : ''}`}
-                onClick={() => { setStatusFilter('all'); setOpenFilterColumn(null); setCurrentPage(1); }}>전체</button>
-              {STATUS_OPTIONS.map(s => (
-                <button key={s} className={`${styles.filterOption} ${statusFilter === s ? styles.filterOptionActive : ''}`}
-                  onClick={() => { setStatusFilter(s); setOpenFilterColumn(null); setCurrentPage(1); }}>{s}</button>
+            <div className={styles.thFilterSection}>
+              {['all', ...STATUS_OPTIONS].map(opt => (
+                <div key={opt}
+                  className={`${styles.thFilterItem} ${statusFilter === opt ? styles.thFilterItemSelected : ''}`}
+                  onClick={() => { setStatusFilter(opt as ConsultationStatus | 'all'); setCurrentPage(1); setOpenFilterColumn(null); }}>
+                  {opt === 'all' ? '전체' : opt}
+                </div>
               ))}
-            </>
+            </div>
           )}
         </div>
       )}
