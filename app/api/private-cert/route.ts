@@ -25,7 +25,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, contact, education, hope_course, reason, click_source, residence, subject_cost, manager } = body;
+    const { name, contact, education, hope_course, reason, click_source, residence, subject_cost, manager, memo, counsel_check, status } = body;
 
     if (!name || !contact) {
       return NextResponse.json({ error: 'Name and contact are required' }, { status: 400 });
@@ -43,7 +43,9 @@ export async function POST(request: NextRequest) {
         residence: residence || null,
         subject_cost: subject_cost || null,
         manager: manager || null,
-        status: '상담대기',
+        memo: memo || null,
+        counsel_check: counsel_check || null,
+        status: status || '상담대기',
       }])
       .select()
       .single();

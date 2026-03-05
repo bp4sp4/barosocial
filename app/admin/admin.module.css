@@ -82,6 +82,7 @@
   padding: 16px;
 }
 
+
 .header {
   display: flex;
   flex-direction: row;
@@ -568,9 +569,30 @@
   font-weight: 600;
 }
 
+.fieldLabel {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #191f28;
+  margin-bottom: 8px;
+}
+
 .memoTextarea {
   width: 100%;
   min-height: 140px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.memoTextarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .formGroup {

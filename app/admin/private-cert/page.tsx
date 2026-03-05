@@ -434,7 +434,13 @@ export default function PrivateCertAdminPage() {
           </div>
           <div className={styles.formGroup}>
             <label>대분류</label>
-            <input type="text" value={formData.major_category} onChange={e => setFormData(p => ({ ...p, major_category: e.target.value }))} placeholder="대분류 입력" />
+            <input type="text" value={formData.major_category} onChange={e => {
+              const newMajor = e.target.value;
+              const newClickSource = newMajor
+                ? `바로폼_${newMajor}${formData.hope_course ? '_' + formData.hope_course : ''}`
+                : (formData.hope_course ? `바로폼__${formData.hope_course}` : '');
+              setFormData(p => ({ ...p, major_category: newMajor, click_source: newClickSource }));
+            }} placeholder="대분류 입력" />
           </div>
           <div className={styles.formGroup}>
             <label>중분류(희망과정)</label>
@@ -450,13 +456,21 @@ export default function PrivateCertAdminPage() {
               {addCourseOpen && (
                 <div className={styles.tossDropdownMenu}>
                   <button type="button" className={`${styles.tossDropdownItem} ${!formData.hope_course ? styles.tossDropdownItemActive : ''}`}
-                    onClick={() => { setFormData(p => ({ ...p, hope_course: '' })); setAddCourseOpen(false); }}>
+                    onClick={() => {
+                      const newClickSource = formData.major_category ? `바로폼_${formData.major_category}` : '';
+                      setFormData(p => ({ ...p, hope_course: '', click_source: newClickSource }));
+                      setAddCourseOpen(false);
+                    }}>
                     <span>선택 안 함</span>
                   </button>
                   {COURSE_OPTIONS.map(opt => (
                     <button type="button" key={opt}
                       className={`${styles.tossDropdownItem} ${formData.hope_course === opt ? styles.tossDropdownItemActive : ''}`}
-                      onClick={() => { setFormData(p => ({ ...p, hope_course: opt })); setAddCourseOpen(false); }}>
+                      onClick={() => {
+                        const newClickSource = `바로폼_${formData.major_category ? formData.major_category + '_' : '_'}${opt}`;
+                        setFormData(p => ({ ...p, hope_course: opt, click_source: newClickSource }));
+                        setAddCourseOpen(false);
+                      }}>
                       <span>{opt}</span>
                     </button>
                   ))}
@@ -770,8 +784,15 @@ export default function PrivateCertAdminPage() {
       {showMemoModal && (
         <div className={styles.modalOverlay} onClick={() => setShowMemoModal(false)}>
           <div className={styles.modalContent} onClick={e => e.stopPropagation()}>
-            <h2 className={styles.modalTitle}>메모</h2>
-            <textarea className={styles.memoTextarea} value={memoText} onChange={e => setMemoText(e.target.value)} rows={4} />
+            <h2 className={styles.modalTitle}>메모 편집</h2>
+            {selectedItem && (
+              <div className={styles.memoInfo}>
+                <p><strong>이름:</strong> {selectedItem.name}</p>
+                <p><strong>연락처:</strong> {selectedItem.contact}</p>
+              </div>
+            )}
+            <label className={styles.fieldLabel}>메모</label>
+            <textarea className={styles.memoTextarea} value={memoText} onChange={e => setMemoText(e.target.value)} rows={4} placeholder="메모를 입력하세요..." />
             <div className={styles.modalActions}>
               <button onClick={handleUpdateMemo} className={styles.submitButton}>저장</button>
               <button onClick={() => setShowMemoModal(false)} className={styles.cancelButton}>취소</button>

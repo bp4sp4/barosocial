@@ -132,7 +132,9 @@ export default function AdminPage() {
     click_source: '',
     subject_cost: '',
     manager: '',
-    residence: ''
+    residence: '',
+    memo: '',
+    counsel_check: ''
   });
   const router = useRouter();
 
@@ -352,7 +354,9 @@ export default function AdminPage() {
 
   // click_source 파싱: "바로폼_대분류_중분류" 또는 "대분류_중분류" → { major, minor, display }
   const parseClickSource = (source: string | null) => {
-    if (!source) return { major: '', minor: '', display: '-' };
+    if (!source) return { major: '바로폼', minor: '', display: '바로폼' };
+    // 바로폼 단독 값
+    if (source === '바로폼') return { major: '바로폼', minor: '', display: '바로폼' };
     // 바로폼_ 접두사 제거
     const isBaro = source.startsWith('바로폼_');
     const stripped = isBaro ? source.slice(4) : source;
@@ -369,6 +373,10 @@ export default function AdminPage() {
     }
     const major = stripped.slice(0, underscoreIdx);
     const rawMinor = stripped.slice(underscoreIdx + 1);
+    // referrer는 대분류명으로 표시
+    if (rawMinor === 'referrer') {
+      return { major, minor: major, display: `${major}_${major}` };
+    }
     // 중분류가 카페 ID인 경우 이름으로 변환
     const minor = cafeIdToName[rawMinor] || rawMinor;
     const display = `${major}_${minor}`;
@@ -414,7 +422,9 @@ export default function AdminPage() {
         click_source: '',
         subject_cost: '',
         manager: '',
-        residence: ''
+        residence: '',
+        memo: '',
+        counsel_check: ''
       });
       setAddSourceMajor('');
       setAddSourceMinor('');
@@ -657,7 +667,9 @@ export default function AdminPage() {
         click_source: consultation.click_source || '',
         subject_cost: consultation.subject_cost ? consultation.subject_cost.toLocaleString() : '',
         manager: consultation.manager || '',
-        residence: consultation.residence || ''
+        residence: consultation.residence || '',
+        memo: consultation.memo || '',
+        counsel_check: consultation.counsel_check || ''
       });
       setShowEditModal(true);
     }
@@ -684,6 +696,8 @@ export default function AdminPage() {
           subject_cost: formData.subject_cost ? parseInt(formData.subject_cost.replace(/,/g, '')) : null,
           manager: formData.manager || null,
           residence: formData.residence || null,
+          memo: formData.memo || null,
+          counsel_check: formData.counsel_check || null,
         }),
       });
 
@@ -698,7 +712,9 @@ export default function AdminPage() {
         click_source: '',
         subject_cost: '',
         manager: '',
-        residence: ''
+        residence: '',
+        memo: '',
+        counsel_check: ''
       });
       setShowEditModal(false);
       setSelectedConsultation(null);
@@ -1927,6 +1943,35 @@ export default function AdminPage() {
                   value={formData.manager}
                   onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
                   placeholder="담당자 이름 (선택사항)"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>거주지</label>
+                <input
+                  type="text"
+                  value={formData.residence}
+                  onChange={(e) => setFormData({ ...formData, residence: e.target.value })}
+                  placeholder="거주지 (선택사항)"
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>메모</label>
+                <textarea
+                  value={formData.memo}
+                  onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
+                  placeholder="메모 (선택사항)"
+                  rows={3}
+                  style={{ resize: 'vertical' }}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label>고민</label>
+                <textarea
+                  value={formData.counsel_check}
+                  onChange={(e) => setFormData({ ...formData, counsel_check: e.target.value })}
+                  placeholder="고민 내용 (선택사항)"
+                  rows={3}
+                  style={{ resize: 'vertical' }}
                 />
               </div>
               <div className={styles.modalActions}>

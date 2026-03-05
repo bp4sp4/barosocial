@@ -85,37 +85,37 @@ function ClickSourceHandler({
       // referrer로 네이버카페 감지
       const referrer = document.referrer;
       console.log('[referrer]', referrer);
-      if (referrer.includes("cafe.naver.com/redog2oi") || referrer.includes("cafes/28111532")) {
+      if (referrer.includes("cafe.naver.com/redog2oi") || referrer.includes("/cafes/redog2oi") || referrer.includes("cafes/28111532")) {
         onSourceChange("맘카페_부천소사구");
-      } else if (referrer.includes("cafe.naver.com/babylovecafe") || referrer.includes("cafes/12688726")) {
+      } else if (referrer.includes("cafe.naver.com/babylovecafe") || referrer.includes("/cafes/babylovecafe") || referrer.includes("cafes/12688726")) {
         onSourceChange("맘카페_베이비러브");
-      } else if (referrer.includes("cafe.naver.com/magic26") || referrer.includes("cafes/20091703")) {
+      } else if (referrer.includes("cafe.naver.com/magic26") || referrer.includes("/cafes/magic26") || referrer.includes("cafes/20091703")) {
         onSourceChange("맘카페_안평맘스비");
-      } else if (referrer.includes("cafe.naver.com/chobomamy") || referrer.includes("cafes/20655292")) {
+      } else if (referrer.includes("cafe.naver.com/chobomamy") || referrer.includes("/cafes/chobomamy") || referrer.includes("cafes/20655292")) {
         onSourceChange("맘카페_러브양산맘");
-      } else if (referrer.includes("cafe.naver.com/jinhaemam") || referrer.includes("cafes/14952369")) {
+      } else if (referrer.includes("cafe.naver.com/jinhaemam") || referrer.includes("/cafes/jinhaemam") || referrer.includes("cafes/14952369")) {
         onSourceChange("맘카페_창원진해댁");
-      } else if (referrer.includes("cafe.naver.com/momspanggju") || referrer.includes("cafes/26025763")) {
+      } else if (referrer.includes("cafe.naver.com/momspanggju") || referrer.includes("/cafes/momspanggju") || referrer.includes("cafes/26025763")) {
         onSourceChange("맘카페_광주맘스팡");
-      } else if (referrer.includes("cafe.naver.com/cjasm") || referrer.includes("cafes/15857728")) {
+      } else if (referrer.includes("cafe.naver.com/cjasm") || referrer.includes("/cafes/cjasm") || referrer.includes("cafes/15857728")) {
         onSourceChange("맘카페_충주아사모");
-      } else if (referrer.includes("cafe.naver.com/yul2moms") || referrer.includes("cafes/30142013")) {
+      } else if (referrer.includes("cafe.naver.com/yul2moms") || referrer.includes("/cafes/yul2moms") || referrer.includes("cafes/30142013")) {
         onSourceChange("맘카페_율하맘");
-      } else if (referrer.includes("cafe.naver.com/chbabymom") || referrer.includes("cafes/20364180")) {
+      } else if (referrer.includes("cafe.naver.com/chbabymom") || referrer.includes("/cafes/chbabymom") || referrer.includes("cafes/20364180")) {
         onSourceChange("맘카페_춘천맘");
-      } else if (referrer.includes("cafe.naver.com/ksn82599") || referrer.includes("cafes/29019575")) {
+      } else if (referrer.includes("cafe.naver.com/ksn82599") || referrer.includes("/cafes/ksn82599") || referrer.includes("cafes/29019575")) {
         onSourceChange("맘카페_둔산맘");
-      } else if (referrer.includes("cafe.naver.com/anjungmom") || referrer.includes("cafes/13186768")) {
+      } else if (referrer.includes("cafe.naver.com/anjungmom") || referrer.includes("/cafes/anjungmom") || referrer.includes("cafes/13186768")) {
         onSourceChange("맘카페_평택안포맘");
-      } else if (referrer.includes("cafe.naver.com/tlgmdaka0") || referrer.includes("cafes/24302163")) {
+      } else if (referrer.includes("cafe.naver.com/tlgmdaka0") || referrer.includes("/cafes/tlgmdaka0") || referrer.includes("cafes/24302163")) {
         onSourceChange("맘카페_시맘수");
-      } else if (referrer.includes("cafe.naver.com/naese") || referrer.includes("cafes/11790061")) {
+      } else if (referrer.includes("cafe.naver.com/naese") || referrer.includes("/cafes/naese") || referrer.includes("cafes/11790061")) {
         onSourceChange("맘카페_중리사랑방");
-      } else if (referrer.includes("cafe.naver.com/mygodsend") || referrer.includes("cafes/16565537")) {
+      } else if (referrer.includes("cafe.naver.com/mygodsend") || referrer.includes("/cafes/mygodsend") || referrer.includes("cafes/16565537")) {
         onSourceChange("맘카페_화성남양애");
-      } else if (referrer.includes("cafe.naver.com/cjsam") || referrer.includes("cafes/20479493")) {
+      } else if (referrer.includes("cafe.naver.com/cjsam") || referrer.includes("/cafes/cjsam") || referrer.includes("cafes/20479493")) {
         onSourceChange("맘카페_순광맘");
-      } else if (referrer.includes("cafe.naver.com/seosanmom") || referrer.includes("cafes/10328492")) {
+      } else if (referrer.includes("cafe.naver.com/seosanmom") || referrer.includes("/cafes/seosanmom") || referrer.includes("cafes/10328492")) {
         onSourceChange("맘카페_서산맘");
       } else if (referrer.includes("cafe.naver.com")) {
         onSourceChange("네이버카페_referrer");
