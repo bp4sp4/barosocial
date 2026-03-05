@@ -235,6 +235,45 @@ export default function PrivateCertAdminPage() {
     fetchItems();
   };
 
+  // 학점은행제로 이동
+  const handleMoveToConsultations = async () => {
+    if (!confirm(`선택한 ${selectedIds.length}건을 학점은행제로 이동하시겠습니까?`)) return;
+    const targets = items.filter(i => selectedIds.includes(i.id));
+    try {
+      for (const item of targets) {
+        await fetch('/api/consultations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: item.name,
+            contact: item.contact,
+            education: null,
+            hope_course: item.hope_course,
+            reason: item.reason,
+            click_source: item.click_source,
+            memo: item.memo,
+            counsel_check: item.counsel_check,
+            status: item.status,
+            subject_cost: item.subject_cost,
+            manager: item.manager,
+            residence: item.residence,
+            is_manual_entry: true,
+          }),
+        });
+      }
+      await fetch('/api/private-cert', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selectedIds }),
+      });
+      setSelectedIds([]);
+      fetchItems();
+      alert(`${targets.length}건이 학점은행제로 이동되었습니다.`);
+    } catch {
+      alert('이동에 실패했습니다.');
+    }
+  };
+
   // 메모
   const handleUpdateMemo = async () => {
     if (!selectedItem) return;
@@ -462,19 +501,8 @@ export default function PrivateCertAdminPage() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        {/* 메인 탭 */}
-        <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
-          <Link href="/admin" style={{ padding: '8px 20px', borderRadius: 8, background: '#f2f4f6', color: '#4e5968', fontWeight: 500, textDecoration: 'none', fontSize: 15 }}>
-            학점은행제
-          </Link>
-          <span style={{ padding: '8px 20px', borderRadius: 8, background: '#3182f6', color: '#fff', fontWeight: 700, fontSize: 15 }}>
-            민간자격증
-          </span>
-        </div>
-
-        <div className={styles.titleRow}>
+<div className={styles.titleRow}>
           <h1 className={styles.title}>민간자격증 상담 관리 ({filteredItems.length}건)</h1>
-          <button onClick={handleLogout} className={styles.logoutButton}>로그아웃</button>
         </div>
 
         {/* 필터 */}
@@ -503,6 +531,9 @@ export default function PrivateCertAdminPage() {
           <button onClick={() => setShowAddModal(true)} className={styles.addButton}>추가</button>
           {selectedIds.length === 1 && (
             <button onClick={openEditModal} className={styles.editButton}>수정</button>
+          )}
+          {selectedIds.length > 0 && (
+            <button onClick={handleMoveToConsultations} className={styles.editButton}>학점이동 ({selectedIds.length})</button>
           )}
           {selectedIds.length > 0 && (
             <button onClick={handleBulkDelete} className={styles.deleteButton}>삭제 ({selectedIds.length})</button>
