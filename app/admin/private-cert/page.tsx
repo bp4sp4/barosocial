@@ -7,7 +7,49 @@ import styles from '../admin.module.css';
 import Link from 'next/link';
 import { CAFE_NAMES, KNOWN_CAFE_NAMES, CAFE_CONFIG } from '@/lib/cafe-names';
 
-const COURSE_OPTIONS = ['심리상담사'];
+const CERT_CATEGORIES = [
+  {
+    label: "전체과정",
+    options: [
+      "병원동행매니저1급","노인돌봄생활지원사1급","방과후돌봄교실지도사1급","바리스타1급","타로심리상담사1급",
+      "심리상담사1급","아동요리지도사1급","노인심리상담사1급","다문화심리상담사1급","독서논술지도사1급",
+      "독서지도사1급","동화구연지도사1급","디지털중독예방지도사1급","미술심리상담사1급","미술심리상담사2급",
+      "방과후수학지도사1급","스토리텔링수학지도사1급","방과후아동지도사1급","방과후학교지도사1급",
+      "병원코디네이터1급","부동산권리분석사1급","부모교육상담사1급","북아트1급","산모신생아건강관리사",
+      "산후관리사","손유희지도사1급","스피치지도사1급","실버인지활동지도사1급","심리분석사1급",
+      "아동공예지도자","아동미술심리상담사","아동미술지도사","아동미술심리상담사1급","안전교육지도사",
+      "안전관리사","안전교육지도사1급","영어동화구연지도사","유튜브크리에이터","음악심리상담사",
+      "이미지메이킹스피치","인성지도사1급","인성지도사2급","자기주도학습지도사1급","자기주도학습지도사2급",
+      "자원봉사지도사1급","종이접기지도사","지역아동교육지도사1급","진로적성상담사1급","코딩지도사",
+      "클레이아트지도사","프레젠테이션스피치","학교폭력예방상담사1급","NIE지도사1급","교육마술지도사1급",
+      "POP디자인지도사","SNS마케팅전문가",
+    ],
+  },
+  {
+    label: "실버과정",
+    options: ["생활지원사1급","노인심리상담사1급","병원동행매니저1급","실버인지활동지도사1급","안전교육지도사1급","자원봉사지도사1급"],
+  },
+  {
+    label: "아동과정",
+    options: ["아동미술지도사1급","아동요리지도사1급","손유희지도사1급","종이접기지도사1급","클레이아트지도사1급","북아트1급"],
+  },
+  {
+    label: "방과후과정",
+    options: ["방과후돌봄교실지도사1급","방과후아동지도사1급","영어동화구연지도사1급","코딩지도사1급","독서논술지도사1급","진로적성상담사1급","학교폭력예방상담사1급"],
+  },
+  {
+    label: "심리과정",
+    options: ["심리상담사1급","심리분석사1급","미술심리상담사1급","음악심리상담사1급","부모교육상담사1급","진로적성상담사1급","학교폭력예방상담사1급"],
+  },
+  {
+    label: "커피과정",
+    options: ["바리스타1급"],
+  },
+  {
+    label: "취·창업과정",
+    options: ["타로심리상담사1급","바리스타1급","안전관리사1급","안전교육지도사1급","산모신생아건강관리사1급","산후관리사1급","SNS마케팅전문가1급","유튜브크리에이터1급"],
+  },
+];
 
 type ConsultationStatus = '상담대기' | '상담중' | '보류' | '등록대기' | '등록완료';
 
@@ -111,6 +153,10 @@ export default function PrivateCertAdminPage() {
   const [reasonText, setReasonText] = useState('');
   const [subjectCostText, setSubjectCostText] = useState('');
   const [managerText, setManagerText] = useState('');
+  const [pcManagerDirect, setPcManagerDirect] = useState(false);
+  const [pcManagerModalDirect, setPcManagerModalDirect] = useState(false);
+  const [editingManagerId, setEditingManagerId] = useState<number | null>(null);
+  const [editingManagerValue, setEditingManagerValue] = useState('');
   const [residenceText, setResidenceText] = useState('');
   const [counselCheckText, setCounselCheckText] = useState('');
   const [counselCheckEtcInput, setCounselCheckEtcInput] = useState('');
@@ -120,11 +166,20 @@ export default function PrivateCertAdminPage() {
   const [formData, setFormData] = useState(emptyForm);
   const addCourseRef = useRef<HTMLDivElement>(null);
   const [addCourseOpen, setAddCourseOpen] = useState(false);
+  const [addCourseSearch, setAddCourseSearch] = useState('');
+  // 유입경로 칩 상태
+  const [pcSourceMajor, setPcSourceMajor] = useState('');
+  const [pcSourceMinor, setPcSourceMinor] = useState('');
+  const [pcSourceCustom, setPcSourceCustom] = useState('');
+  const [pcMamcafeTextInput, setPcMamcafeTextInput] = useState('');
+  const [pcMamcafeNewId, setPcMamcafeNewId] = useState('');
+  const [pcMamcafeNewName, setPcMamcafeNewName] = useState('');
+  const [pcMamcafeAdding, setPcMamcafeAdding] = useState(false);
 
   // 인증 확인
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) { fetchItems(); fetchCafes(); }
+      if (user) { fetchItems(true); fetchCafes(); }
       else router.push('/admin/login');
     });
   }, []);
@@ -137,6 +192,67 @@ export default function PrivateCertAdminPage() {
     } catch {}
   };
 
+  // 유입경로 칩 헬퍼
+  const applyPcSource = (major: string, minor: string, custom: string) => {
+    if (!major) { setFormData(p => ({ ...p, click_source: '' })); return; }
+    if (minor && minor !== '직접입력') {
+      setFormData(p => ({ ...p, click_source: `${major}_${minor}` }));
+    } else if (minor === '직접입력' && custom) {
+      setFormData(p => ({ ...p, click_source: `${major}_${custom}` }));
+    } else {
+      setFormData(p => ({ ...p, click_source: major }));
+    }
+  };
+
+  const handlePcMamcafeTextInput = (text: string) => {
+    setPcMamcafeTextInput(text);
+    if (!text.trim()) { setPcSourceMinor(''); applyPcSource('맘카페', '', ''); return; }
+    const matchedCafe = cafes.find(c => c.name === text.trim() || c.id === text.trim());
+    const matchedId = matchedCafe?.id || Object.entries(CAFE_NAMES).find(([, name]) => name === text.trim())?.[0];
+    if (matchedId) {
+      setPcSourceMinor(matchedId);
+      applyPcSource('맘카페', matchedId, '');
+    } else {
+      setPcSourceMinor('확인필요');
+      setFormData(p => ({ ...p, click_source: '맘카페_확인필요' }));
+    }
+  };
+
+  const handleAddPcMamcafe = async () => {
+    const rawId = pcMamcafeNewId.trim();
+    const name = pcMamcafeNewName.trim();
+    if (!rawId || !name) { alert('카페 ID와 이름을 모두 입력해주세요.'); return; }
+    const match = rawId.match(/(?:https?:\/\/)?(?:m\.)?cafe\.naver\.com\/([a-zA-Z0-9_]+)/);
+    const cafeId = match ? match[1] : rawId;
+    setPcMamcafeAdding(true);
+    try {
+      const res = await fetch('/api/channels', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: cafeId, name, type: 'mamcafe' }),
+      });
+      if (!res.ok) { const err = await res.json(); alert(err.error || '추가 실패'); return; }
+      await fetchCafes();
+      setPcSourceMinor(cafeId);
+      setPcMamcafeNewId('');
+      setPcMamcafeNewName('');
+      applyPcSource('맘카페', cafeId, '');
+    } catch {
+      alert('카페 추가에 실패했습니다.');
+    } finally {
+      setPcMamcafeAdding(false);
+    }
+  };
+
+  const resetPcSource = () => {
+    setPcSourceMajor('');
+    setPcSourceMinor('');
+    setPcSourceCustom('');
+    setPcMamcafeTextInput('');
+    setPcMamcafeNewId('');
+    setPcMamcafeNewName('');
+  };
+
   // 드롭다운 외부 클릭 닫기
   useEffect(() => {
     const handle = (e: MouseEvent) => {
@@ -144,7 +260,7 @@ export default function PrivateCertAdminPage() {
       if (filterDropdownRef.current && !filterDropdownRef.current.contains(target) && !target.closest(`.${styles.thFilterBtn}`)) {
         setOpenFilterColumn(null);
       }
-      if (addCourseRef.current && !addCourseRef.current.contains(e.target as Node)) setAddCourseOpen(false);
+      if (addCourseRef.current && !addCourseRef.current.contains(e.target as Node)) { setAddCourseOpen(false); setAddCourseSearch(''); }
     };
     document.addEventListener('mousedown', handle);
     return () => document.removeEventListener('mousedown', handle);
@@ -160,8 +276,8 @@ export default function PrivateCertAdminPage() {
     return () => { document.body.style.overflow = ''; };
   }, [showAddModal, showEditModal]);
 
-  const fetchItems = async () => {
-    setLoading(true);
+  const fetchItems = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       const res = await fetch('/api/private-cert');
       if (!res.ok) throw new Error('Failed');
@@ -170,7 +286,7 @@ export default function PrivateCertAdminPage() {
     } catch {
       setError('데이터를 불러오지 못했습니다.');
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   };
 
@@ -201,6 +317,7 @@ export default function PrivateCertAdminPage() {
       }),
     });
     setFormData(emptyForm);
+    resetPcSource();
     setShowAddModal(false);
     fetchItems();
   };
@@ -221,6 +338,7 @@ export default function PrivateCertAdminPage() {
     setShowEditModal(false);
     setSelectedItem(null);
     setFormData(emptyForm);
+    resetPcSource();
     setSelectedIds([]);
     fetchItems();
   };
@@ -229,6 +347,12 @@ export default function PrivateCertAdminPage() {
     if (selectedIds.length !== 1) return;
     const item = items.find(i => i.id === selectedIds[0]);
     if (!item) return;
+    // 유입경로 칩 상태 복원
+    const { major, minor } = parseClickSource(item.click_source);
+    setPcSourceMajor(major);
+    setPcSourceMinor(minor && !minor.endsWith('(확인필요)') ? minor : '');
+    setPcSourceCustom('');
+    setPcMamcafeTextInput('');
     setSelectedItem(item);
     setFormData({
       name: item.name,
@@ -241,6 +365,8 @@ export default function PrivateCertAdminPage() {
       manager: item.manager || '',
       residence: item.residence || '',
     });
+    const mgr = item.manager || '';
+    setPcManagerDirect(mgr !== '' && !uniqueManagers.includes(mgr));
     setShowEditModal(true);
   };
 
@@ -511,7 +637,7 @@ export default function PrivateCertAdminPage() {
           <div className={styles.formGroup}>
             <label>희망과정</label>
             <div className={styles.tossDropdown} ref={addCourseRef}>
-              <button type="button" className={styles.tossDropdownTrigger} onClick={() => setAddCourseOpen(o => !o)}>
+              <button type="button" className={styles.tossDropdownTrigger} onClick={() => { setAddCourseOpen(o => !o); setAddCourseSearch(''); }}>
                 <span className={formData.hope_course ? '' : styles.tossDropdownPlaceholder}>
                   {formData.hope_course || '선택하세요 (선택사항)'}
                 </span>
@@ -520,25 +646,200 @@ export default function PrivateCertAdminPage() {
                 </svg>
               </button>
               {addCourseOpen && (
-                <div className={styles.tossDropdownMenu}>
+                <div className={styles.tossDropdownMenu} style={{ maxHeight: 320 }}>
+                  <div style={{ padding: '8px 12px', borderBottom: '1px solid #f2f4f6', position: 'sticky', top: 0, background: '#fff', zIndex: 1 }}>
+                    <input
+                      type="text"
+                      autoFocus
+                      value={addCourseSearch}
+                      onChange={e => setAddCourseSearch(e.target.value)}
+                      placeholder="과정 검색..."
+                      onClick={e => e.stopPropagation()}
+                      style={{ width: '100%', padding: '8px 10px', border: '1px solid #e5e8eb', borderRadius: 6, fontSize: 13, outline: 'none', boxSizing: 'border-box' }}
+                    />
+                  </div>
                   <button type="button" className={`${styles.tossDropdownItem} ${!formData.hope_course ? styles.tossDropdownItemActive : ''}`}
-                    onClick={() => { setFormData(p => ({ ...p, hope_course: '' })); setAddCourseOpen(false); }}>
+                    onClick={() => { setFormData(p => ({ ...p, hope_course: '' })); setAddCourseOpen(false); setAddCourseSearch(''); }}>
                     <span>선택 안 함</span>
                   </button>
-                  {COURSE_OPTIONS.map(opt => (
-                    <button type="button" key={opt}
-                      className={`${styles.tossDropdownItem} ${formData.hope_course === opt ? styles.tossDropdownItemActive : ''}`}
-                      onClick={() => { setFormData(p => ({ ...p, hope_course: opt })); setAddCourseOpen(false); }}>
-                      <span>{opt}</span>
-                    </button>
-                  ))}
+                  {addCourseSearch.trim()
+                    ? CERT_CATEGORIES[0].options
+                        .filter(opt => opt.includes(addCourseSearch.trim()))
+                        .map(opt => (
+                          <button type="button" key={opt}
+                            className={`${styles.tossDropdownItem} ${formData.hope_course === opt ? styles.tossDropdownItemActive : ''}`}
+                            onClick={() => { setFormData(p => ({ ...p, hope_course: opt })); setAddCourseOpen(false); setAddCourseSearch(''); }}>
+                            <span>{opt}</span>
+                          </button>
+                        ))
+                    : CERT_CATEGORIES.map(cat => (
+                        <div key={cat.label}>
+                          <div style={{ padding: '6px 12px 2px', fontSize: 11, fontWeight: 700, color: '#8b95a1', letterSpacing: 0.3, background: '#f9fafb' }}>
+                            {cat.label}
+                          </div>
+                          {cat.options.map(opt => (
+                            <button type="button" key={`${cat.label}-${opt}`}
+                              className={`${styles.tossDropdownItem} ${formData.hope_course === opt ? styles.tossDropdownItemActive : ''}`}
+                              onClick={() => { setFormData(p => ({ ...p, hope_course: opt })); setAddCourseOpen(false); setAddCourseSearch(''); }}>
+                              <span>{opt}</span>
+                            </button>
+                          ))}
+                        </div>
+                      ))
+                  }
                 </div>
               )}
             </div>
           </div>
           <div className={styles.formGroup}>
-            <label>유입경로</label>
-            <input type="text" list="pcClickSourceOptions" value={formData.click_source} onChange={e => setFormData(p => ({ ...p, click_source: e.target.value }))} placeholder="예: 인스타_홈피드, 맘카페_cjsam" />
+            <label>유입 경로</label>
+            {/* 대분류 칩 */}
+            <div className={styles.sourceChips}>
+              {['당근', '맘카페', '네이버', '인스타', '유튜브', '카카오', '페이스북', '기타'].map(m => (
+                <button type="button" key={m}
+                  className={`${styles.sourceChip} ${pcSourceMajor === m ? styles.sourceChipSelected : ''}`}
+                  onClick={() => {
+                    const newMajor = pcSourceMajor === m ? '' : m;
+                    setPcSourceMajor(newMajor);
+                    setPcSourceMinor('');
+                    setPcSourceCustom('');
+                    setPcMamcafeTextInput('');
+                    applyPcSource(newMajor, '', '');
+                  }}>{m}</button>
+              ))}
+            </div>
+            {/* 맘카페 서브 */}
+            {pcSourceMajor === '맘카페' && (
+              <div className={styles.sourceSubChips}>
+                {cafes.map(c => (
+                  <button type="button" key={c.id}
+                    className={`${styles.sourceChip} ${pcSourceMinor === c.id ? styles.sourceChipSelected : ''}`}
+                    onClick={() => {
+                      const newMinor = pcSourceMinor === c.id ? '' : c.id;
+                      setPcSourceMinor(newMinor);
+                      setPcSourceCustom('');
+                      setPcMamcafeNewId('');
+                      setPcMamcafeNewName('');
+                      setPcMamcafeTextInput(newMinor ? (c.name.startsWith('http') ? c.id : c.name) : '');
+                      applyPcSource('맘카페', newMinor, '');
+                    }}>{c.name.startsWith('http') ? c.id : c.name}</button>
+                ))}
+                <button type="button"
+                  className={`${styles.sourceChip} ${pcSourceMinor === '직접입력' ? styles.sourceChipSelected : ''}`}
+                  onClick={() => {
+                    setPcSourceMinor(pcSourceMinor === '직접입력' ? '' : '직접입력');
+                    setPcMamcafeNewId('');
+                    setPcMamcafeNewName('');
+                    applyPcSource('맘카페', '', '');
+                  }}>+ 직접 추가</button>
+              </div>
+            )}
+            {pcSourceMajor === '맘카페' && (
+              <div style={{ marginTop: 8 }}>
+                <input
+                  type="text"
+                  style={{ width: '100%', padding: '8px 12px', border: '1px solid #e5e8eb', borderRadius: 8, fontSize: 14, boxSizing: 'border-box' }}
+                  placeholder="활동하고 계신 맘카페를 적어주세요 (제휴여부 확인)"
+                  value={pcMamcafeTextInput}
+                  onChange={e => handlePcMamcafeTextInput(e.target.value)}
+                />
+                {pcMamcafeTextInput && (
+                  <div style={{ fontSize: 12, marginTop: 4, color: pcSourceMinor === '확인필요' ? '#f59e0b' : '#3182f6' }}>
+                    {pcSourceMinor === '확인필요'
+                      ? '⚠ 지정된 제휴 맘카페가 아닙니다 → 확인필요로 분류됩니다'
+                      : `✓ 제휴 맘카페 확인: ${cafes.find(c => c.id === pcSourceMinor)?.name || CAFE_NAMES[pcSourceMinor] || pcSourceMinor}`}
+                  </div>
+                )}
+              </div>
+            )}
+            {pcSourceMajor === '맘카페' && pcSourceMinor === '직접입력' && (
+              <div className={styles.sourceAddForm}>
+                <input type="text" className={styles.sourceAddInput} value={pcMamcafeNewId} placeholder="카페 ID 또는 네이버 카페 URL"
+                  onChange={async e => {
+                    const val = e.target.value;
+                    const urlMatch = val.match(/(?:https?:\/\/)?(?:m\.)?cafe\.naver\.com\/([a-zA-Z0-9_]+)/);
+                    if (urlMatch) {
+                      setPcMamcafeNewId(urlMatch[1]);
+                      try {
+                        const res = await fetch(`/api/cafe-lookup?id=${encodeURIComponent(urlMatch[1])}`);
+                        const data = await res.json();
+                        if (data.name) setPcMamcafeNewName(data.name);
+                      } catch {}
+                    } else {
+                      setPcMamcafeNewId(val);
+                    }
+                  }} />
+                <input type="text" className={styles.sourceAddInput} value={pcMamcafeNewName} placeholder="카페 이름 (예: 순광맘)"
+                  onChange={e => setPcMamcafeNewName(e.target.value)} />
+                <button type="button" className={styles.sourceAddBtn} onClick={handleAddPcMamcafe} disabled={pcMamcafeAdding}>
+                  {pcMamcafeAdding ? '추가 중...' : '카페 추가'}
+                </button>
+              </div>
+            )}
+            {/* 당근 서브 */}
+            {pcSourceMajor === '당근' && (
+              <div className={styles.sourceSubChips}>
+                {['당근채팅', '대표전화(당근)'].map(opt => (
+                  <button type="button" key={opt}
+                    className={`${styles.sourceChip} ${pcSourceMinor === opt ? styles.sourceChipSelected : ''}`}
+                    onClick={() => {
+                      const newMinor = pcSourceMinor === opt ? '' : opt;
+                      setPcSourceMinor(newMinor);
+                      setPcSourceCustom('');
+                      applyPcSource('당근', newMinor, '');
+                    }}>{opt}</button>
+                ))}
+                <button type="button"
+                  className={`${styles.sourceChip} ${pcSourceMinor === '직접입력' ? styles.sourceChipSelected : ''}`}
+                  onClick={() => {
+                    setPcSourceMinor(pcSourceMinor === '직접입력' ? '' : '직접입력');
+                    setPcSourceCustom('');
+                    applyPcSource('당근', '', '');
+                  }}>직접입력</button>
+              </div>
+            )}
+            {pcSourceMajor === '당근' && pcSourceMinor === '직접입력' && (
+              <input type="text" className={styles.sourceCustomInput} value={pcSourceCustom}
+                placeholder="당근 경로 입력 (예: 채팅, 전화 등)"
+                onChange={e => { setPcSourceCustom(e.target.value); applyPcSource('당근', '직접입력', e.target.value); }} />
+            )}
+            {/* 네이버 서브 */}
+            {pcSourceMajor === '네이버' && (
+              <div className={styles.sourceSubChips}>
+                {['카페', '블로그', '검색', '지식인', '쇼핑'].map(opt => (
+                  <button type="button" key={opt}
+                    className={`${styles.sourceChip} ${pcSourceMinor === opt ? styles.sourceChipSelected : ''}`}
+                    onClick={() => {
+                      const newMinor = pcSourceMinor === opt ? '' : opt;
+                      setPcSourceMinor(newMinor);
+                      applyPcSource('네이버', newMinor, '');
+                    }}>{opt}</button>
+                ))}
+              </div>
+            )}
+            {/* 인스타 서브 */}
+            {pcSourceMajor === '인스타' && (
+              <div className={styles.sourceSubChips}>
+                {['홈피드', '릴스', '스토리', '광고', '프로필'].map(opt => (
+                  <button type="button" key={opt}
+                    className={`${styles.sourceChip} ${pcSourceMinor === opt ? styles.sourceChipSelected : ''}`}
+                    onClick={() => {
+                      const newMinor = pcSourceMinor === opt ? '' : opt;
+                      setPcSourceMinor(newMinor);
+                      applyPcSource('인스타', newMinor, '');
+                    }}>{opt}</button>
+                ))}
+              </div>
+            )}
+            {/* 기타 서브 */}
+            {pcSourceMajor === '기타' && (
+              <input type="text" className={styles.sourceCustomInput} value={pcSourceCustom}
+                placeholder="경로를 입력해주세요"
+                onChange={e => { setPcSourceCustom(e.target.value); applyPcSource('기타', '직접입력', e.target.value); }} />
+            )}
+            {formData.click_source && (
+              <span className={styles.sourcePreview}>{formData.click_source}</span>
+            )}
           </div>
           <div className={styles.formGroup}>
             <label>취득사유</label>
@@ -552,7 +853,7 @@ export default function PrivateCertAdminPage() {
           </div>
           <div className={styles.formGroup}>
             <label>담당자</label>
-            <input type="text" list="pcManagerOptions" value={formData.manager} onChange={e => setFormData(p => ({ ...p, manager: e.target.value }))} placeholder="담당자 이름" />
+            <input type="text" value={formData.manager} onChange={e => setFormData(p => ({ ...p, manager: e.target.value }))} placeholder="담당자 이름" />
           </div>
           <div className={styles.formGroup}>
             <label>거주지</label>
@@ -600,7 +901,7 @@ export default function PrivateCertAdminPage() {
 
         {/* 액션 버튼 */}
         <div className={styles.headerActions}>
-          <button onClick={() => setShowAddModal(true)} className={styles.addButton}>추가</button>
+          <button onClick={() => { setShowAddModal(true); setPcManagerDirect(false); }} className={styles.addButton}>추가</button>
           {selectedIds.length === 1 && (
             <button onClick={openEditModal} className={styles.editButton}>수정</button>
           )}
@@ -782,7 +1083,7 @@ export default function PrivateCertAdminPage() {
                   </td>
                   <td>
                     <div className={`${styles.memoCell} ${!item.manager ? styles.empty : ''}`}
-                      onClick={() => { setSelectedItem(item); setManagerText(item.manager || ''); setShowManagerModal(true); }}>
+                      onClick={() => { setSelectedItem(item); const mgr = item.manager || ''; setManagerText(mgr); setPcManagerModalDirect(mgr !== '' && !uniqueManagers.includes(mgr)); setShowManagerModal(true); }}>
                       {item.manager ? highlightText(item.manager, searchText) : '담당자 입력...'}
                     </div>
                   </td>
@@ -900,10 +1201,10 @@ export default function PrivateCertAdminPage() {
       )}
 
       {/* 추가 모달 */}
-      {showAddModal && renderForm(handleAdd, '민간자격증 신청 추가', () => { setShowAddModal(false); setFormData(emptyForm); })}
+      {showAddModal && renderForm(handleAdd, '민간자격증 신청 추가', () => { setShowAddModal(false); setFormData(emptyForm); resetPcSource(); })}
 
       {/* 수정 모달 */}
-      {showEditModal && renderForm(handleEdit, '민간자격증 신청 수정', () => { setShowEditModal(false); setFormData(emptyForm); setSelectedItem(null); })}
+      {showEditModal && renderForm(handleEdit, '민간자격증 신청 수정', () => { setShowEditModal(false); setFormData(emptyForm); resetPcSource(); setSelectedItem(null); })}
 
       {/* 메모 모달 */}
       {showMemoModal && (
@@ -1002,7 +1303,15 @@ export default function PrivateCertAdminPage() {
               </div>
             )}
             <label className={styles.fieldLabel}>담당자</label>
-            <input type="text" list="pcManagerOptions" className={styles.inputField} value={managerText} onChange={e => setManagerText(e.target.value)} placeholder="담당자 이름" />
+            <input
+              type="text"
+              autoFocus
+              className={styles.inputField}
+              value={managerText}
+              onChange={e => setManagerText(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter') handleUpdateManager(); }}
+              placeholder="담당자 이름을 입력하세요"
+            />
             <div className={styles.modalActions}>
               <button onClick={handleUpdateManager} className={styles.submitButton}>저장</button>
               <button onClick={() => setShowManagerModal(false)} className={styles.cancelButton}>취소</button>

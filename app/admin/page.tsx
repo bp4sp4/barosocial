@@ -96,6 +96,10 @@ export default function AdminPage() {
   const [memoText, setMemoText] = useState('');
   const [subjectCostText, setSubjectCostText] = useState('');
   const [managerText, setManagerText] = useState('');
+  const [managerDirect, setManagerDirect] = useState(false);
+  const [managerModalDirect, setManagerModalDirect] = useState(false);
+  const [editingManagerId, setEditingManagerId] = useState<number | null>(null);
+  const [editingManagerValue, setEditingManagerValue] = useState('');
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -253,7 +257,7 @@ export default function AdminPage() {
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
-      fetchConsultations();
+      fetchConsultations(true);
     } else {
       router.push('/admin/login');
     }
@@ -345,8 +349,8 @@ export default function AdminPage() {
   };
 
   // 상담 신청 목록 가져오기
-  const fetchConsultations = async () => {
-    setLoading(true);
+  const fetchConsultations = async (isInitial = false) => {
+    if (isInitial) setLoading(true);
     try {
       const { data, error } = await supabase
         .from('consultations')
@@ -365,7 +369,7 @@ export default function AdminPage() {
     } catch (error: any) {
       setError(error.message || '데이터를 불러오는데 실패했습니다.');
     } finally {
-      setLoading(false);
+      if (isInitial) setLoading(false);
     }
   };
 
@@ -618,7 +622,9 @@ export default function AdminPage() {
   // 담당자 모달 열기/닫기
   const openManagerModal = (consultation: Consultation) => {
     setSelectedConsultation(consultation);
-    setManagerText(consultation.manager || '');
+    const mgr = consultation.manager || '';
+    setManagerText(mgr);
+    setManagerModalDirect(mgr !== '' && !uniqueManagers.includes(mgr));
     setShowManagerModal(true);
   };
 
@@ -649,6 +655,22 @@ export default function AdminPage() {
       closeManagerModal();
       fetchConsultations();
     } catch (error) {
+      alert('담당자 저장에 실패했습니다.');
+    }
+  };
+
+  // 담당자 인라인 저장
+  const handleInlineManagerSave = async (id: number, value: string) => {
+    setEditingManagerId(null);
+    try {
+      const response = await fetch('/api/consultations', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, manager: value.trim() || null }),
+      });
+      if (!response.ok) throw new Error();
+      fetchConsultations();
+    } catch {
       alert('담당자 저장에 실패했습니다.');
     }
   };
@@ -765,6 +787,9 @@ export default function AdminPage() {
       // 희망과정 직접입력 모드 초기화
       const hopeCourse = consultation.hope_course || '';
       setAddCourseDirectMode(hopeCourse !== '' && !ADMIN_COURSE_OPTIONS.includes(hopeCourse));
+      // 담당자 직접입력 모드 초기화
+      const mgr = consultation.manager || '';
+      setManagerDirect(mgr !== '' && !uniqueManagers.includes(mgr));
       setShowEditModal(true);
     }
   };
@@ -1214,7 +1239,7 @@ export default function AdminPage() {
           )}
         </div>
         <div className={styles.headerActions}>
-          <button onClick={() => setShowAddModal(true)} className={styles.addButton}>추가</button>
+          <button onClick={() => { setShowAddModal(true); setManagerDirect(false); }} className={styles.addButton}>추가</button>
           {selectedIds.length === 1 && (
             <button onClick={openEditModal} className={styles.editButton}>수정</button>
           )}
@@ -1611,7 +1636,7 @@ export default function AdminPage() {
                       </div>
                     </td>
                     <td>
-                      <div 
+                      <div
                         className={`${styles.memoCell} ${!consultation.manager ? styles.empty : ''}`}
                         onClick={() => openManagerModal(consultation)}
                       >
@@ -1990,7 +2015,6 @@ export default function AdminPage() {
                 <label>담당자</label>
                 <input
                   type="text"
-                  list="managerOptions"
                   value={formData.manager}
                   onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
                   placeholder="담당자 이름 (선택사항)"
@@ -2279,13 +2303,25 @@ export default function AdminPage() {
               </div>
               <div className={styles.formGroup}>
                 <label>담당자</label>
-                <input
-                  type="text"
-                  list="managerOptions"
-                  value={formData.manager}
-                  onChange={(e) => setFormData({ ...formData, manager: e.target.value })}
-                  placeholder="담당자 이름 (선택사항)"
-                />
+                <div className={styles.sourceChips}>
+                  {uniqueManagers.map(m => (
+                    <button type="button" key={m}
+                      className={`${styles.sourceChip} ${formData.manager === m && !managerDirect ? styles.sourceChipSelected : ''}`}
+                      onClick={() => { setFormData(p => ({ ...p, manager: m })); setManagerDirect(false); }}>
+                      {m}
+                    </button>
+                  ))}
+                  <button type="button"
+                    className={`${styles.sourceChip} ${managerDirect ? styles.sourceChipSelected : ''}`}
+                    onClick={() => { setManagerDirect(true); setFormData(p => ({ ...p, manager: '' })); }}>
+                    직접입력
+                  </button>
+                </div>
+                {managerDirect && (
+                  <input type="text" style={{ marginTop: 8 }} value={formData.manager}
+                    onChange={e => setFormData(p => ({ ...p, manager: e.target.value }))}
+                    placeholder="담당자 이름을 입력하세요" autoFocus />
+                )}
               </div>
               <div className={styles.formGroup}>
                 <label>거주지</label>
@@ -2542,10 +2578,11 @@ export default function AdminPage() {
               <label>담당자</label>
               <input
                 type="text"
-                list="managerOptions"
+                autoFocus
                 value={managerText}
-                onChange={(e) => setManagerText(e.target.value)}
-                placeholder="담당자 이름을 입력하세요..."
+                onChange={e => setManagerText(e.target.value)}
+                onKeyDown={e => { if (e.key === 'Enter') handleUpdateManager(); }}
+                placeholder="담당자 이름을 입력하세요"
               />
             </div>
             <div className={styles.modalActions}>
