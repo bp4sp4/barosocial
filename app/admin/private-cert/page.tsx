@@ -1298,10 +1298,23 @@ export default function PrivateCertAdminPage() {
                 <p><strong>연락처:</strong> {selectedItem.contact}</p>
               </div>
             )}
-            <label className={styles.fieldLabel}>담당자</label>
+            {uniqueManagers.length > 0 && (
+              <div className={styles.counselCheckOptions}>
+                {uniqueManagers.map(m => (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`${styles.counselCheckOption} ${managerText === m ? styles.counselCheckOptionActive : ''}`}
+                    onClick={() => setManagerText(managerText === m ? '' : m)}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            )}
+            <label className={styles.fieldLabel}>직접 입력</label>
             <input
               type="text"
-              autoFocus
               className={styles.inputField}
               value={managerText}
               onChange={e => setManagerText(e.target.value)}

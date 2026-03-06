@@ -2561,11 +2561,24 @@ export default function AdminPage() {
               <p><strong>이름:</strong> {selectedConsultation.name}</p>
               <p><strong>연락처:</strong> {selectedConsultation.contact}</p>
             </div>
+            {uniqueManagers.length > 0 && (
+              <div className={styles.counselCheckOptions}>
+                {uniqueManagers.map(m => (
+                  <button
+                    key={m}
+                    type="button"
+                    className={`${styles.counselCheckOption} ${managerText === m ? styles.counselCheckOptionActive : ''}`}
+                    onClick={() => setManagerText(managerText === m ? '' : m)}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className={styles.formGroup}>
-              <label>담당자</label>
+              <label>직접 입력</label>
               <input
                 type="text"
-                autoFocus
                 value={managerText}
                 onChange={e => setManagerText(e.target.value)}
                 onKeyDown={e => { if (e.key === 'Enter') handleUpdateManager(); }}
