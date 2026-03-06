@@ -16,7 +16,11 @@ export const CAFE_NAMES: Record<string, string> = {
   tlgmdaka0: '시맘수',
   babylovecafe: '베이비러브',
   naese: '중리사랑방',
+  andongmom: '안동맘',
 };
+
+// 알려진 카페 한글명 집합 (사용자가 직접 입력한 값 검증용)
+export const KNOWN_CAFE_NAMES = new Set(Object.values(CAFE_NAMES));
 
 export function resolveCafeName(cafeId: string): string {
   return CAFE_NAMES[cafeId] || cafeId;
@@ -30,6 +34,12 @@ export function formatClickSource(clickSource: string | null): string {
   if (idx === -1) return stripped;
   const major = stripped.slice(0, idx);
   const rawMinor = stripped.slice(idx + 1);
-  const minor = resolveCafeName(rawMinor);
-  return `${major} > ${minor}`;
+  const resolvedMinor = resolveCafeName(rawMinor);
+
+  // 맘카페 유입인데 알려진 카페 ID/이름과 다르면 확인필요 표시
+  if (major === '맘카페' && !CAFE_NAMES[rawMinor] && !KNOWN_CAFE_NAMES.has(rawMinor)) {
+    return `${major} > ${resolvedMinor}(확인필요)`;
+  }
+
+  return `${major} > ${resolvedMinor}`;
 }

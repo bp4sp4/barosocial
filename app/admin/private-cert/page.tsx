@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import styles from '../admin.module.css';
 import Link from 'next/link';
+import { CAFE_NAMES, KNOWN_CAFE_NAMES } from '@/lib/cafe-names';
 
 const COURSE_OPTIONS = ['심리상담사'];
 
@@ -60,7 +61,14 @@ function parseClickSource(source: string | null) {
   const stripped = source.startsWith('바로폼_') ? source.slice(4) : source;
   const idx = stripped.indexOf('_');
   if (idx === -1) return { major: stripped, minor: '' };
-  return { major: stripped.slice(0, idx), minor: stripped.slice(idx + 1) };
+  const major = stripped.slice(0, idx);
+  const rawMinor = stripped.slice(idx + 1);
+  // 맘카페 유입인데 알려진 카페 ID/이름과 다르면 확인필요 표시
+  const minor =
+    major === '맘카페' && !CAFE_NAMES[rawMinor] && !KNOWN_CAFE_NAMES.has(rawMinor)
+      ? `${rawMinor}(확인필요)`
+      : (CAFE_NAMES[rawMinor] || rawMinor);
+  return { major, minor };
 }
 
 export default function PrivateCertAdminPage() {
