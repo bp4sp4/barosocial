@@ -340,7 +340,9 @@ export default function PrivateCertAdminPage() {
     if (majorCategoryFilter !== 'all') {
       if (parseClickSource(item.click_source).major !== majorCategoryFilter) return false;
     }
-    if (minorCategoryFilter !== 'all') {
+    if (minorCategoryFilter === '__needs_check__') {
+      if (!parseClickSource(item.click_source).minor.includes('(확인필요)')) return false;
+    } else if (minorCategoryFilter !== 'all') {
       if (parseClickSource(item.click_source).minor !== minorCategoryFilter) return false;
     }
     if (startDate || endDate) {
@@ -354,6 +356,8 @@ export default function PrivateCertAdminPage() {
   const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
   const paginatedItems = filteredItems.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
   const uniqueManagers = Array.from(new Set(items.map(i => i.manager).filter(Boolean))) as string[];
+  const needsCheckCount = items.filter(i => parseClickSource(i.click_source).minor.includes('(확인필요)')).length;
+
 
   // 등록률 통계
   const calcRegRate = (list: PrivateCert[]) => {
@@ -385,7 +389,7 @@ export default function PrivateCertAdminPage() {
       items
         .filter(i => majorCategoryFilter === 'all' || parseClickSource(i.click_source).major === majorCategoryFilter)
         .map(i => parseClickSource(i.click_source).minor)
-        .filter(Boolean)
+        .filter(v => Boolean(v) && !v.includes('(확인필요)'))
     )
   ).sort() as string[];
 
@@ -797,11 +801,12 @@ export default function PrivateCertAdminPage() {
           )}
           {openFilterColumn === 'minor' && (
             <div className={styles.thFilterSection}>
-              {['all', ...uniqueMinorCategories].map(cat => (
+              {['all', '__needs_check__', ...uniqueMinorCategories].map(cat => (
                 <div key={cat}
                   className={`${styles.thFilterItem} ${minorCategoryFilter === cat ? styles.thFilterItemSelected : ''}`}
+                  style={cat === '__needs_check__' ? { color: '#ef4444', fontWeight: 600 } : {}}
                   onClick={() => { setMinorCategoryFilter(cat); setCurrentPage(1); setOpenFilterColumn(null); }}>
-                  {cat === 'all' ? '전체' : cat}
+                  {cat === 'all' ? '전체' : cat === '__needs_check__' ? `확인필요 (${needsCheckCount})` : cat}
                 </div>
               ))}
             </div>
