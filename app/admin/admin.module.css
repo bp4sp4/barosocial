@@ -352,13 +352,15 @@
   background: white;
   border-radius: 16px;
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.04);
-  overflow: hidden;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   min-width: 1200px;
+  table-layout: fixed;
 }
 
 .table thead {
@@ -398,9 +400,12 @@
 }
 
 .checkboxCell {
-  width: 40px;
+  width: 60px !important;
+  min-width: 60px !important;
   text-align: center;
+  vertical-align: middle;
 }
+
 
 .checkboxCell input[type="checkbox"] {
   width: 18px;
@@ -654,6 +659,160 @@
 .memoCell:hover {
   background: #f2f4f6;
   color: #191f28;
+}
+
+/* 확인필요 스타일 */
+.needsCheck {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+/* 중분류 셀 - 두 케이스 모두 동일한 레이아웃 */
+.minorCell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  font-size: 14px;
+  color: #191f28;
+  font-weight: 500;
+  min-height: 53px;
+}
+
+.minorCellEditable {
+  cursor: pointer;
+  gap: 4px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background 0.2s;
+  padding: 6px 10px;
+}
+
+.minorCellEditable:hover {
+  background: #f2f4f6;
+}
+
+.minorCellEmpty {
+  color: #8b95a1;
+  font-weight: 400;
+}
+
+.minorCellEmpty:hover {
+  color: #6b7684;
+  background: #f2f4f6;
+}
+
+.minorCellText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+/* 맘카페 검색박스 */
+.cafeSearchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1.5px solid #e5e8eb;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.cafeSearchBox:focus-within {
+  border-color: #3182f6;
+}
+
+.cafeSearchInput {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: #191f28;
+  background: transparent;
+}
+
+.cafeSearchInput::placeholder {
+  color: #b0b8c1;
+}
+
+.cafeSearchClear {
+  border: none;
+  background: none;
+  color: #b0b8c1;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 4px;
+  line-height: 1;
+}
+
+.cafeSearchClear:hover {
+  color: #6b7684;
+  background: #f2f4f6;
+}
+
+/* 맘카페 리스트 */
+.cafeList {
+  max-height: 280px;
+  overflow-y: auto;
+  border: 1px solid #e5e8eb;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+.cafeListItem {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  border-bottom: 1px solid #f2f4f6;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+  gap: 8px;
+  transition: background 0.1s;
+}
+
+.cafeListItem:last-child {
+  border-bottom: none;
+}
+
+.cafeListItem:hover {
+  background: #f7f8fa;
+}
+
+.cafeListItemSelected {
+  background: #eff6ff !important;
+}
+
+.cafeListName {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 500;
+  color: #191f28;
+}
+
+.cafeListItemSelected .cafeListName {
+  color: #3182f6;
+  font-weight: 600;
+}
+
+.cafeListId {
+  font-size: 11px;
+  color: #b0b8c1;
+  font-family: monospace;
+}
+
+.cafeListEmpty {
+  padding: 20px;
+  text-align: center;
+  color: #b0b8c1;
+  font-size: 13px;
 }
 
 /* 빈 값 표시 스타일 */

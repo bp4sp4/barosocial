@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import styles from '../admin.module.css';
 import Link from 'next/link';
-import { CAFE_NAMES, KNOWN_CAFE_NAMES } from '@/lib/cafe-names';
+import { CAFE_NAMES, KNOWN_CAFE_NAMES, CAFE_CONFIG } from '@/lib/cafe-names';
 
 const COURSE_OPTIONS = ['심리상담사'];
 
@@ -99,6 +99,10 @@ export default function PrivateCertAdminPage() {
   const [showReasonModal, setShowReasonModal] = useState(false);
   const [showSubjectCostModal, setShowSubjectCostModal] = useState(false);
   const [showManagerModal, setShowManagerModal] = useState(false);
+  const [showClickSourceModal, setShowClickSourceModal] = useState(false);
+  const [clickSourceSearch, setClickSourceSearch] = useState('');
+  const [cafes, setCafes] = useState<{ id: string; name: string; type: string }[]>([]);
+  const [copiedContactId, setCopiedContactId] = useState<number | null>(null);
   const [showResidenceModal, setShowResidenceModal] = useState(false);
   const [showCounselCheckModal, setShowCounselCheckModal] = useState(false);
 
@@ -120,10 +124,18 @@ export default function PrivateCertAdminPage() {
   // 인증 확인
   useEffect(() => {
     supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) fetchItems();
+      if (user) { fetchItems(); fetchCafes(); }
       else router.push('/admin/login');
     });
   }, []);
+
+  const fetchCafes = async () => {
+    try {
+      const res = await fetch('/api/channels?type=mamcafe');
+      const data = await res.json();
+      if (Array.isArray(data)) setCafes(data);
+    } catch {}
+  };
 
   // 드롭다운 외부 클릭 닫기
   useEffect(() => {
@@ -306,6 +318,35 @@ export default function PrivateCertAdminPage() {
     if (!selectedItem) return;
     await fetch('/api/private-cert', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: selectedItem.id, manager: managerText || null }) });
     setShowManagerModal(false); setSelectedItem(null); setManagerText(''); fetchItems();
+  };
+
+  // 맘카페 click_source 모달
+  const openClickSourceModal = (item: PrivateCert) => {
+    setSelectedItem(item);
+    setClickSourceSearch('');
+    setShowClickSourceModal(true);
+  };
+
+  const closeClickSourceModal = () => {
+    setShowClickSourceModal(false);
+    setSelectedItem(null);
+    setClickSourceSearch('');
+  };
+
+  const handleUpdateClickSource = async (cafeId: string) => {
+    if (!selectedItem) return;
+    try {
+      const response = await fetch('/api/private-cert', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: selectedItem.id, click_source: `맘카페_${cafeId}` }),
+      });
+      if (!response.ok) throw new Error('저장 실패');
+      closeClickSourceModal();
+      fetchItems();
+    } catch {
+      alert('저장에 실패했습니다.');
+    }
   };
   // 거주지
   const handleUpdateResidence = async () => {
@@ -512,7 +553,7 @@ export default function PrivateCertAdminPage() {
           </div>
           <div className={styles.formGroup}>
             <label>유입경로</label>
-            <input type="text" value={formData.click_source} onChange={e => setFormData(p => ({ ...p, click_source: e.target.value }))} placeholder="예: 인스타_홈피드" />
+            <input type="text" list="pcClickSourceOptions" value={formData.click_source} onChange={e => setFormData(p => ({ ...p, click_source: e.target.value }))} placeholder="예: 인스타_홈피드, 맘카페_cjsam" />
           </div>
           <div className={styles.formGroup}>
             <label>취득사유</label>
@@ -526,7 +567,7 @@ export default function PrivateCertAdminPage() {
           </div>
           <div className={styles.formGroup}>
             <label>담당자</label>
-            <input type="text" value={formData.manager} onChange={e => setFormData(p => ({ ...p, manager: e.target.value }))} placeholder="담당자 이름" />
+            <input type="text" list="pcManagerOptions" value={formData.manager} onChange={e => setFormData(p => ({ ...p, manager: e.target.value }))} placeholder="담당자 이름" />
           </div>
           <div className={styles.formGroup}>
             <label>거주지</label>
@@ -700,9 +741,40 @@ export default function PrivateCertAdminPage() {
                     <input type="checkbox" checked={selectedIds.includes(item.id)} onChange={() => toggleSelect(item.id)} />
                   </td>
                   <td>{parseClickSource(item.click_source).major || '-'}</td>
-                  <td>{parseClickSource(item.click_source).minor || '-'}</td>
+                  <td style={{ padding: 0 }}>
+                    {parseClickSource(item.click_source).major === '맘카페' ? (
+                      <div
+                        className={`${styles.minorCell} ${styles.minorCellEditable} ${!parseClickSource(item.click_source).minor ? styles.minorCellEmpty : ''} ${parseClickSource(item.click_source).minor.includes('(확인필요)') ? styles.needsCheck : ''}`}
+                        onClick={() => openClickSourceModal(item)}
+                        title="클릭하여 카페 수정"
+                      >
+                        <span className={styles.minorCellText}>
+                          {parseClickSource(item.click_source).minor || '카페 선택...'}
+                        </span>
+                      </div>
+                    ) : (
+                      <div
+                        className={styles.minorCell}
+                        style={parseClickSource(item.click_source).minor.includes('(확인필요)') ? { color: '#ef4444', fontWeight: 600 } : {}}
+                      >
+                        {parseClickSource(item.click_source).minor || '-'}
+                      </div>
+                    )}
+                  </td>
                   <td>{highlightText(item.name, searchText)}</td>
-                  <td>{item.contact}</td>
+                  <td
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => {
+                      navigator.clipboard.writeText(item.contact.replace(/-/g, ''));
+                      setCopiedContactId(-(item.id));
+                      setTimeout(() => setCopiedContactId(null), 1500);
+                    }}
+                    title="클릭하여 복사"
+                  >
+                    {copiedContactId === -(item.id)
+                      ? <span style={{ color: '#3182f6', fontWeight: 600 }}>복사됨!</span>
+                      : item.contact}
+                  </td>
                   <td>{item.hope_course || '-'}</td>
                   <td>
                     <div className={`${styles.memoCell} ${!item.reason ? styles.empty : ''}`}
@@ -939,7 +1011,7 @@ export default function PrivateCertAdminPage() {
               </div>
             )}
             <label className={styles.fieldLabel}>담당자</label>
-            <input type="text" className={styles.inputField} value={managerText} onChange={e => setManagerText(e.target.value)} placeholder="담당자 이름" />
+            <input type="text" list="pcManagerOptions" className={styles.inputField} value={managerText} onChange={e => setManagerText(e.target.value)} placeholder="담당자 이름" />
             <div className={styles.modalActions}>
               <button onClick={handleUpdateManager} className={styles.submitButton}>저장</button>
               <button onClick={() => setShowManagerModal(false)} className={styles.cancelButton}>취소</button>
@@ -1011,6 +1083,82 @@ export default function PrivateCertAdminPage() {
           </div>
         </div>
       )}
+
+      {/* 맘카페 click_source 편집 모달 */}
+      {showClickSourceModal && selectedItem && (
+        <div className={styles.modalOverlay} onClick={closeClickSourceModal}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.modalTitle}>맘카페 수정</h2>
+            <div className={styles.memoInfo}>
+              <p><strong>{selectedItem.name}</strong> · 현재: <span style={{ color: '#3182f6' }}>{parseClickSource(selectedItem.click_source).minor || '미선택'}</span></p>
+            </div>
+            {/* 검색 */}
+            <div className={styles.cafeSearchBox}>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                <circle cx="6.5" cy="6.5" r="5" stroke="#8b95a1" strokeWidth="1.5"/>
+                <path d="M10 10l3 3" stroke="#8b95a1" strokeWidth="1.5" strokeLinecap="round"/>
+              </svg>
+              <input
+                type="text"
+                value={clickSourceSearch}
+                onChange={(e) => setClickSourceSearch(e.target.value)}
+                placeholder="카페 이름 검색..."
+                autoFocus
+                className={styles.cafeSearchInput}
+              />
+              {clickSourceSearch && (
+                <button type="button" onClick={() => setClickSourceSearch('')} className={styles.cafeSearchClear}>✕</button>
+              )}
+            </div>
+            {/* 리스트 */}
+            <div className={styles.cafeList}>
+              {(() => {
+                const currentCafeId = selectedItem.click_source?.replace('맘카페_', '');
+                const filtered = CAFE_CONFIG.filter(c =>
+                  !clickSourceSearch ||
+                  c.name.includes(clickSourceSearch) ||
+                  c.id.includes(clickSourceSearch)
+                );
+                if (filtered.length === 0) return (
+                  <div className={styles.cafeListEmpty}>검색 결과가 없습니다</div>
+                );
+                return filtered.map(cafe => {
+                  const isSelected = currentCafeId === cafe.id;
+                  return (
+                    <button
+                      key={cafe.id}
+                      type="button"
+                      onClick={() => handleUpdateClickSource(cafe.id)}
+                      className={`${styles.cafeListItem} ${isSelected ? styles.cafeListItemSelected : ''}`}
+                    >
+                      <span className={styles.cafeListName}>{cafe.name}</span>
+                      <span className={styles.cafeListId}>{cafe.id}</span>
+                      {isSelected && (
+                        <svg width="14" height="10" viewBox="0 0 14 10" fill="none" style={{ flexShrink: 0 }}>
+                          <path d="M1 5l4 4 8-8" stroke="#3182f6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      )}
+                    </button>
+                  );
+                });
+              })()}
+            </div>
+            <div className={styles.modalActions}>
+              <button onClick={closeClickSourceModal} className={styles.cancelButton}>닫기</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 담당자 datalist */}
+      <datalist id="pcManagerOptions">
+        {uniqueManagers.map(m => <option key={m} value={m} />)}
+      </datalist>
+
+      {/* 맘카페 click_source datalist */}
+      <datalist id="pcClickSourceOptions">
+        {CAFE_CONFIG.map(c => <option key={c.id} value={`맘카페_${c.id}`} label={`맘카페 > ${c.name}`} />)}
+      </datalist>
     </div>
   );
 }
