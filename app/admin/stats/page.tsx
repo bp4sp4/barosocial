@@ -598,7 +598,7 @@ export default function StatsPage() {
                         data={courseData}
                         layout="vertical"
                         margin={{ top: 4, right: 32, bottom: 0, left: 72 }}
-                        onClick={(e) => { if (e?.activeLabel) setSelectedCourse(e.activeLabel); }}
+                        onClick={(e) => { if (e?.activeLabel) setSelectedCourse(String(e.activeLabel)); }}
                         style={{ cursor: 'pointer' }}
                       >
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
