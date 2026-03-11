@@ -39,9 +39,9 @@ export default function AdminLayoutClient({
             민간자격증
           </Link>
           <Link href="/admin/stats" style={{
-            padding: '6px 18px', borderRadius: 8, fontSize: 14, fontWeight: pathname === '/admin/private-cert' ? 700 : 500,
-            background: pathname === '/admin/private-cert' ? '#3182f6' : '#f2f4f6',
-            color: pathname === '/admin/private-cert' ? '#fff' : '#4e5968',
+            padding: '6px 18px', borderRadius: 8, fontSize: 14, fontWeight: pathname === '/admin/stats' ? 700 : 500,
+            background: pathname === '/admin/stats' ? '#3182f6' : '#f2f4f6',
+            color: pathname === '/admin/stats' ? '#fff' : '#4e5968',
             textDecoration: 'none',
           }}>
             통계

@@ -177,13 +177,29 @@ export default function StatsPage() {
     name: s, value: data.filter(c => c.status === s).length, fill: STATUS_COLORS[s],
   }));
 
-  // ── 월별 6개월
-  const monthlyData = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(now); d.setDate(1); d.setMonth(d.getMonth() - (5 - i));
-    const key = ym(d);
-    const list = data.filter(c => c.created_at.slice(0, 7) === key);
-    return { month: key.slice(5) + '월', 신규: list.length, 등록: list.filter(c => c.status === '등록완료').length };
-  });
+  // ── 월별 (데이터 시작 월 ~ 현재, 최대 6개월)
+  const monthlyData = (() => {
+    const sixAgo = new Date(now); sixAgo.setDate(1); sixAgo.setMonth(sixAgo.getMonth() - 5);
+    const sixAgoYm = ym(sixAgo);
+    let startYm: string;
+    if (data.length > 0) {
+      const earliest = data.reduce((min, c) => c.created_at < min ? c.created_at : min, data[0].created_at);
+      const earliestYm = earliest.slice(0, 7);
+      startYm = earliestYm > sixAgoYm ? earliestYm : sixAgoYm;
+    } else {
+      startYm = thisMonthKey;
+    }
+    const months: { month: string; 신규: number; 등록: number }[] = [];
+    const cur = new Date(startYm + '-01T00:00:00');
+    while (ym(cur) <= thisMonthKey) {
+      const key = ym(cur);
+      const list = data.filter(c => c.created_at.slice(0, 7) === key);
+      months.push({ month: key.slice(5) + '월', 신규: list.length, 등록: list.filter(c => c.status === '등록완료').length });
+      cur.setMonth(cur.getMonth() + 1);
+    }
+    return months;
+  })();
+  const monthlySub = monthlyData.length >= 6 ? '최근 6개월' : monthlyData.length > 1 ? `최근 ${monthlyData.length}개월` : '이번달';
 
   // ── 일별 30일
   const dailyData = Array.from({ length: 30 }, (_, i) => {
@@ -333,7 +349,7 @@ export default function StatsPage() {
               <Card label="상담 대기중" value={waiting} sub="미처리 건수" color={waiting > 20 ? '#f04452' : '#f59e0b'} />
             </div>
 
-            <Panel title="월별 신규 신청 vs 등록완료" sub="최근 6개월" style={{ marginBottom: 16 }}>
+            <Panel title="월별 신규 신청 vs 등록완료" sub={monthlySub} style={{ marginBottom: 16 }}>
               <ResponsiveContainer width="100%" height={220}>
                 <ComposedChart data={monthlyData} margin={{ top: 4, right: 16, bottom: 0, left: -16 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
@@ -528,7 +544,7 @@ export default function StatsPage() {
                     <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} allowDecimals={false} />
                     <Tooltip content={<Tip />} />
                     <Bar dataKey="count" radius={[4, 4, 0, 0]} barSize={28} name="건수">
-                      {weekData.map((d, i) => <Cell key={i} fill={i === 0 || i === 6 ? '#fca5a5' : '#bfdbfe'} />)}
+                      {(() => { const maxCount = Math.max(...weekData.map(d => d.count)); return weekData.map((d, i) => <Cell key={i} fill={d.count === maxCount && maxCount > 0 ? '#3b82f6' : i === 0 || i === 6 ? '#fca5a5' : '#bfdbfe'} />); })()}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
