@@ -213,7 +213,8 @@ export default function StatsPage() {
     hour: String(h).padStart(2, '0'),
     count: data.filter(c => toKST(c.created_at).getHours() === h).length,
   }));
-  const peak = hourData.reduce((a, b) => b.count > a.count ? b : a, hourData[0]);
+  const peakCount = Math.max(...hourData.map(d => d.count));
+  const peaks = hourData.filter(d => d.count === peakCount);
 
   // ── 요일
   const weekData = WEEKDAY.map((day, i) => ({
@@ -500,7 +501,7 @@ export default function StatsPage() {
         {tab === 'time' && (
           <div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 16 }}>
-              <Card label="피크 시간대" value={`${peak.hour}시`} sub={`${peak.count}건 접수`} color="#3b82f6" />
+              <Card label="피크 시간대" value={peaks.map(p => `${p.hour}시`).join(', ')} sub={`${peakCount}건 접수`} color="#3b82f6" />
               <Card label="평일 평균" value={
                 Math.round(weekData.filter((_, i) => i >= 1 && i <= 5).reduce((a, b) => a + b.count, 0) / 5)
               } sub="월~금 하루 평균" color="#22c55e" />
@@ -518,7 +519,7 @@ export default function StatsPage() {
                     <YAxis tick={{ fontSize: 10, fill: '#94a3b8' }} tickLine={false} axisLine={false} allowDecimals={false} />
                     <Tooltip content={<Tip />} />
                     <Bar dataKey="count" radius={[3, 3, 0, 0]} barSize={13} name="건수">
-                      {hourData.map((d, i) => <Cell key={i} fill={d.hour === peak.hour ? '#3b82f6' : '#dbeafe'} />)}
+                      {hourData.map((d, i) => <Cell key={i} fill={peaks.some(p => p.hour === d.hour) ? '#3b82f6' : '#dbeafe'} />)}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
