@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-13T02:50:29.331Z",
+  "lastUpdated": "2026-03-13T07:25:12.156Z",
   "activeFeatures": [
     "korhrdsocial",
     "admin",
@@ -11,7 +11,9 @@
     "channels",
     "private-cert",
     "stats",
-    "credit-bank"
+    "credit-bank",
+    "bulk",
+    "agency"
   ],
   "primaryFeature": "korhrdsocial",
   "features": {
@@ -37,9 +39,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-25T07:35:55.325Z",
-        "lastUpdated": "2026-03-13T02:11:26.388Z"
+        "lastUpdated": "2026-03-13T07:23:04.990Z"
       },
-      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/AdminLayoutClient.tsx"
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/page.tsx"
     },
     "consultations": {
       "phase": "do",
@@ -141,9 +143,35 @@
       "documents": {},
       "timestamps": {
         "started": "2026-03-13T02:11:19.528Z",
-        "lastUpdated": "2026-03-13T02:50:29.331Z"
+        "lastUpdated": "2026-03-13T05:09:57.098Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/credit-bank/page.tsx"
+    },
+    "bulk": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-13T05:09:35.950Z",
+        "lastUpdated": "2026-03-13T05:13:07.010Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/api/private-cert/bulk/route.ts"
+    },
+    "agency": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-03-13T05:23:57.467Z",
+        "lastUpdated": "2026-03-13T07:25:12.156Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/agency/page.tsx"
     }
   },
   "pipeline": {
@@ -154,7 +182,7 @@
   "session": {
     "startedAt": "2026-02-23T02:24:27.317Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-13T02:50:29.331Z"
+    "lastActivity": "2026-03-13T07:25:12.156Z"
   },
   "history": [
     {
@@ -2968,6 +2996,240 @@
     {
       "timestamp": "2026-03-13T02:50:29.331Z",
       "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:15:32.491Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:15:40.283Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:20:46.467Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:20:50.698Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:21:00.257Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:21:12.934Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:21:18.016Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:21:21.285Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:23:28.368Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:26:50.133Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:26:54.484Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:26:59.922Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:27:07.909Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:27:18.123Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:27:35.617Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:27:41.358Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:27:47.053Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:27:57.452Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:28:07.311Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T03:28:23.369Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:02:22.453Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:02:26.166Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:02:29.527Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:02:33.655Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:02:44.839Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:05:28.945Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:09:35.950Z",
+      "feature": "bulk",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:09:57.098Z",
+      "feature": "credit-bank",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:13:07.010Z",
+      "feature": "bulk",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:23:45.614Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:23:57.467Z",
+      "feature": "agency",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:26:29.040Z",
+      "feature": "agency",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:29:10.381Z",
+      "feature": "agency",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:31:24.317Z",
+      "feature": "agency",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:32:05.964Z",
+      "feature": "agency",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T05:34:19.073Z",
+      "feature": "agency",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T07:23:04.991Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T07:25:06.710Z",
+      "feature": "agency",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-03-13T07:25:12.156Z",
+      "feature": "agency",
       "phase": "do",
       "action": "updated"
     }

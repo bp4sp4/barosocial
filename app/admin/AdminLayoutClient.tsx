@@ -40,14 +40,22 @@ export default function AdminLayoutClient({
           }}>
             민간자격증
           </Link>
+          <Link href="/admin/agency" style={{
+            padding: '6px 18px', borderRadius: 8, fontSize: 14, fontWeight: pathname === '/admin/agency' ? 700 : 500,
+            background: pathname === '/admin/agency' ? '#3182f6' : '#f2f4f6',
+            color: pathname === '/admin/agency' ? '#fff' : '#4e5968',
+            textDecoration: 'none',
+          }}>
+            기관협약(개발중)
+          </Link>
                    <Link href="/admin/credit-bank" style={{
             padding: '6px 18px', borderRadius: 8, fontSize: 14, fontWeight: pathname === '/admin/credit-bank' ? 700 : 500,
             background: pathname === '/admin/credit-bank' ? '#3182f6' : '#f2f4f6',
             color: pathname === '/admin/credit-bank' ? '#fff' : '#4e5968',
             textDecoration: 'none',
           }}>
-            학점은행제(CSV)
-          </Link>
+            일괄 등록
+</Link>
           <Link href="/admin/stats" style={{
             padding: '6px 18px', borderRadius: 8, fontSize: 14, fontWeight: pathname === '/admin/stats' ? 700 : 500,
             background: pathname === '/admin/stats' ? '#3182f6' : '#f2f4f6',

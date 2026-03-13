@@ -8,7 +8,7 @@ import { CAFE_NAMES, KNOWN_CAFE_NAMES, CAFE_CONFIG } from '@/lib/cafe-names';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
-const EDUCATION_OPTIONS = ['고등학교 졸업', '전문대 졸업', '대학교 재학', '대학교 졸업', '대학원 이상'];
+const EDUCATION_OPTIONS = ['고등학교 졸업', '전문대 졸업', '대학교 재학', '대학교 중퇴', '대학교 졸업', '대학원 이상'];
 const ADMIN_COURSE_OPTIONS = ['사회복지사', '아동학사', '평생교육사', '편입/대학원', '건강가정사', '청소년지도사', '보육교사', '심리상담사'];
 
 type ConsultationStatus = '상담대기' | '상담중' | '보류' | '등록대기' | '등록완료';
