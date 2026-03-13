@@ -136,6 +136,9 @@ export default function BulkRegisterPage() {
   const [fileName, setFileName] = useState('');
   const [saving, setSaving] = useState(false);
 
+  const [showGuide, setShowGuide] = useState(false);
+  const [guideStep, setGuideStep] = useState(0);
+
   // 임시저장 탭 상태
   const [staging, setStaging] = useState<StagingRow[]>([]);
   const [stagingLoading, setStagingLoading] = useState(false);
@@ -305,9 +308,17 @@ export default function BulkRegisterPage() {
           </p>
         </div>
         {tab === 'upload' && (
-          <button onClick={handleDownloadTemplate} style={btn('#f2f4f6', '#4e5968')}>
-            {uploadType === 'consult' ? '학점은행제' : '민간자격증'} 템플릿 다운로드
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button
+              onClick={() => setShowGuide(true)}
+              style={{ ...btn('#fff', '#3182f6'), border: '1px solid #d1e0ff' }}
+            >
+              ❓ 업로드 가이드
+            </button>
+            <button onClick={handleDownloadTemplate} style={btn('#f2f4f6', '#4e5968')}>
+              {uploadType === 'consult' ? '학점은행제' : '민간자격증'} 템플릿 다운로드
+            </button>
+          </div>
         )}
       </div>
 
@@ -379,6 +390,7 @@ export default function BulkRegisterPage() {
               </div>
             </div>
           )}
+
 
           {/* 미리보기 */}
           {csvRows.length > 0 && (
@@ -595,6 +607,72 @@ export default function BulkRegisterPage() {
           )}
         </>
       )}
+      {/* 가이드 모달 */}
+      {showGuide && (() => {
+        const GUIDES = [
+          { img: '/guide/guide_01.png', step: 1, title: '템플릿 데이터 입력', desc: '다운로드한 CSV 템플릿 파일을 엑셀로 열어 데이터를 입력한후 저장후' },
+          { img: '/guide/guide_02.png', step: 2, title: '다른 이름으로 저장', desc: '파일 메뉴 → 다른 이름으로 저장 → 내 컴퓨터를 선택합니다.' },
+          { img: '/guide/guide_03.png', step: 3, title: 'CSV 형식으로 저장', desc: '파일 형식을 CSV(쉼표로 구분)(*.csv) 로 선택 후 저장합니다.' },
+          { img: '/guide/guide_04.png', step: 4, title: '파일 업로드', desc: '저장한 CSV 파일을 업로드 영역에 드래그하거나 클릭해서 선택합니다.' },
+        ];
+        const current = GUIDES[guideStep];
+        return (
+          <div
+            onClick={() => { setShowGuide(false); setGuideStep(0); }}
+            style={{
+              position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)',
+              zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center',
+              padding: 20,
+            }}
+          >
+            <div
+              onClick={e => e.stopPropagation()}
+              style={{
+                background: '#fff', borderRadius: 16,
+                width: 'fit-content', maxWidth: '95vw', maxHeight: '95vh',
+                display: 'flex', flexDirection: 'column',
+                overflow: 'hidden',
+              }}
+            >
+              {/* 헤더 */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '1px solid #f0f2f4' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <span style={{ background: '#3182f6', color: '#fff', borderRadius: 20, fontSize: 13, fontWeight: 700, padding: '4px 14px' }}>
+                    STEP {current.step} / {GUIDES.length}
+                  </span>
+                  <span style={{ fontSize: 18, fontWeight: 700, color: '#191f28' }}>{current.title}</span>
+                </div>
+                <button
+                  onClick={() => { setShowGuide(false); setGuideStep(0); }}
+                  style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer', color: '#8b95a1' }}
+                >✕</button>
+              </div>
+
+              {/* 이미지 */}
+              <div style={{ overflowY: 'auto' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={current.img} alt={`step${current.step}`} style={{ display: 'block', maxWidth: '70vw', maxHeight: '60vh', objectFit: 'contain' }} />
+              </div>
+
+              {/* 하단 */}
+              <div style={{ padding: '16px 24px', borderTop: '1px solid #f0f2f4', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+                <p style={{ fontSize: 16, fontWeight: 500, color: '#191f28', margin: 0, lineHeight: 1.6 }}>{current.desc}</p>
+                <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
+                  <button
+                    onClick={() => setGuideStep(s => s - 1)}
+                    disabled={guideStep === 0}
+                    style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #e5e8eb', background: '#fff', color: guideStep === 0 ? '#c8d0d8' : '#4e5968', fontWeight: 600, fontSize: 14, cursor: guideStep === 0 ? 'default' : 'pointer' }}
+                  >이전</button>
+                  <button
+                    onClick={() => guideStep === GUIDES.length - 1 ? (setShowGuide(false), setGuideStep(0)) : setGuideStep(s => s + 1)}
+                    style={{ padding: '8px 20px', borderRadius: 8, border: 'none', background: '#3182f6', color: '#fff', fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
+                  >{guideStep === GUIDES.length - 1 ? '완료' : '다음'}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }
