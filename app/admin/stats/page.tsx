@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { CAFE_NAMES } from '@/lib/cafe-names';
 import {
   ResponsiveContainer, PieChart, Pie, Cell, Tooltip,
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
@@ -11,7 +12,7 @@ import {
 
 // ─── 타입 ──────────────────────────────────────────
 type ConsultationStatus = '상담대기' | '상담중' | '보류' | '등록대기' | '등록완료';
-type Tab = 'overview' | 'status' | 'source' | 'time' | 'course';
+type Tab = 'overview' | 'status' | 'source' | 'time' | 'course' | 'concern';
 
 interface Consultation {
   id: number;
@@ -19,6 +20,7 @@ interface Consultation {
   click_source: string | null;
   hope_course: string | null;
   major_category?: string | null;
+  counsel_check?: string | null;
   created_at: string;
 }
 
@@ -37,6 +39,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'source',   label: '유입 경로' },
   { id: 'time',     label: '시간 패턴' },
   { id: 'course',   label: '과정 수요' },
+  { id: 'concern',  label: '고민 분석' },
 ];
 
 // ─── 유틸 ──────────────────────────────────────────
@@ -45,6 +48,13 @@ function getMajor(source: string | null): string {
   const s = source.startsWith('바로폼_') ? source.slice(4) : source;
   const i = s.indexOf('_');
   return i === -1 ? s : s.slice(0, i);
+}
+
+function getMinor(source: string | null): string {
+  if (!source) return '';
+  const s = source.startsWith('바로폼_') ? source.slice(4) : source;
+  const i = s.indexOf('_');
+  return i === -1 ? '' : s.slice(i + 1);
 }
 
 function toKST(dateStr: string): Date {
@@ -122,6 +132,8 @@ export default function StatsPage() {
   const [tab, setTab] = useState<Tab>('overview');
   const [source, setSource] = useState<Source>('hakjeom');
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [selectedSrcBar, setSelectedSrcBar] = useState<string | null>(null);
+  const [cafes, setCafes] = useState<{ id: string; name: string }[]>([]);
   const srcRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const srcBarRef = useRef<HTMLDivElement>(null);
   const [srcPill, setSrcPill] = useState<{ left: number; width: number } | null>(null);
@@ -140,13 +152,15 @@ export default function StatsPage() {
     (async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/admin/login'); return; }
-      const [r1, r2] = await Promise.all([
-        supabase.from('consultations').select('id, status, click_source, hope_course, created_at').order('created_at', { ascending: false }),
+      const [r1, r2, r3] = await Promise.all([
+        supabase.from('consultations').select('id, status, click_source, hope_course, counsel_check, created_at').order('created_at', { ascending: false }),
         // private-cert API는 major_category 포함
         fetch('/api/private-cert').then(r => r.json()),
+        fetch('/api/channels?type=mamcafe').then(r => r.json()),
       ]);
       if (r1.data) setHakjeomData(r1.data.map((d: any) => ({ ...d, status: d.status || '상담대기' })));
       if (Array.isArray(r2)) setPrivateData(r2.map((d: any) => ({ ...d, status: d.status || '상담대기' })));
+      if (Array.isArray(r3)) setCafes(r3);
       setLoading(false);
     })();
   }, [router]);
@@ -225,6 +239,39 @@ export default function StatsPage() {
   const srcMap: Record<string, number> = {};
   data.forEach(c => { const m = getMajor(c.click_source); srcMap[m] = (srcMap[m] || 0) + 1; });
   const srcData = Object.entries(srcMap).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
+
+  // ── 맘카페 드릴다운
+  const cafeIdToName: Record<string, string> = Object.fromEntries(cafes.map(c => [c.id, c.name]));
+  const mamcafeData = (() => {
+    const items = data.filter(c => getMajor(c.click_source) === '맘카페');
+    const map: Record<string, number> = {};
+    items.forEach(c => {
+      const minor = getMinor(c.click_source);
+      if (!minor || minor === '확인필요') return;
+      const name = cafeIdToName[minor] || CAFE_NAMES[minor] || minor;
+      map[name] = (map[name] || 0) + 1;
+    });
+    const unknown = items.filter(c => getMinor(c.click_source) === '확인필요').length;
+    const result = Object.entries(map).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
+    if (unknown > 0) result.push({ name: '확인필요', value: unknown });
+    return result;
+  })();
+
+  // ── 고민(상담체크) 분석
+  const counselMap: Record<string, number> = {};
+  data.forEach(c => {
+    if (!c.counsel_check) return;
+    c.counsel_check.split(', ').forEach(item => {
+      const trimmed = item.trim();
+      if (!trimmed) return;
+      const key = trimmed.startsWith('기타:') ? '기타' : trimmed;
+      counselMap[key] = (counselMap[key] || 0) + 1;
+    });
+  });
+  const counselData = Object.entries(counselMap).sort((a, b) => b[1] - a[1]).map(([name, value]) => ({ name, value }));
+  const counselTotal = counselData.reduce((s, d) => s + d.value, 0);
+  const withCounsel = data.filter(c => c.counsel_check).length;
+  const withoutCounsel = total - withCounsel;
 
   // ── 희망과정 (별칭 정규화)
   const COURSE_ALIAS: Record<string, string> = {
@@ -460,18 +507,42 @@ export default function StatsPage() {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: 16 }}>
-              <Panel title="유입 경로별 신청 건수" sub="대분류 기준">
-                <ResponsiveContainer width="100%" height={Math.max(200, srcData.length * 42)}>
-                  <BarChart data={srcData} layout="vertical" margin={{ top: 4, right: 32, bottom: 0, left: 56 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
-                    <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} allowDecimals={false} />
-                    <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: '#4e5968' }} tickLine={false} axisLine={false} width={56} />
-                    <Tooltip content={<Tip />} />
-                    <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={22} name="건수">
-                      {srcData.map((_, i) => <Cell key={i} fill={SRC_COLORS[i % SRC_COLORS.length]} />)}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
+              <Panel title="유입 경로별 신청 건수" sub={selectedSrcBar === '맘카페' ? '맘카페 카페별 상세 — 닫으려면 같은 항목 클릭' : '대분류 기준 · 맘카페 클릭 시 카페별 상세 보기'}>
+                {selectedSrcBar === '맘카페' && mamcafeData.length > 0 ? (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: '#3b82f6' }}>맘카페 상세</span>
+                      <button onClick={() => setSelectedSrcBar(null)} style={{ background: '#f2f4f6', border: 'none', borderRadius: 6, padding: '3px 10px', fontSize: 12, color: '#4e5968', cursor: 'pointer' }}>← 전체로</button>
+                    </div>
+                    <ResponsiveContainer width="100%" height={Math.max(200, mamcafeData.length * 40)}>
+                      <BarChart data={mamcafeData} layout="vertical" margin={{ top: 4, right: 32, bottom: 0, left: 80 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
+                        <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} allowDecimals={false} />
+                        <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: '#4e5968' }} tickLine={false} axisLine={false} width={80} />
+                        <Tooltip content={<Tip />} />
+                        <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={20} name="건수">
+                          {mamcafeData.map((d, i) => <Cell key={i} fill={d.name === '확인필요' ? '#f59e0b' : SRC_COLORS[i % SRC_COLORS.length]} />)}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </>
+                ) : (
+                  <ResponsiveContainer width="100%" height={Math.max(200, srcData.length * 42)}>
+                    <BarChart
+                      data={srcData} layout="vertical" margin={{ top: 4, right: 32, bottom: 0, left: 56 }}
+                      onClick={e => { if (e?.activeLabel) setSelectedSrcBar(prev => prev === e.activeLabel ? null : String(e.activeLabel)); }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
+                      <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} allowDecimals={false} />
+                      <YAxis type="category" dataKey="name" tick={{ fontSize: 12, fill: '#4e5968' }} tickLine={false} axisLine={false} width={56} />
+                      <Tooltip content={<Tip />} />
+                      <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={22} name="건수">
+                        {srcData.map((d, i) => <Cell key={i} fill={d.name === '맘카페' ? '#3b82f6' : SRC_COLORS[i % SRC_COLORS.length]} />)}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </Panel>
 
               <Panel title="비율">
@@ -638,6 +709,92 @@ export default function StatsPage() {
                       ))}
                     </div>
                   </Panel>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+
+        {/* ════ 고민 분석 탭 ════ */}
+        {tab === 'concern' && (
+          <div>
+            {counselData.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '60px 0', color: '#94a3b8', fontSize: 14 }}>
+                고민 데이터가 없습니다
+              </div>
+            ) : (
+              <>
+                {/* 요약 카드 */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12, marginBottom: 16 }}>
+                  <Card
+                    label="고민 기록된 상담"
+                    value={withCounsel}
+                    sub={total > 0 ? `전체의 ${Math.round((withCounsel / total) * 100)}%` : '-'}
+                    color="#6366f1"
+                  />
+                  {counselData.slice(0, 3).map((d, i) => (
+                    <Card
+                      key={d.name}
+                      label={`${i + 1}위 고민`}
+                      value={d.name}
+                      sub={`${d.value}건 · ${counselTotal > 0 ? Math.round((d.value / counselTotal) * 100) : 0}%`}
+                      color={SRC_COLORS[i]}
+                    />
+                  ))}
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 16 }}>
+                  {/* 바 차트 */}
+                  <Panel title="고민 유형별 건수" sub="중복 선택 포함 · 상담체크 기준">
+                    <ResponsiveContainer width="100%" height={Math.max(200, counselData.length * 52)}>
+                      <BarChart data={counselData} layout="vertical" margin={{ top: 4, right: 40, bottom: 0, left: 64 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" horizontal={false} />
+                        <XAxis type="number" tick={{ fontSize: 11, fill: '#94a3b8' }} tickLine={false} axisLine={false} allowDecimals={false} />
+                        <YAxis type="category" dataKey="name" tick={{ fontSize: 13, fill: '#4e5968' }} tickLine={false} axisLine={false} width={64} />
+                        <Tooltip content={<Tip />} />
+                        <Bar dataKey="value" radius={[0, 6, 6, 0]} barSize={26} name="건수">
+                          {counselData.map((_, i) => <Cell key={i} fill={SRC_COLORS[i % SRC_COLORS.length]} />)}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Panel>
+
+                  {/* 비율 + 목록 */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                    <Panel title="비율">
+                      <ResponsiveContainer width="100%" height={180}>
+                        <PieChart>
+                          <Pie data={counselData} cx="50%" cy="50%" outerRadius={78} paddingAngle={2} dataKey="value">
+                            {counselData.map((_, i) => <Cell key={i} fill={SRC_COLORS[i % SRC_COLORS.length]} />)}
+                          </Pie>
+                          <Tooltip content={<Tip />} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 8 }}>
+                        {counselData.map((d, i) => (
+                          <div key={d.name} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                            <div style={{ width: 10, height: 10, borderRadius: 2, background: SRC_COLORS[i % SRC_COLORS.length], flexShrink: 0 }} />
+                            <span style={{ color: '#4e5968', flex: 1 }}>{d.name}</span>
+                            <span style={{ fontWeight: 700, color: '#191f28' }}>{d.value}건</span>
+                            <span style={{ fontSize: 11, color: '#94a3b8' }}>
+                              {counselTotal > 0 ? Math.round((d.value / counselTotal) * 100) : 0}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </Panel>
+
+                    <Panel title="미기록">
+                      <div style={{ padding: '12px 0' }}>
+                        <div style={{ fontSize: 28, fontWeight: 800, color: withoutCounsel > total * 0.3 ? '#f04452' : '#94a3b8' }}>
+                          {withoutCounsel}건
+                        </div>
+                        <div style={{ fontSize: 12, color: '#b0b8c1', marginTop: 4 }}>
+                          고민 미기록 ({total > 0 ? Math.round((withoutCounsel / total) * 100) : 0}%)
+                        </div>
+                      </div>
+                    </Panel>
+                  </div>
                 </div>
               </>
             )}

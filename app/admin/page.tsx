@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import styles from './admin.module.css';
 import { CAFE_NAMES, KNOWN_CAFE_NAMES, CAFE_CONFIG } from '@/lib/cafe-names';
 import Link from 'next/link';
+import { toast } from 'sonner';
 
 const EDUCATION_OPTIONS = ['고등학교 졸업', '전문대 졸업', '대학교 재학', '대학교 졸업', '대학원 이상'];
 const ADMIN_COURSE_OPTIONS = ['사회복지사', '아동학사', '평생교육사', '편입/대학원', '건강가정사', '청소년지도사', '보육교사', '심리상담사'];
@@ -89,7 +90,7 @@ export default function AdminPage() {
         closeResidenceModal();
         fetchConsultations();
       } catch (error) {
-        alert('거주지 저장에 실패했습니다.');
+        toast.error('거주지 저장에 실패했습니다.');
       }
     };
   const [selectedConsultation, setSelectedConsultation] = useState<Consultation | null>(null);
@@ -193,7 +194,7 @@ export default function AdminPage() {
   const handleAddMamcafe = async () => {
     const rawId = addMamcafeNewId.trim();
     const name = addMamcafeNewName.trim();
-    if (!rawId || !name) { alert('카페 ID와 이름을 모두 입력해주세요.'); return; }
+    if (!rawId || !name) { toast.warning('카페 ID와 이름을 모두 입력해주세요.'); return; }
     // 네이버 URL에서 ID 추출
     const match = rawId.match(/(?:https?:\/\/)?(?:m\.)?cafe\.naver\.com\/([a-zA-Z0-9_]+)/);
     const cafeId = match ? match[1] : rawId;
@@ -206,7 +207,7 @@ export default function AdminPage() {
       });
       if (!res.ok) {
         const err = await res.json();
-        alert(err.error || '추가 실패');
+        toast.error(err.error || '추가 실패');
         return;
       }
       await fetchCafes(); // 카페탭에도 즉시 반영
@@ -215,7 +216,7 @@ export default function AdminPage() {
       setAddMamcafeNewName('');
       applyAddSource('맘카페', cafeId, '');
     } catch {
-      alert('카페 추가에 실패했습니다.');
+      toast.error('카페 추가에 실패했습니다.');
     } finally {
       setAddMamcafeAdding(false);
     }
@@ -282,15 +283,15 @@ export default function AdminPage() {
     e?.preventDefault();
     const name = newCafeName.trim();
     const id = newCafeId.trim().replace(/\s/g, '');
-    if (!name) { alert('카페 이름을 입력해주세요.'); return; }
-    if (!id) { alert('카페 ID를 입력해주세요.'); return; }
+    if (!name) { toast.warning('카페 이름을 입력해주세요.'); return; }
+    if (!id) { toast.warning('카페 ID를 입력해주세요.'); return; }
     const res = await fetch('/api/channels', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, name, type: 'mamcafe' }),
     });
-    if (res.status === 409) { alert('이미 존재하는 카페 ID입니다.'); return; }
-    if (!res.ok) { alert('추가에 실패했습니다.'); return; }
+    if (res.status === 409) { toast.error('이미 존재하는 카페 ID입니다.'); return; }
+    if (!res.ok) { toast.error('추가에 실패했습니다.'); return; }
     setNewCafeName('');
     setNewCafeId('');
     setShowAddCafeModal(false);
@@ -305,8 +306,8 @@ export default function AdminPage() {
 
   const handleEditCafe = async () => {
     if (!editCafe) return;
-    if (!editCafeName.trim()) { alert('이름을 입력해주세요.'); return; }
-    if (!editCafeId.trim()) { alert('카페 ID를 입력해주세요.'); return; }
+    if (!editCafeName.trim()) { toast.warning('이름을 입력해주세요.'); return; }
+    if (!editCafeId.trim()) { toast.warning('카페 ID를 입력해주세요.'); return; }
     const res = await fetch('/api/channels', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
@@ -314,7 +315,7 @@ export default function AdminPage() {
     });
     if (!res.ok) {
       const err = await res.json();
-      alert(err.error || '수정 실패');
+      toast.error(err.error || '수정 실패');
       return;
     }
     setShowEditCafeModal(false);
@@ -474,7 +475,7 @@ export default function AdminPage() {
       setShowAddModal(false);
       fetchConsultations();
     } catch (error) {
-      alert('상담 신청 추가에 실패했습니다.');
+      toast.error('상담 신청 추가에 실패했습니다.');
     }
   };
 
@@ -498,7 +499,7 @@ export default function AdminPage() {
       setMemoText('');
       fetchConsultations();
     } catch (error) {
-      alert('메모 저장에 실패했습니다.');
+      toast.error('메모 저장에 실패했습니다.');
     }
   };
 
@@ -529,7 +530,7 @@ export default function AdminPage() {
       setReasonText('');
       fetchConsultations();
     } catch (error) {
-      alert('취득사유 저장에 실패했습니다.');
+      toast.error('취득사유 저장에 실패했습니다.');
     }
   };
 
@@ -576,7 +577,7 @@ export default function AdminPage() {
       setCounselCheckText(newValue);
       fetchConsultations();
     } catch (error) {
-      alert('상담체크 저장에 실패했습니다.');
+      toast.error('상담체크 저장에 실패했습니다.');
     }
   };
 
@@ -615,7 +616,7 @@ export default function AdminPage() {
       closeSubjectCostModal();
       fetchConsultations();
     } catch (error) {
-      alert('과목비용 저장에 실패했습니다.');
+      toast.error('과목비용 저장에 실패했습니다.');
     }
   };
 
@@ -655,7 +656,7 @@ export default function AdminPage() {
       closeManagerModal();
       fetchConsultations();
     } catch (error) {
-      alert('담당자 저장에 실패했습니다.');
+      toast.error('담당자 저장에 실패했습니다.');
     }
   };
 
@@ -671,7 +672,7 @@ export default function AdminPage() {
       if (!response.ok) throw new Error();
       fetchConsultations();
     } catch {
-      alert('담당자 저장에 실패했습니다.');
+      toast.error('담당자 저장에 실패했습니다.');
     }
   };
 
@@ -700,7 +701,7 @@ export default function AdminPage() {
       closeClickSourceModal();
       fetchConsultations();
     } catch {
-      alert('저장에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     }
   };
 
@@ -738,7 +739,7 @@ export default function AdminPage() {
   // 수정 모달 열기
   const openEditModal = () => {
     if (selectedIds.length !== 1) {
-      alert('수정할 항목을 1개만 선택해주세요.');
+      toast.warning('수정할 항목을 1개만 선택해주세요.');
       return;
     }
     const consultation = consultations.find(c => c.id === selectedIds[0]);
@@ -840,7 +841,7 @@ export default function AdminPage() {
       setSelectedIds([]);
       fetchConsultations();
     } catch (error) {
-      alert('상담 신청 수정에 실패했습니다.');
+      toast.error('상담 신청 수정에 실패했습니다.');
     }
   };
 
@@ -859,7 +860,7 @@ export default function AdminPage() {
 
       fetchConsultations();
     } catch (error) {
-      alert('상태 변경에 실패했습니다.');
+      toast.error('상태 변경에 실패했습니다.');
     }
   };
 
@@ -912,16 +913,16 @@ export default function AdminPage() {
       });
       setSelectedIds([]);
       fetchConsultations();
-      alert(`${targets.length}건이 민간자격증으로 이동되었습니다.`);
+      toast.success(`${targets.length}건이 민간자격증으로 이동되었습니다.`);
     } catch {
-      alert('이동에 실패했습니다.');
+      toast.error('이동에 실패했습니다.');
     }
   };
 
   // 일괄 삭제
   const handleBulkDelete = async () => {
     if (selectedIds.length === 0) {
-      alert('삭제할 항목을 선택해주세요.');
+      toast.warning('삭제할 항목을 선택해주세요.');
       return;
     }
 
@@ -943,7 +944,7 @@ export default function AdminPage() {
       setSelectedIds([]);
       fetchConsultations();
     } catch (error) {
-      alert('삭제에 실패했습니다.');
+      toast.error('삭제에 실패했습니다.');
     }
   };
 
@@ -1152,7 +1153,7 @@ export default function AdminPage() {
       : filteredConsultations;
 
     if (dataToDownload.length === 0) {
-      alert('다운로드할 데이터가 없습니다.');
+      toast.warning('다운로드할 데이터가 없습니다.');
       return;
     }
 

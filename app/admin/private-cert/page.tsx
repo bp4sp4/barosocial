@@ -6,6 +6,7 @@ import { supabase } from '@/lib/supabase';
 import styles from '../admin.module.css';
 import Link from 'next/link';
 import { CAFE_NAMES, KNOWN_CAFE_NAMES, CAFE_CONFIG } from '@/lib/cafe-names';
+import { toast } from 'sonner';
 
 const CERT_CATEGORIES = [
   {
@@ -221,7 +222,7 @@ export default function PrivateCertAdminPage() {
   const handleAddPcMamcafe = async () => {
     const rawId = pcMamcafeNewId.trim();
     const name = pcMamcafeNewName.trim();
-    if (!rawId || !name) { alert('카페 ID와 이름을 모두 입력해주세요.'); return; }
+    if (!rawId || !name) { toast.warning('카페 ID와 이름을 모두 입력해주세요.'); return; }
     const match = rawId.match(/(?:https?:\/\/)?(?:m\.)?cafe\.naver\.com\/([a-zA-Z0-9_]+)/);
     const cafeId = match ? match[1] : rawId;
     setPcMamcafeAdding(true);
@@ -231,14 +232,14 @@ export default function PrivateCertAdminPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: cafeId, name, type: 'mamcafe' }),
       });
-      if (!res.ok) { const err = await res.json(); alert(err.error || '추가 실패'); return; }
+      if (!res.ok) { const err = await res.json(); toast.error(err.error || '추가 실패'); return; }
       await fetchCafes();
       setPcSourceMinor(cafeId);
       setPcMamcafeNewId('');
       setPcMamcafeNewName('');
       applyPcSource('맘카페', cafeId, '');
     } catch {
-      alert('카페 추가에 실패했습니다.');
+      toast.error('카페 추가에 실패했습니다.');
     } finally {
       setPcMamcafeAdding(false);
     }
@@ -317,7 +318,7 @@ export default function PrivateCertAdminPage() {
       }),
     });
     if (!res.ok) {
-      alert('저장에 실패했습니다. 다시 시도해주세요.');
+      toast.error('저장에 실패했습니다. 다시 시도해주세요.');
       return;
     }
     setFormData(emptyForm);
@@ -418,9 +419,9 @@ export default function PrivateCertAdminPage() {
       });
       setSelectedIds([]);
       fetchItems();
-      alert(`${targets.length}건이 학점은행제로 이동되었습니다.`);
+      toast.success(`${targets.length}건이 학점은행제로 이동되었습니다.`);
     } catch {
-      alert('이동에 실패했습니다.');
+      toast.error('이동에 실패했습니다.');
     }
   };
 
@@ -475,7 +476,7 @@ export default function PrivateCertAdminPage() {
       closeClickSourceModal();
       fetchItems();
     } catch {
-      alert('저장에 실패했습니다.');
+      toast.error('저장에 실패했습니다.');
     }
   };
   // 거주지

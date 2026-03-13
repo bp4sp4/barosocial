@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
+import { Toaster } from 'sonner';
 
 export default function AdminLayoutClient({
   children,
@@ -39,7 +40,15 @@ export default function AdminLayoutClient({
           }}>
             민간자격증
           </Link>
-                   <Link href="/admin/stats" style={{
+                   <Link href="/admin/credit-bank" style={{
+            padding: '6px 18px', borderRadius: 8, fontSize: 14, fontWeight: pathname === '/admin/credit-bank' ? 700 : 500,
+            background: pathname === '/admin/credit-bank' ? '#3182f6' : '#f2f4f6',
+            color: pathname === '/admin/credit-bank' ? '#fff' : '#4e5968',
+            textDecoration: 'none',
+          }}>
+            학점은행제(CSV)
+          </Link>
+          <Link href="/admin/stats" style={{
             padding: '6px 18px', borderRadius: 8, fontSize: 14, fontWeight: pathname === '/admin/stats' ? 700 : 500,
             background: pathname === '/admin/stats' ? '#3182f6' : '#f2f4f6',
             color: pathname === '/admin/stats' ? '#fff' : '#4e5968',
@@ -57,6 +66,7 @@ export default function AdminLayoutClient({
         </div>
       )}
       {children}
+      <Toaster position="bottom-center" richColors />
       <style>{`footer { display: none !important; }`}</style>
     </>
   );
