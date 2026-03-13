@@ -66,6 +66,7 @@ export default function AgencyPage() {
   // 셀 클릭 편집 모달
   const [fieldModal, setFieldModal] = useState<FieldModal | null>(null);
   const [fieldSaving, setFieldSaving] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     checkAuth();
@@ -198,6 +199,44 @@ export default function AgencyPage() {
     }
   };
 
+  const handleDeleteSelected = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`${selectedIds.size}건을 삭제하시겠습니까?`)) return;
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from('agency_agreements').delete().in('id', ids);
+    if (error) {
+      toast.error('삭제 실패: ' + error.message);
+    } else {
+      toast.success(`${ids.length}건 삭제되었습니다.`);
+      setSelectedIds(new Set());
+      fetchAgencies();
+    }
+  };
+
+  const toggleSelect = (id: number) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filtered.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filtered.map(a => a.id)));
+    }
+  };
+
+  const formatPhoneNumber = (value: string) => {
+    const numbers = value.replace(/[^0-9]/g, '');
+    if (numbers.length <= 3) return numbers;
+    if (numbers.length <= 7) return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
+    if (numbers.length <= 11) return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7)}`;
+    return `${numbers.slice(0, 3)}-${numbers.slice(3, 7)}-${numbers.slice(7, 11)}`;
+  };
+
   const handleStatusChange = async (id: number, status: AgencyStatus) => {
     const { error } = await supabase
       .from('agency_agreements')
@@ -303,6 +342,24 @@ export default function AgencyPage() {
         </div>
 
         <div className={styles.headerActions}>
+          {selectedIds.size > 0 && (
+            <>
+              {selectedIds.size === 1 && (
+                <button
+                  onClick={() => {
+                    const target = agencies.find(a => a.id === Array.from(selectedIds)[0]);
+                    if (target) openEdit(target);
+                  }}
+                  className={styles.editButton}
+                >
+                  수정
+                </button>
+              )}
+              <button onClick={handleDeleteSelected} className={styles.deleteButton}>
+                삭제 ({selectedIds.size})
+              </button>
+            </>
+          )}
           <button onClick={openAdd} className={styles.addButton}>+ 기관 추가</button>
         </div>
 
@@ -338,11 +395,34 @@ export default function AgencyPage() {
         {loading ? (
           <div className={styles.loading}>로딩 중...</div>
         ) : filtered.length === 0 ? (
-          <div className={styles.empty}>데이터가 없습니다.</div>
+          <div className={styles.agencyEmpty}>
+            <div className={styles.agencyEmptyGrid}>
+              {[
+                ['분류 입력...', '지역 입력...'],
+                ['기관이름 입력...', '연락처 입력...'],
+                ['학점커미션 입력...', '민간커미션 입력...'],
+              ].map((row, i) => (
+                <div key={i} className={styles.agencyEmptyRow}>
+                  {row.map((text, j) => (
+                    <div key={j} className={styles.agencyEmptyCell}>{text}</div>
+                  ))}
+                </div>
+              ))}
+            </div>
+            <p className={styles.agencyEmptyText}>등록된 기관이 없습니다</p>
+          </div>
         ) : (
           <table className={styles.table} style={{ minWidth: 900 }}>
             <thead>
               <tr>
+                <th style={{ width: 36, textAlign: 'center' }}>
+                  <input
+                    type="checkbox"
+                    checked={filtered.length > 0 && selectedIds.size === filtered.length}
+                    onChange={toggleSelectAll}
+                    style={{ cursor: 'pointer', accentColor: '#3182f6' }}
+                  />
+                </th>
                 <th>분류</th>
                 <th>지역</th>
                 <th>기관이름</th>
@@ -353,12 +433,19 @@ export default function AgencyPage() {
                 <th>메모</th>
                 <th>상태</th>
                 <th>등록일</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(a => (
-                <tr key={a.id}>
+                <tr key={a.id} style={{ background: selectedIds.has(a.id) ? '#f0f7ff' : '' }}>
+                  <td style={{ textAlign: 'center' }}>
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(a.id)}
+                      onChange={() => toggleSelect(a.id)}
+                      style={{ cursor: 'pointer', accentColor: '#3182f6' }}
+                    />
+                  </td>
                   <td>{a.category || '-'}</td>
                   <td>{a.region || '-'}</td>
                   <td style={{ fontWeight: 600 }}>{a.institution_name || '-'}</td>
@@ -423,20 +510,6 @@ export default function AgencyPage() {
                     </select>
                   </td>
                   <td style={{ fontSize: 12, color: '#8b95a1' }}>{formatDate(a.created_at)}</td>
-                  <td>
-                    <div style={{ display: 'flex', gap: 6, justifyContent: 'center' }}>
-                      <button
-                        onClick={() => openEdit(a)}
-                        className={styles.editButton}
-                        style={{ padding: '6px 12px', fontSize: 12 }}
-                      >수정</button>
-                      <button
-                        onClick={() => handleDelete(a.id)}
-                        className={styles.deleteButton}
-                        style={{ padding: '6px 12px', fontSize: 12 }}
-                      >삭제</button>
-                    </div>
-                  </td>
                 </tr>
               ))}
             </tbody>
@@ -523,7 +596,10 @@ export default function AgencyPage() {
                   <label>{label}</label>
                   <input
                     value={form[key as keyof typeof form]}
-                    onChange={e => setForm(prev => ({ ...prev, [key]: e.target.value }))}
+                    onChange={e => {
+                      const value = key === 'contact' ? formatPhoneNumber(e.target.value) : e.target.value;
+                      setForm(prev => ({ ...prev, [key]: value }));
+                    }}
                     placeholder={placeholder}
                   />
                 </div>

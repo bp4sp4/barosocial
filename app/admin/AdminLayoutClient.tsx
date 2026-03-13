@@ -46,7 +46,7 @@ export default function AdminLayoutClient({
             color: pathname === '/admin/agency' ? '#fff' : '#4e5968',
             textDecoration: 'none',
           }}>
-            기관협약(개발중)
+            기관협약
           </Link>
                    <Link href="/admin/credit-bank" style={{
             padding: '6px 18px', borderRadius: 8, fontSize: 14, fontWeight: pathname === '/admin/credit-bank' ? 700 : 500,
