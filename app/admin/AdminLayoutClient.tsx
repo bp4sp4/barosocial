@@ -74,7 +74,18 @@ export default function AdminLayoutClient({
         </div>
       )}
       {children}
-      <Toaster position="bottom-center" richColors />
+      <Toaster
+        position="top-right"
+        richColors
+        toastOptions={{
+          style: {
+            fontSize: '15px',
+            fontWeight: 700,
+            padding: '14px 20px',
+            minWidth: '220px',
+          },
+        }}
+      />
       <style>{`footer { display: none !important; }`}</style>
     </>
   );

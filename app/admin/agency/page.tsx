@@ -68,6 +68,7 @@ export default function AgencyPage() {
   const [fieldSaving, setFieldSaving] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
 
+
   useEffect(() => {
     checkAuth();
     fetchAgencies();
@@ -449,7 +450,19 @@ export default function AgencyPage() {
                   <td>{a.category || '-'}</td>
                   <td>{a.region || '-'}</td>
                   <td style={{ fontWeight: 600 }}>{a.institution_name || '-'}</td>
-                  <td>{a.contact || '-'}</td>
+                  <td>
+                    {a.contact ? (
+                      <span
+                        onClick={() => { navigator.clipboard.writeText(a.contact!); toast.success('복사되었습니다.'); }}
+                        style={{ cursor: 'pointer', borderRadius: 4, padding: '2px 4px', transition: 'background 0.15s' }}
+                        onMouseEnter={e => (e.currentTarget.style.background = '#f2f4f6')}
+                        onMouseLeave={e => (e.currentTarget.style.background = '')}
+                        title="클릭하여 복사"
+                      >
+                        {a.contact}
+                      </span>
+                    ) : '-'}
+                  </td>
 
                   {/* 학점커미션 - 클릭 편집 */}
                   <td>

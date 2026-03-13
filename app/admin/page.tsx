@@ -54,7 +54,6 @@ export default function AdminPage() {
   const [newCafeName, setNewCafeName] = useState('');
   const [newCafeId, setNewCafeId] = useState('');
   const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [copiedConsultId, setCopiedConsultId] = useState<number | null>(null);
   const [showAddCafeModal, setShowAddCafeModal] = useState(false);
   const [showEditCafeModal, setShowEditCafeModal] = useState(false);
   const [editCafe, setEditCafe] = useState<{ id: string; name: string } | null>(null);
@@ -1608,14 +1607,11 @@ export default function AdminPage() {
                       style={{ cursor: 'pointer' }}
                       onClick={() => {
                         navigator.clipboard.writeText(consultation.contact.replace(/-/g, ''));
-                        setCopiedConsultId(-(consultation.id));
-                        setTimeout(() => setCopiedConsultId(null), 1500);
+                        toast.success('복사되었습니다.');
                       }}
                       title="클릭하여 복사"
                     >
-                      {copiedConsultId === -(consultation.id)
-                        ? <span style={{ color: '#3182f6', fontWeight: 600 }}>복사됨!</span>
-                        : highlightContact(consultation.contact, searchText)}
+                      {highlightContact(consultation.contact, searchText)}
                     </td>
                     <td>{consultation.education || '-'}</td>
                     <td>{consultation.hope_course || '-'}</td>
