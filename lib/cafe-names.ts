@@ -24,6 +24,7 @@ export const CAFE_CONFIG: CafeConfig[] = [
   { id: 'babylovecafe',name: '베이비러브',   numericId: '12688726' },
   { id: 'naese',       name: '중리사랑방',   numericId: '11790061' },
   { id: 'andongmom',   name: '안동맘' },
+  { id: 'doanmom1004', name: '대전도안맘' },
 ];
 
 // 이하는 CAFE_CONFIG에서 자동 생성 — 직접 수정 불필요
