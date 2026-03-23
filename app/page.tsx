@@ -145,6 +145,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     education: "", // 최종학력
     hope_course: "", // 희망과정
     reason: "", // 취득사유
+    residence: "", // 거주지
   });
   const [loading, setLoading] = useState(false);
   const [contactError, setContactError] = useState("");
@@ -213,6 +214,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
           education: formData.education,
           hope_course: formData.hope_course,
           reason: formData.reason,
+          residence: formData.residence,
           click_source: clickSource,
         }),
       });
@@ -456,6 +458,30 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
 
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>
+                거주지를 입력해주세요{" "}
+                <span
+                  style={{
+                    fontSize: "13px",
+                    color: "#EF4444",
+                    fontWeight: "400",
+                  }}
+                >
+                  (미기재 시 실습처 배정에 불이익이 있을 수 있습니다.)
+                </span>
+              </label>
+              <input
+                type="text"
+                placeholder="예) 대전 유성구, 경남 창원시"
+                className={styles.inputField}
+                value={formData.residence}
+                onChange={(e) =>
+                  setFormData({ ...formData, residence: e.target.value })
+                }
+              />
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>
                 취득사유가 어떻게 되시나요?{" "}
                 <span style={{ color: "#9ca3af", fontWeight: 400, fontSize: "13px" }}>(복수선택 가능)</span>
               </label>
@@ -591,7 +617,8 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 <p className={styles.modalPrivacyItem}>
                   <strong>2. 수집 및 이용하는 개인정보 항목</strong>
                   <br />
-                  필수 - 이름, 연락처(휴대전화번호), 최종학력, 희망과정, 취득사유
+                  필수 - 이름, 연락처(휴대전화번호), 최종학력, 희망과정, <br/>
+                  선택 - 거주지, 취득사유
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>3. 보유 및 이용 기간</strong>
