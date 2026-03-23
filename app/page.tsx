@@ -243,6 +243,8 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
     !contactError &&
     formData.education.length > 0 &&
     formData.hope_course.length > 0 &&
+    formData.residence.length > 0 &&
+    formData.reason.length > 0 &&
     privacyAgreed;
 
   return (
@@ -459,6 +461,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>
                 거주지를 입력해주세요{" "}
+                <span style={{ color: "#EF4444" }}>*</span>
                 <span
                   style={{
                     fontSize: "13px",
@@ -466,7 +469,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                     fontWeight: "400",
                   }}
                 >
-                  (미기재 시 실습처 배정에 불이익이 있을 수 있습니다.)
+                  {" "}상세히 입력할수록 실습처 배정에 유리해요.
                 </span>
               </label>
               <input
@@ -483,6 +486,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>
                 취득사유가 어떻게 되시나요?{" "}
+                <span style={{ color: "#EF4444" }}>*</span>{" "}
                 <span style={{ color: "#9ca3af", fontWeight: 400, fontSize: "13px" }}>(복수선택 가능)</span>
               </label>
               <div className={styles.reasonCheckGroup}>
@@ -617,8 +621,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 <p className={styles.modalPrivacyItem}>
                   <strong>2. 수집 및 이용하는 개인정보 항목</strong>
                   <br />
-                  필수 - 이름, 연락처(휴대전화번호), 최종학력, 희망과정, <br/>
-                  선택 - 거주지, 취득사유
+                  필수 - 이름, 연락처(휴대전화번호), 최종학력, 희망과정, 거주지, 취득사유
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>3. 보유 및 이용 기간</strong>
