@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-03-23T06:59:40.102Z",
+  "lastUpdated": "2026-04-09T06:30:00.111Z",
   "activeFeatures": [
     "korhrdsocial",
     "admin",
@@ -26,9 +26,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-23T02:30:41.159Z",
-        "lastUpdated": "2026-03-23T06:59:40.101Z"
+        "lastUpdated": "2026-04-09T06:30:00.111Z"
       },
-      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/page.tsx"
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/lib/kakao.ts"
     },
     "admin": {
       "phase": "do",
@@ -52,7 +52,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-27T02:01:42.335Z",
-        "lastUpdated": "2026-03-09T05:15:19.875Z"
+        "lastUpdated": "2026-04-09T06:29:52.265Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/api/consultations/route.ts"
     },
@@ -182,7 +182,7 @@
   "session": {
     "startedAt": "2026-02-23T02:24:27.317Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-03-23T06:59:40.102Z"
+    "lastActivity": "2026-04-09T06:30:00.111Z"
   },
   "history": [
     {
@@ -3499,6 +3499,84 @@
     },
     {
       "timestamp": "2026-03-23T06:59:40.101Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-01T09:19:21.870Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-01T09:19:30.192Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-01T09:19:39.260Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-01T09:35:00.083Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-01T09:35:08.851Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-01T09:42:18.627Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-01T09:43:23.139Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-09T06:25:28.712Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-09T06:29:18.847Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-09T06:29:41.722Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-09T06:29:47.638Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-09T06:29:52.265Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-09T06:30:00.111Z",
       "feature": "korhrdsocial",
       "phase": "do",
       "action": "updated"

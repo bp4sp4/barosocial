@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { sendConsultationEmail } from '@/lib/email';
+import { sendAlimtalk } from '@/lib/kakao';
 import { formatClickSource as formatClickSourceStatic } from '@/lib/cafe-names';
 
 async function formatClickSourceFromDB(clickSource: string | null): Promise<string> {
@@ -279,6 +280,25 @@ export async function POST(request: NextRequest) {
       }
     } else {
       console.warn('[SLACK] SLACK_WEBHOOK_URL이 설정되지 않아 Slack 알림을 건너뜁니다');
+    }
+
+    // 카카오 알림톡 전송 (신청자에게, 수동 추가 제외)
+    if (!is_manual_entry) {
+      console.log('[KAKAO] 카카오 알림톡 전송 시도');
+      try {
+        const kakaoResult = await sendAlimtalk({
+          contact,
+        });
+        if (kakaoResult.success) {
+          console.log('[KAKAO] ✅ 알림톡 전송 성공');
+        } else {
+          console.warn('[KAKAO] ⚠️ 알림톡 전송 실패:', kakaoResult.error);
+        }
+      } catch (kakaoError) {
+        console.error('[KAKAO] 알림톡 전송 중 오류:', kakaoError);
+      }
+    } else {
+      console.log('[KAKAO] 수동 추가로 알림톡 전송을 건너뜁니다.');
     }
 
     return NextResponse.json(
