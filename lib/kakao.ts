@@ -23,26 +23,53 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
   const receiverPhone = data.contact.replace(/-/g, '');
   const message = templateMessage;
 
-  const formData = new FormData();
-  formData.append('apikey', apikey);
-  formData.append('userid', userid);
-  formData.append('senderkey', senderkey);
-  formData.append('tpl_code', tpl_code);
-  formData.append('sender', sender);
-  formData.append('receiver_1', receiverPhone);
-  formData.append('subject_1', process.env.ALIGO_TEMPLATE_SUBJECT || '상담 신청 접수 안내');
-  formData.append('message_1', message);
-  formData.append('failover', 'N');
+  const proxyUrl = process.env.PROXY_URL;
+  const proxySecret = process.env.PROXY_SECRET;
 
   try {
     console.log('[KAKAO] 알림톡 전송 시도:', receiverPhone);
 
-    const response = await fetch('https://kakaoapi.aligo.in/akv10/alimtalk/send/', {
-      method: 'POST',
-      body: formData,
-    });
+    let result: { code: number; message: string; info?: unknown };
 
-    const result = await response.json() as { code: number; message: string; info?: unknown };
+    if (proxyUrl && proxySecret) {
+      // 카페24 프록시를 통해 전송 (고정 IP)
+      const response = await fetch(`${proxyUrl}/alimtalk`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-proxy-secret': proxySecret,
+        },
+        body: JSON.stringify({
+          apikey,
+          userid,
+          senderkey,
+          tpl_code,
+          sender,
+          receiver_1: receiverPhone,
+          subject_1: process.env.ALIGO_TEMPLATE_SUBJECT || '상담 신청 접수 안내',
+          message_1: message,
+          failover: 'N',
+        }),
+      });
+      result = await response.json() as { code: number; message: string; info?: unknown };
+    } else {
+      // 프록시 미설정시 직접 호출
+      const formData = new FormData();
+      formData.append('apikey', apikey);
+      formData.append('userid', userid);
+      formData.append('senderkey', senderkey);
+      formData.append('tpl_code', tpl_code);
+      formData.append('sender', sender);
+      formData.append('receiver_1', receiverPhone);
+      formData.append('subject_1', process.env.ALIGO_TEMPLATE_SUBJECT || '상담 신청 접수 안내');
+      formData.append('message_1', message);
+      formData.append('failover', 'N');
+      const response = await fetch('https://kakaoapi.aligo.in/akv10/alimtalk/send/', {
+        method: 'POST',
+        body: formData,
+      });
+      result = await response.json() as { code: number; message: string; info?: unknown };
+    }
 
     if (result.code === 0) {
       console.log('[KAKAO] ✅ 알림톡 전송 성공:', result.message);
