@@ -9,6 +9,7 @@ export function parsePhones(raw: string | undefined): string[] {
 
 export async function sendAdminNewInquiryAlimtalk(customerName: string): Promise<void> {
   const phones = parsePhones(process.env.ALIGO_NEW_INQUIRY_PHONES)
+  console.log('[ADMIN] ALIGO_NEW_INQUIRY_PHONES:', process.env.ALIGO_NEW_INQUIRY_PHONES, '→ phones:', phones)
   if (phones.length === 0) return
 
   const apikey = process.env.ALIGO_API_KEY
