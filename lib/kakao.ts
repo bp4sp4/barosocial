@@ -33,7 +33,7 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
 
     if (proxyUrl && proxySecret) {
       // 카페24 프록시를 통해 전송 (고정 IP)
-      const response = await fetch(`${proxyUrl}/alimtalk`, {
+      const response = await fetch(`${proxyUrl.replace(/\/$/, '')}/alimtalk`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -51,7 +51,13 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
           failover: 'N',
         }),
       });
-      result = await response.json() as { code: number; message: string; info?: unknown };
+      const text = await response.text();
+      try {
+        result = JSON.parse(text) as { code: number; message: string; info?: unknown };
+      } catch {
+        console.error('[KAKAO] ❌ 프록시 비-JSON 응답:', response.status, text.slice(0, 200));
+        return { success: false, error: `프록시 응답 오류 (${response.status}): ${text.slice(0, 100)}` };
+      }
     } else {
       // 프록시 미설정시 직접 호출
       const formData = new FormData();
