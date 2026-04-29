@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { sendConsultationEmail } from '@/lib/email';
-import { sendAlimtalk } from '@/lib/kakao';
+import { sendAlimtalk, sendAdminNewInquiryAlimtalk } from '@/lib/kakao';
 import { formatClickSource as formatClickSourceStatic } from '@/lib/cafe-names';
 
 async function formatClickSourceFromDB(clickSource: string | null): Promise<string> {
@@ -297,6 +297,8 @@ export async function POST(request: NextRequest) {
       } catch (kakaoError) {
         console.error('[KAKAO] 알림톡 전송 중 오류:', kakaoError);
       }
+      // 관리자 신규 문의 알림톡
+      sendAdminNewInquiryAlimtalk(name).catch(() => {})
     } else {
       console.log('[KAKAO] 수동 추가로 알림톡 전송을 건너뜁니다.');
     }

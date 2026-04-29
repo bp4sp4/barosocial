@@ -2,6 +2,51 @@ interface AlimtalkData {
   contact: string;
 }
 
+export function parsePhones(raw: string | undefined): string[] {
+  if (!raw) return []
+  return raw.split(',').map((s) => s.trim()).filter(Boolean)
+}
+
+export async function sendAdminNewInquiryAlimtalk(customerName: string): Promise<void> {
+  const phones = parsePhones(process.env.ALIGO_NEW_INQUIRY_PHONES)
+  if (phones.length === 0) return
+
+  const apikey = process.env.ALIGO_API_KEY
+  const userid = process.env.ALIGO_USER_ID
+  const senderkey = process.env.ALIGO_SENDER_KEY
+  const sender = process.env.ALIGO_SENDER
+  if (!apikey || !userid || !senderkey || !sender) return
+
+  const tpl_code = 'UH_4559'
+  const message = `${customerName}님, 새로운 문의가 등록되었습니다.`
+  const proxyUrl = process.env.PROXY_URL
+  const proxySecret = process.env.PROXY_SECRET
+
+  const payload: Record<string, string> = { apikey, userid, senderkey, tpl_code, sender, failover: 'N' }
+  phones.forEach((phone, i) => {
+    payload[`receiver_${i + 1}`] = phone.replace(/-/g, '')
+    payload[`subject_${i + 1}`] = '새 문의 알림'
+    payload[`message_${i + 1}`] = message
+  })
+
+  try {
+    if (proxyUrl && proxySecret) {
+      await fetch(`${proxyUrl.replace(/\/$/, '')}/alimtalk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-proxy-secret': proxySecret },
+        body: JSON.stringify(payload),
+      })
+    } else {
+      const formData = new FormData()
+      Object.entries(payload).forEach(([k, v]) => formData.append(k, v))
+      await fetch('https://kakaoapi.aligo.in/akv10/alimtalk/send/', { method: 'POST', body: formData })
+    }
+    console.log('[KAKAO] ✅ 관리자 신규 문의 알림톡 전송')
+  } catch (e) {
+    console.error('[KAKAO] 관리자 알림톡 전송 실패:', e)
+  }
+}
+
 export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boolean; error?: string }> {
   const apikey = process.env.ALIGO_API_KEY;
   const userid = process.env.ALIGO_USER_ID;

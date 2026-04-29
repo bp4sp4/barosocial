@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-09T06:30:00.111Z",
+  "lastUpdated": "2026-04-14T06:21:23.024Z",
   "activeFeatures": [
     "korhrdsocial",
     "admin",
@@ -13,7 +13,9 @@
     "stats",
     "credit-bank",
     "bulk",
-    "agency"
+    "agency",
+    "korhrd_social_momcafe",
+    "korhrd_privatecert2"
   ],
   "primaryFeature": "korhrdsocial",
   "features": {
@@ -26,7 +28,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-23T02:30:41.159Z",
-        "lastUpdated": "2026-04-09T06:30:00.111Z"
+        "lastUpdated": "2026-04-14T05:31:19.472Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/lib/kakao.ts"
     },
@@ -52,9 +54,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-27T02:01:42.335Z",
-        "lastUpdated": "2026-04-09T06:29:52.265Z"
+        "lastUpdated": "2026-04-14T06:21:23.024Z"
       },
-      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/api/consultations/route.ts"
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_privatecert2/app/api/consultations/route.ts"
     },
     "[id]": {
       "phase": "do",
@@ -172,6 +174,32 @@
         "lastUpdated": "2026-03-13T08:41:23.790Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/agency/page.tsx"
+    },
+    "korhrd_social_momcafe": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-14T06:13:40.730Z",
+        "lastUpdated": "2026-04-14T06:13:40.730Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_social_momcafe/lib/kakao.ts"
+    },
+    "korhrd_privatecert2": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-04-14T06:20:09.893Z",
+        "lastUpdated": "2026-04-14T06:20:09.893Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_privatecert2/lib/kakao.ts"
     }
   },
   "pipeline": {
@@ -182,7 +210,7 @@
   "session": {
     "startedAt": "2026-02-23T02:24:27.317Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-09T06:30:00.111Z"
+    "lastActivity": "2026-04-14T06:21:23.024Z"
   },
   "history": [
     {
@@ -3578,6 +3606,48 @@
     {
       "timestamp": "2026-04-09T06:30:00.111Z",
       "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-14T05:31:19.472Z",
+      "feature": "korhrdsocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-14T06:13:40.730Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-14T06:15:46.318Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-14T06:15:59.319Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-14T06:20:09.893Z",
+      "feature": "korhrd_privatecert2",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-14T06:20:56.028Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-04-14T06:21:23.024Z",
+      "feature": "consultations",
       "phase": "do",
       "action": "updated"
     }
