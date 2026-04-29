@@ -298,7 +298,7 @@ export async function POST(request: NextRequest) {
         console.error('[KAKAO] 알림톡 전송 중 오류:', kakaoError);
       }
       // 관리자 신규 문의 알림톡
-      sendAdminNewInquiryAlimtalk(name).catch(() => {})
+      await sendAdminNewInquiryAlimtalk(name)
     } else {
       console.log('[KAKAO] 수동 추가로 알림톡 전송을 건너뜁니다.');
     }
