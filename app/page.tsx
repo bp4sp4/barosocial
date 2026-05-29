@@ -138,7 +138,7 @@ const COURSE_OPTIONS = [
 ];
 
 function StepFlowContent({ clickSource }: { clickSource: string }) {
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(2);
   const [formData, setFormData] = useState({
     name: "", // 이름
     contact: "", // 연락처
