@@ -201,6 +201,8 @@ const COURSE_OPTIONS = [
   "심리상담사",
 ];
 
+const TIME_OPTIONS = ["10:00~13:00", "14:00~17:00", "17:00~19:00"];
+
 function StepFlowContent({ clickSource }: { clickSource: string }) {
   const [step, setStep] = useState(2);
   const [formData, setFormData] = useState({
@@ -218,6 +220,15 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
   const [showCourseModal, setShowCourseModal] = useState(false);
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [customCourse, setCustomCourse] = useState("");
+  const [quickConsult, setQuickConsult] = useState(false); // (선택) 빠른 상담
+  const [preferredTimes, setPreferredTimes] = useState<string[]>([]); // 상담 선호 시간
+  const [timeMemo, setTimeMemo] = useState(""); // 상담 시간 관련 메모
+
+  const togglePreferredTime = (time: string) => {
+    setPreferredTimes((prev) =>
+      prev.includes(time) ? prev.filter((t) => t !== time) : [...prev, time],
+    );
+  };
 
   const toggleCourse = (course: string) => {
     setSelectedCourses((prev) =>
@@ -280,6 +291,9 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
           reason: formData.reason,
           residence: formData.residence,
           click_source: clickSource,
+          fast_consultation: quickConsult,
+          preferred_times: preferredTimes,
+          consult_time_memo: timeMemo || null,
         }),
       });
 
@@ -392,9 +406,9 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className={styles.stepWrapper}
+            className={`${styles.stepWrapper} ${styles.formBody}`}
           >
-            <div style={{ textAlign: "left", marginBottom: "24px" }}>
+            <div style={{ textAlign: "left" }}>
               <p
                 style={{
                   fontSize: "28px",
@@ -408,7 +422,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
 
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>
-                이름을 입력해주세요 <span style={{ color: "#EF4444" }}>*</span>
+                이름 <span style={{ color: "#EF4444" }}>*</span>
               </label>
               <input
                 type="text"
@@ -424,8 +438,7 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
 
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>
-                연락처를 입력해주세요{" "}
-                <span style={{ color: "#EF4444" }}>*</span>
+                연락처 <span style={{ color: "#EF4444" }}>*</span>
               </label>
               <input
                 type="tel"
@@ -445,41 +458,51 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
-                최종학력 <span style={{ color: "#EF4444" }}>*</span>{" "}
-                <span
-                  style={{
-                    fontSize: "16px",
-                    color: "#6B7280",
-                    fontWeight: "400",
-                  }}
-                >
+              <label className={`${styles.inputLabel} ${styles.inputLabelCol}`}>
+                <span className={styles.inputLabelMain}>
+                  최종학력 <span style={{ color: "#EF4444" }}>*</span>
+                </span>
+                <span className={styles.inputLabelSub}>
                   최종학력마다 과정이 달라져요!
                 </span>
               </label>
-              <select
-                className={styles.inputField}
-                value={formData.education}
-                onChange={(e) =>
-                  setFormData({ ...formData, education: e.target.value })
-                }
-                style={{ cursor: "pointer" }}
-              >
-                <option value="">선택해주세요</option>
-                <option value="고졸">고졸</option>
-                <option value="전문대졸">전문대졸</option>
-                <option value="대졸">대졸</option>
-                <option value="대학원 이상">대학원 이상</option>
-              </select>
+              <div className={styles.selectBox}>
+                <select
+                  className={styles.selectBoxSelect}
+                  value={formData.education}
+                  onChange={(e) =>
+                    setFormData({ ...formData, education: e.target.value })
+                  }
+                >
+                  <option value="">선택해주세요</option>
+                  <option value="고졸">고졸</option>
+                  <option value="전문대졸">전문대졸</option>
+                  <option value="대졸">대졸</option>
+                  <option value="대학원 이상">대학원 이상</option>
+                </select>
+                <span className={styles.selectBoxChevron}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                  >
+                    <path
+                      d="M10.7683 3.3485C10.6276 3.20789 10.4369 3.12891 10.238 3.12891C10.0391 3.12891 9.8484 3.20789 9.70775 3.3485L5.99525 7.061L2.28275 3.3485C2.1413 3.21188 1.95185 3.13628 1.7552 3.13799C1.55855 3.1397 1.37044 3.21858 1.23139 3.35763C1.09233 3.49669 1.01346 3.6848 1.01175 3.88144C1.01004 4.07809 1.08563 4.26754 1.22225 4.409L5.465 8.65175C5.60565 8.79235 5.79638 8.87134 5.99525 8.87134C6.19413 8.87134 6.38486 8.79235 6.5255 8.65175L10.7683 4.409C10.9089 4.26835 10.9878 4.07762 10.9878 3.87875C10.9878 3.67987 10.9089 3.48914 10.7683 3.3485Z"
+                      fill="#919191"
+                    />
+                  </svg>
+                </span>
+              </div>
             </div>
 
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>
-                희망과정을 선택해주세요{" "}
-                <span style={{ color: "#EF4444" }}>*</span>
+                희망과정 <span style={{ color: "#EF4444" }}>*</span>
               </label>
               <div
-                className={styles.inputField + " " + styles.courseSelectField}
+                className={`${styles.selectBox} ${styles.selectBoxClickable}`}
                 onClick={() => {
                   const existing = formData.hope_course
                     ? formData.hope_course.split(", ").filter(Boolean)
@@ -496,45 +519,38 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 }}
               >
                 {formData.hope_course ? (
-                  <span className={styles.courseSelectedText}>
+                  <span className={styles.selectBoxValue}>
                     {formData.hope_course}
                   </span>
                 ) : (
-                  <span className={styles.coursePlaceholder}>
+                  <span className={styles.selectBoxPlaceholder}>
                     과정을 선택해주세요
                   </span>
                 )}
-                <svg
-                  width="20"
-                  height="20"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M5 7.5L10 12.5L15 7.5"
-                    stroke="#6B7280"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <span className={styles.selectBoxChevron}>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="12"
+                    height="12"
+                    viewBox="0 0 12 12"
+                    fill="none"
+                  >
+                    <path
+                      d="M10.7683 3.3485C10.6276 3.20789 10.4369 3.12891 10.238 3.12891C10.0391 3.12891 9.8484 3.20789 9.70775 3.3485L5.99525 7.061L2.28275 3.3485C2.1413 3.21188 1.95185 3.13628 1.7552 3.13799C1.55855 3.1397 1.37044 3.21858 1.23139 3.35763C1.09233 3.49669 1.01346 3.6848 1.01175 3.88144C1.01004 4.07809 1.08563 4.26754 1.22225 4.409L5.465 8.65175C5.60565 8.79235 5.79638 8.87134 5.99525 8.87134C6.19413 8.87134 6.38486 8.79235 6.5255 8.65175L10.7683 4.409C10.9089 4.26835 10.9878 4.07762 10.9878 3.87875C10.9878 3.67987 10.9089 3.48914 10.7683 3.3485Z"
+                      fill="#919191"
+                    />
+                  </svg>
+                </span>
               </div>
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
-                거주지를 입력해주세요{" "}
-                <span style={{ color: "#EF4444" }}>*</span>
-                <span
-                  style={{
-                    fontSize: "13px",
-                    color: "#EF4444",
-                    fontWeight: "400",
-                  }}
-                >
-                  {" "}
-                  상세히 입력할수록 실습처 배정에 유리해요.
+              <label className={`${styles.inputLabel} ${styles.inputLabelCol}`}>
+                <span className={styles.inputLabelMain}>
+                  거주지 <span style={{ color: "#EF4444" }}>*</span>
+                </span>
+                <span className={styles.inputLabelSub}>
+                  구체적일수록 실습처 배정에 유리해요.
                 </span>
               </label>
               <input
@@ -547,20 +563,13 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 }
               />
             </div>
-
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
-                취득사유가 어떻게 되시나요?{" "}
-                <span style={{ color: "#EF4444" }}>*</span>{" "}
-                <span
-                  style={{
-                    color: "#9ca3af",
-                    fontWeight: 400,
-                    fontSize: "13px",
-                  }}
-                >
-                  (복수선택 가능)
+              <label className={`${styles.inputLabel} ${styles.inputLabelCol}`}>
+                <span className={styles.inputLabelMain}>
+                  취득사유가 어떻게 되시나요?{" "}
+                  <span style={{ color: "#EF4444" }}>*</span>
                 </span>
+                <span className={styles.inputLabelSub}>복수선택 가능</span>
               </label>
               <div className={styles.reasonCheckGroup}>
                 {["즉시취업", "이직", "미래준비", "취미"].map((opt) => {
@@ -595,29 +604,144 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
                 })}
               </div>
             </div>
+            {/* (선택) 빠른 상담 + 상담 선호 시간 */}
+            <div className={styles.inputGroup}>
+              <div className={styles.quickConsultSection}>
+                {/* (선택) 빠른 상담을 원합니다. */}
+                <div className={styles.quickConsultBlock}>
+                  <div className={styles.quickConsultHeader}>
+                    <span className={styles.quickConsultTitle}>
+                      (선택) 빠른 상담을 원합니다.
+                    </span>
+                    <button
+                      type="button"
+                      className={`${styles.quickConsultCheck} ${quickConsult ? styles.quickConsultCheckOn : ""}`}
+                      onClick={() => setQuickConsult((prev) => !prev)}
+                      aria-pressed={quickConsult}
+                      aria-label="빠른 상담 원함"
+                    >
+                      {quickConsult && (
+                        <svg
+                          width="16"
+                          height="16"
+                          viewBox="0 0 16 16"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M3.5 8.5L6.5 11.5L12.5 4.5"
+                            stroke="#fff"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  <p className={styles.quickConsultDesc}>
+                    빠른 상담 체크 시{" "}
+                    <span className={styles.quickConsultEmph}>
+                      당일 오후 7시
+                    </span>{" "}
+                    이전까지 신청은 당일 상담,
+                    <br /> 이후 신청은 다음날 오전 10시~ 오후 7시 사이에
+                    연락드립니다.
+                  </p>
+                </div>
+
+                {/* (선택) 상담이 편하신 시간을 알려주세요. */}
+                <div className={styles.preferTimeBlock}>
+                  <span className={styles.quickConsultTitle}>
+                    (선택) 상담이 편하신 시간을 알려주세요.
+                  </span>
+
+                  {/* 상담 선호 시간 */}
+                  <div className={styles.preferTimeGroup}>
+                    <div className={styles.preferLabelWrap}>
+                      <span className={styles.preferLabel}>상담 선호 시간</span>
+                      <span className={styles.preferSubLabel}>
+                        복수선택 가능
+                      </span>
+                    </div>
+                    <div className={styles.preferTimeGrid}>
+                      {TIME_OPTIONS.map((time) => (
+                        <button
+                          key={time}
+                          type="button"
+                          className={`${styles.preferTimeSlot} ${preferredTimes.includes(time) ? styles.preferTimeSlotOn : ""}`}
+                          onClick={() => togglePreferredTime(time)}
+                          aria-pressed={preferredTimes.includes(time)}
+                        >
+                          {time}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 상담 시간 관련 메모 */}
+                  <div className={styles.preferMemoGroup}>
+                    <div className={styles.preferLabelWrap}>
+                      <span className={styles.preferLabel}>
+                        상담 시간 관련 메모(25자 이내)
+                      </span>
+                      <span className={styles.preferMemoSubLabel}>
+                        편하신 요일, 시간 관련 메모를 남겨주시면 최대한 맞춰서
+                        연락드려요.
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      maxLength={25}
+                      placeholder="월/수/금 오전, 화/목 오후 선호"
+                      className={styles.preferMemoInput}
+                      value={timeMemo}
+                      onChange={(e) => setTimeMemo(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.checkboxLabel}>
-                <input
-                  type="checkbox"
-                  checked={privacyAgreed}
-                  onChange={(e) => setPrivacyAgreed(e.target.checked)}
-                  className={styles.checkbox}
-                />
-                <span>
+              <div className={styles.privacyRow}>
+                <span className={styles.privacyText}>
                   <button
                     type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setShowPrivacyModal(true);
-                    }}
+                    onClick={() => setShowPrivacyModal(true)}
                     className={styles.privacyLink}
                   >
                     개인정보처리방침
                   </button>{" "}
-                  동의 <span style={{ color: "#EF4444" }}>*</span>
+                  <span className={styles.privacyAgree}>동의</span>{" "}
+                  <span className={styles.privacyRequired}>(필수)</span>
                 </span>
-              </label>
+                <button
+                  type="button"
+                  className={`${styles.quickConsultCheck} ${privacyAgreed ? styles.quickConsultCheckOn : ""}`}
+                  onClick={() => setPrivacyAgreed((prev) => !prev)}
+                  aria-pressed={privacyAgreed}
+                  aria-label="개인정보처리방침 동의 (필수)"
+                >
+                  {privacyAgreed && (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M3.5 8.5L6.5 11.5L12.5 4.5"
+                        stroke="#fff"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
+                </button>
+              </div>
             </div>
 
             <button

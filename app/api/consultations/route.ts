@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, memo, counsel_check, status, subject_cost, manager } = body;
+    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, memo, counsel_check, status, subject_cost, manager, fast_consultation, preferred_times, consult_time_memo } = body;
 
     // 유효성 검사 - 이름과 연락처만 필수
     if (!name || !contact) {
@@ -103,6 +103,9 @@ export async function POST(request: NextRequest) {
           subject_cost: subject_cost ? parseInt(String(subject_cost).replace(/,/g, '')) || null : null,
           manager: manager || null,
           status: status || '상담대기',
+          fast_consultation: !!fast_consultation,
+          preferred_times: Array.isArray(preferred_times) && preferred_times.length ? preferred_times : null,
+          consult_time_memo: consult_time_memo || null,
         },
       ])
       .select()
