@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-04-14T06:21:23.024Z",
+  "lastUpdated": "2026-06-23T09:56:23.324Z",
   "activeFeatures": [
     "korhrdsocial",
     "admin",
@@ -15,7 +15,8 @@
     "bulk",
     "agency",
     "korhrd_social_momcafe",
-    "korhrd_privatecert2"
+    "korhrd_privatecert2",
+    "barosocial"
   ],
   "primaryFeature": "korhrdsocial",
   "features": {
@@ -54,9 +55,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-27T02:01:42.335Z",
-        "lastUpdated": "2026-04-14T06:21:23.024Z"
+        "lastUpdated": "2026-06-23T09:56:23.324Z"
       },
-      "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_privatecert2/app/api/consultations/route.ts"
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_social_momcafe/app/api/consultations/route.ts"
     },
     "[id]": {
       "phase": "do",
@@ -184,9 +185,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-04-14T06:13:40.730Z",
-        "lastUpdated": "2026-04-14T06:13:40.730Z"
+        "lastUpdated": "2026-06-23T09:56:04.839Z"
       },
-      "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_social_momcafe/lib/kakao.ts"
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_social_momcafe/app/page.tsx"
     },
     "korhrd_privatecert2": {
       "phase": "do",
@@ -200,6 +201,19 @@
         "lastUpdated": "2026-04-14T06:20:09.893Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/korhrd_privatecert2/lib/kakao.ts"
+    },
+    "barosocial": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-06-23T09:03:13.444Z",
+        "lastUpdated": "2026-06-23T09:33:33.256Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/barosocial/app/page.tsx"
     }
   },
   "pipeline": {
@@ -210,7 +224,7 @@
   "session": {
     "startedAt": "2026-02-23T02:24:27.317Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-04-14T06:21:23.024Z"
+    "lastActivity": "2026-06-23T09:56:23.324Z"
   },
   "history": [
     {
@@ -3647,6 +3661,138 @@
     },
     {
       "timestamp": "2026-04-14T06:21:23.024Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:03:13.444Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:03:19.844Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:03:28.120Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:03:47.098Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:09:51.262Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:14:12.602Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:14:25.976Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:17:16.596Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:17:23.621Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:30:53.723Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:33:33.256Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:54:28.543Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:54:35.105Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:54:41.395Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:54:47.476Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:55:04.701Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:55:25.432Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:55:32.506Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:55:54.663Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:56:04.839Z",
+      "feature": "korhrd_social_momcafe",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:56:14.993Z",
+      "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-23T09:56:23.324Z",
       "feature": "consultations",
       "phase": "do",
       "action": "updated"
