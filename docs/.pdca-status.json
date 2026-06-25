@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-06-23T09:56:23.324Z",
+  "lastUpdated": "2026-06-25T08:15:21.948Z",
   "activeFeatures": [
     "korhrdsocial",
     "admin",
@@ -16,7 +16,8 @@
     "agency",
     "korhrd_social_momcafe",
     "korhrd_privatecert2",
-    "barosocial"
+    "barosocial",
+    "daangn"
   ],
   "primaryFeature": "korhrdsocial",
   "features": {
@@ -214,6 +215,19 @@
         "lastUpdated": "2026-06-23T09:33:33.256Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/barosocial/app/page.tsx"
+    },
+    "daangn": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-06-25T08:15:21.948Z",
+        "lastUpdated": "2026-06-25T08:15:21.948Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/barosocial/app/daangn/page.tsx"
     }
   },
   "pipeline": {
@@ -224,7 +238,7 @@
   "session": {
     "startedAt": "2026-02-23T02:24:27.317Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-06-23T09:56:23.324Z"
+    "lastActivity": "2026-06-25T08:15:21.948Z"
   },
   "history": [
     {
@@ -3794,6 +3808,12 @@
     {
       "timestamp": "2026-06-23T09:56:23.324Z",
       "feature": "consultations",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-06-25T08:15:21.948Z",
+      "feature": "daangn",
       "phase": "do",
       "action": "updated"
     }

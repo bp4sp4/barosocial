@@ -9,7 +9,7 @@ export default function DaangnRedirect() {
   useEffect(() => {
     // UTM 파라미터를 추가하여 메인 페이지로 리다이렉트
     router.replace(
-      "/?utm_source=daangn&utm_medium=social&utm_campaign=recruitment"
+      "/?utm_source=daangn&utm_medium=social&utm_campaign=news&blog_id=소식"
     );
   }, [router]);
 

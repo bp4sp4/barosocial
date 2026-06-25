@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>한평생 오피스</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.24.0/dist/tabler-icons.min.css" />
+<style>
+  :root{
+    --blue:#2f6fed; --blue-soft:#eaf1fe; --bg:#f5f6f8; --card:#ffffff;
+    --line:#eef0f3; --line2:#e5e8ec; --txt:#1f2937; --txt2:#6b7280; --muted:#9aa3b2;
+    --green:#16a34a; --green-bar:#22c55e; --gold:#f5b50a; --silver:#a7adb7; --bronze:#cf8a4a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{background:var(--bg);color:var(--txt);font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",-apple-system,sans-serif;font-size:14px}
+  .app{display:grid;grid-template-columns:232px 1fr;height:100vh}
+  /* ===== sidebar ===== */
+  aside{background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow-y:auto}
+  .brand{display:flex;align-items:center;gap:9px;padding:18px 18px 14px;font-weight:700;font-size:17px}
+  .brand .mk{width:22px;height:22px;border-radius:7px;background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .brand .col{margin-left:auto;color:var(--muted);cursor:pointer}
+  nav{padding:4px 12px;flex:1}
+  .ni{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:9px;color:#4b5563;cursor:pointer;margin-bottom:2px;font-size:13.5px}
+  .ni i{font-size:18px;color:#9ca3af;width:18px;text-align:center}
+  .ni:hover{background:#f7f8fa}
+  .ni.on{background:var(--blue-soft);color:var(--blue);font-weight:600}
+  .ni.on i{color:var(--blue)}
+  .ni .bd{margin-left:auto;background:#fde8e8;color:#e24b4a;font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px}
+  .sep{height:1px;background:var(--line);margin:10px 12px}
+  /* ===== topbar ===== */
+  .main{display:flex;flex-direction:column;min-width:0;overflow:hidden}
+  header{height:60px;background:var(--card);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:22px;padding:0 22px;flex:0 0 auto}
+  .dept{display:flex;align-items:center;gap:8px;border:1px solid var(--line2);border-radius:9px;padding:8px 14px;font-weight:600;font-size:13.5px;cursor:pointer}
+  .dept i{color:var(--muted);font-size:16px}
+  .topnav{display:flex;gap:20px;color:#4b5563;font-size:13.5px}
+  .topnav span{cursor:pointer;padding:4px 2px}
+  .topnav span:hover{color:var(--blue)}
+  .tr{margin-left:auto;display:flex;align-items:center;gap:18px;color:#6b7280}
+  .tr i{font-size:19px;cursor:pointer}
+  .bell{position:relative}
+  .bell .b{position:absolute;top:-6px;right:-7px;background:var(--blue);color:#fff;font-size:10px;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+  .tr .lk{font-size:13.5px;cursor:pointer}
+  .punch{background:var(--blue);color:#fff;border:0;border-radius:9px;padding:9px 16px;font-weight:700;font-size:13.5px;display:flex;align-items:center;gap:6px;cursor:pointer}
+  /* ===== content ===== */
+  .scroll{flex:1;overflow-y:auto;padding:22px}
+  .grid{display:grid;grid-template-columns:330px 1fr 326px;grid-template-rows:auto auto;gap:18px;align-items:start}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .card h3{margin:0;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+  .card h3 .sub{font-size:12px;color:var(--muted);font-weight:500}
+  /* punch card */
+  .pc .top{display:flex;align-items:center;justify-content:space-between;color:var(--txt2);font-size:13px}
+  .pc .badge{background:#f1f3f6;color:#6b7280;font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600}
+  .pc .hi{font-size:19px;font-weight:700;margin:14px 0 16px}
+  .pc .track{height:6px;background:#eef2f7;border-radius:4px;position:relative;margin-bottom:6px}
+  .pc .track i{position:absolute;left:0;top:0;height:100%;width:1%;background:var(--blue);border-radius:4px}
+  .pc .ticks{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;margin-bottom:18px}
+  .pc .wt{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:var(--txt2);margin-bottom:14px}
+  .pc .wt b{font-size:15px;color:var(--txt)}
+  .pc .times{display:flex;background:#f7f8fa;border-radius:10px;padding:14px;align-items:center;justify-content:space-around;color:var(--muted);font-size:12px;margin-bottom:16px}
+  .pc .times .c{text-align:center}.pc .times .c b{display:block;color:var(--txt);font-size:15px;margin-top:4px}
+  .pc .punch2{width:100%;background:var(--blue);color:#fff;border:0;border-radius:10px;padding:13px;font-weight:700;font-size:14px;cursor:pointer;margin-bottom:14px}
+  .pc .leave{display:flex;align-items:center;gap:11px;background:var(--blue-soft);border-radius:12px;padding:13px 15px}
+  .pc .leave i{font-size:20px;color:var(--blue)}
+  .pc .leave .t{font-size:12px;color:var(--txt2)}.pc .leave .t b{display:block;color:var(--txt);font-size:15px}
+  .pc .leave .more{margin-left:auto;background:#fff;border:1px solid var(--line2);border-radius:8px;padding:7px 12px;font-size:12px;color:var(--txt2);cursor:pointer}
+  /* goal / video card */
+  .goal .donut-wrap{display:flex;gap:18px;margin-top:16px}
+  .donut{flex:0 0 150px;background:#f6f9ff;border-radius:14px;padding:18px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .donut .ring{width:104px;height:104px;border-radius:50%;background:conic-gradient(var(--blue) 0% 1%,#e7edf5 1% 100%);display:flex;align-items:center;justify-content:center;position:relative}
+  .donut .ring::before{content:"";position:absolute;width:78px;height:78px;border-radius:50%;background:#f6f9ff}
+  .donut .ring b{position:relative;font-size:22px;font-weight:700;color:var(--blue)}
+  .donut .lb{font-size:12px;color:var(--txt2);margin-top:12px}
+  .weeks{flex:1;display:flex;flex-direction:column;justify-content:center;gap:13px}
+  .wk{display:grid;grid-template-columns:42px 1fr 70px;align-items:center;gap:10px;font-size:12.5px}
+  .wk .n{color:var(--txt2)}.wk.b4 .n{color:var(--blue);font-weight:600}
+  .wk .bar{height:6px;background:#eef2f7;border-radius:4px;overflow:hidden}
+  .wk .bar i{display:block;height:100%;width:0;background:var(--blue)}
+  .wk .v{text-align:right;color:var(--txt2)}.wk .v b{color:var(--txt)}
+  .goal .rev{display:flex;align-items:center;gap:10px;margin-top:16px;background:#f7f9fc;border-radius:12px;padding:14px 16px}
+  .goal .rev .big{font-size:20px;font-weight:700}
+  .goal .rev .s{color:var(--muted);font-size:12px;margin-left:auto}
+  /* video view */
+  .videoView{display:none;margin-top:14px}
+  .videoView.show{display:block}
+  .goalView{display:block}
+  .goalView.hide{display:none}
+  .stage{position:relative;width:100%;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .stage iframe{width:100%;height:100%;border:0;display:block}
+  .stage .ph{color:#8b95a3;text-align:center;padding:24px;line-height:1.8;font-size:13px}
+  .stage .ph b{color:#c7ced8}
+  .vbar{display:flex;gap:8px;margin-top:10px}
+  .vbar input{flex:1;border:1px solid var(--line2);border-radius:9px;padding:9px 11px;font-size:12.5px;font-family:inherit;outline:none}
+  .vbar input:focus{border-color:var(--blue)}
+  .vbar button{border:0;border-radius:9px;padding:0 15px;font-weight:700;font-size:12.5px;cursor:pointer;font-family:inherit}
+  .vbar .go{background:var(--blue);color:#fff}.vbar .gh{background:#f1f3f6;color:var(--txt2)}
+  /* rank card */
+  .rank .row{display:flex;align-items:center;gap:12px;margin-top:16px}
+  .rank .row:first-of-type{margin-top:18px}
+  .rk{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex:0 0 auto}
+  .rk.g1{background:var(--gold)}.rk.g2{background:var(--silver)}.rk.g3{background:var(--bronze)}.rk.g0{background:#eef0f3;color:#9aa3b2}
+  .rank .nm{flex:1}.rank .nm .n{font-weight:600;font-size:13.5px}
+  .rank .pct{font-weight:700;color:var(--blue);font-size:14px}
+  .rank .pbar{grid-column:1/-1;height:6px;background:#eef2f7;border-radius:4px;margin-top:7px;overflow:hidden}
+  .rank .pbar i{display:block;height:100%;background:var(--blue)}
+  .rank .item{display:grid;grid-template-columns:24px 1fr auto;gap:12px;align-items:center;margin-top:16px}
+  /* kpi strip */
+  .kpis{grid-column:2/4;display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px;display:flex;align-items:center;gap:13px}
+  .kpi .ic{width:42px;height:42px;border-radius:12px;background:#f1f5fd;color:var(--blue);display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
+  .kpi .k{font-size:12px;color:var(--muted)}.kpi .v{font-size:19px;font-weight:700;margin:2px 0}
+  .kpi .d{font-size:11px;color:var(--muted)}
+  /* mail card */
+  .tabs{display:flex;gap:18px;border-bottom:1px solid var(--line);margin-top:4px}
+  .tabs span{padding:10px 2px;font-size:13px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent}
+  .tabs span.on{color:var(--txt);font-weight:700;border-color:var(--blue)}
+  .tabs span .c{color:var(--muted);font-weight:500;margin-left:3px}
+  .ml{display:flex;align-items:flex-start;gap:11px;padding:13px 0;border-bottom:1px solid #f3f4f6;font-size:13px}
+  .ml i{color:#c2c8d2;font-size:17px;margin-top:1px}
+  .ml .t{flex:1;min-width:0}.ml .t .s{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ml .t .f{color:var(--muted);font-size:12px;margin-top:3px}
+  .ml .dt{color:var(--muted);font-size:12px;white-space:nowrap}
+  .more-link{text-align:center;color:var(--txt2);font-size:13px;padding-top:14px;cursor:pointer}
+  /* calendar */
+  .calhd{display:flex;align-items:center;justify-content:center;gap:18px;font-size:16px;font-weight:700;margin:6px 0 14px}
+  .calhd i{color:var(--muted);cursor:pointer;font-size:18px}
+  table.cal{width:100%;border-collapse:collapse;text-align:center}
+  table.cal th{font-size:12px;color:var(--txt2);font-weight:500;padding-bottom:10px}
+  table.cal td{font-size:13px;padding:7px 0;color:var(--txt);position:relative;height:34px;vertical-align:top}
+  table.cal td.sun{color:#e24b4a}table.cal td.sat{color:var(--blue)}
+  table.cal td.mut{color:#cbd0d8}
+  table.cal td.today{color:#fff}
+  table.cal td.today span{background:var(--blue);border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center}
+  table.cal td .ev{position:absolute;bottom:2px;left:50%;transform:translateX(-50%);background:var(--blue);color:#fff;font-size:9px;border-radius:8px;padding:0 5px;min-width:13px}
+  table.cal td .ev.amb{background:var(--gold)}
+  /* kpi-goal + notice */
+  .kgoal .line{display:flex;align-items:center;justify-content:space-between;margin-top:16px}
+  .kgoal .tag{background:var(--blue-soft);color:var(--blue);font-size:11px;font-weight:700;padding:3px 9px;border-radius:7px}
+  .kgoal .big{font-size:16px;font-weight:700}
+  .kgoal .bar{height:8px;background:#eef2f7;border-radius:5px;overflow:hidden;margin:13px 0 10px}
+  .kgoal .bar i{display:block;height:100%;width:100%;background:var(--green-bar)}
+  .kgoal .res{display:flex;justify-content:space-between;font-size:13px}
+  .kgoal .res b{font-weight:700}.kgoal .res .ok{color:var(--green);font-weight:700}
+  .notice{margin-top:16px}
+  .nrow{display:flex;align-items:center;gap:9px;padding:9px 0;font-size:13px;border-bottom:1px solid #f3f4f6}
+  .nrow .tg{background:#eef2f7;color:#6b7280;font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px}
+  .nrow .x{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nrow .dt{color:var(--muted);font-size:12px}
+  .hint{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;font-size:12.5px;padding:8px 16px;border-radius:8px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:50}
+  .hint.show{opacity:.92}
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- ===== SIDEBAR ===== -->
+  <aside>
+    <div class="brand"><span class="mk">한</span>한평생 오피스 <i class="ti ti-layout-sidebar-left-collapse col"></i></div>
+    <nav>
+      <div class="ni on"><i class="ti ti-home"></i>홈</div>
+      <div class="ni"><i class="ti ti-layout-grid"></i>워크스페이스</div>
+      <div class="ni"><i class="ti ti-clipboard-text"></i>게시판</div>
+      <div class="ni"><i class="ti ti-calendar"></i>캘린더</div>
+      <div class="ni"><i class="ti ti-mail"></i>메일</div>
+      <div class="ni"><i class="ti ti-file-text"></i>전자결재</div>
+      <div class="ni"><i class="ti ti-file-pencil"></i>전자계약</div>
+      <div class="ni"><i class="ti ti-umbrella"></i>휴가</div>
+      <div class="ni"><i class="ti ti-clock"></i>근태</div>
+      <div class="ni"><i class="ti ti-user"></i>인사</div>
+      <div class="ni"><i class="ti ti-users"></i>인사고과</div>
+      <div class="sep"></div>
+      <div class="ni"><i class="ti ti-book"></i>업무일지·활동현황</div>
+      <div class="ni"><i class="ti ti-user-plus"></i>배정 현황</div>
+      <div class="ni"><i class="ti ti-chart-bar"></i>영업 손익·매출목표</div>
+      <div class="ni"><i class="ti ti-users-group"></i>인사 고과</div>
+      <div class="ni"><i class="ti ti-copy"></i>중복 조회</div>
+      <div class="ni"><i class="ti ti-trash"></i>삭제 목록 <span class="bd">232</span></div>
+      <div class="ni"><i class="ti ti-clipboard-list"></i>로그 관리</div>
+    </nav>
+    <div class="ni" style="margin:8px 12px"><i class="ti ti-settings"></i>시스템 설정</div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main">
+    <header>
+      <div class="dept">학점은행제 사업부 <i class="ti ti-chevron-down"></i></div>
+      <div class="topnav"><span>문의 DB</span><span>등록학생 관리</span><span>매출파일</span><span>일괄등록</span><span>통계</span><span>올케어</span><span>예산현황</span></div>
+      <div class="tr">
+        <i class="ti ti-search"></i>
+        <span class="bell"><i class="ti ti-bell"></i><span class="b">2</span></span>
+        <span class="lk">관리자</span>
+        <span class="lk">로그아웃</span>
+        <button class="punch"><i class="ti ti-login-2"></i>출근하기</button>
+      </div>
+    </header>
+
+    <div class="scroll">
+      <div class="grid">
+        <!-- 출근 카드 -->
+        <div class="card pc">
+          <div class="top"><span id="now">2026년 06월 25일 (목) 10:20:13</span><span class="badge">출근전</span></div>
+          <div class="hi">안녕하세요, 관리자님!</div>
+          <div class="track"><i></i></div>
+          <div class="ticks"><span>0h</span><span>40h</span><span>52h</span></div>
+          <div class="wt"><span>오늘 근무시간</span><b>0h 00m</b></div>
+          <div class="times"><div class="c">출근 시간<b>—</b></div><i class="ti ti-arrow-right"></i><div class="c">퇴근 시간<b>—</b></div></div>
+          <button class="punch2">출근하기</button>
+          <div class="leave"><i class="ti ti-umbrella"></i><div class="t">내 연차<b>0일/0일</b></div><span class="more">휴가 현황</span></div>
+        </div>
+
+        <!-- 가운데: 목표현황(위장) ↔ 축구(영상) -->
+        <div class="card goal">
+          <h3>이번달 목표 현황 <span class="sub" id="goalToggle" style="cursor:pointer" title="클릭 또는 ` 키로 전환">2026년 6월</span></h3>
+          <!-- 위장용 정상 화면 -->
+          <div class="goalView" id="goalView">
+            <div class="donut-wrap">
+              <div class="donut"><div class="ring"><b>0%</b></div><div class="lb">6월 달성률</div></div>
+              <div class="weeks">
+                <div class="wk"><span class="n">1주차</span><span class="bar"><i></i></span><span class="v">0% <b>0만원</b></span></div>
+                <div class="wk"><span class="n">2주차</span><span class="bar"><i></i></span><span class="v">0% <b>0만원</b></span></div>
+                <div class="wk"><span class="n">3주차</span><span class="bar"><i></i></span><span class="v">0% <b>0만원</b></span></div>
+                <div class="wk b4"><span class="n">4주차</span><span class="bar"><i></i></span><span class="v">0% <b>0만원</b></span></div>
+                <div class="wk"><span class="n">5주차</span><span class="bar"><i></i></span><span class="v">0% <b>0만원</b></span></div>
+              </div>
+            </div>
+            <div class="rev"><div><div style="font-size:12px;color:var(--txt2)">6월 매출</div><div class="big">0만원</div></div><span class="s">/목표 0만원</span></div>
+          </div>
+          <!-- 축구 -->
+          <div class="videoView" id="videoView">
+            <div class="stage" id="stage">
+              <div class="ph" id="ph"><b>실시간 현황 미연결</b><br>아래에 중계 URL(유튜브/치지직) 또는<br>치지직 '동영상 퍼가기' &lt;iframe&gt; 코드를 붙여넣고 [연결]</div>
+            </div>
+            <div class="vbar">
+              <input id="url" placeholder="유튜브 주소 · chzzk.naver.com/live/채널ID · 퍼가기 <iframe> 코드 OK" />
+              <button class="go" onclick="loadStream()">연결</button>
+              <button class="gh" onclick="clearStream()">해제</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 등록률 랭킹 -->
+        <div class="card rank">
+          <h3>등록률 랭킹 <span class="sub">2026년 6월</span></h3>
+          <div class="item"><span class="rk g1">1</span><div class="nm"><div class="n">김하준</div></div><span class="pct">28%</span><div class="pbar"><i style="width:90%"></i></div></div>
+          <div class="item"><span class="rk g2">2</span><div class="nm"><div class="n">백은정</div></div><span class="pct">16%</span><div class="pbar"><i style="width:52%"></i></div></div>
+          <div class="item"><span class="rk g3">3</span><div class="nm"><div class="n">박혜경</div></div><span class="pct">8%</span><div class="pbar"><i style="width:26%"></i></div></div>
+          <div class="item"><span class="rk g0">4</span><div class="nm"><div class="n">양정은</div></div><span class="pct">8%</span><div class="pbar"><i style="width:26%"></i></div></div>
+          <div class="item"><span class="rk g0">5</span><div class="nm"><div class="n">유승현</div></div><span class="pct">5%</span><div class="pbar"><i style="width:16%"></i></div></div>
+        </div>
+
+        <!-- KPI strip -->
+        <div class="kpis">
+          <div class="kpi"><div class="ic"><i class="ti ti-message-circle"></i></div><div><div class="k">전체문의</div><div class="v">0건</div><div class="d">전일대비 0건</div></div></div>
+          <div class="kpi"><div class="ic"><i class="ti ti-user-check"></i></div><div><div class="k">등록 건수</div><div class="v">0건</div><div class="d">전일대비 0건</div></div></div>
+          <div class="kpi"><div class="ic"><i class="ti ti-trending-up"></i></div><div><div class="k">등록률</div><div class="v">0.0%</div><div class="d">전일대비 0.0%p</div></div></div>
+          <div class="kpi"><div class="ic"><i class="ti ti-wallet"></i></div><div><div class="k">매출</div><div class="v">0만원</div><div class="d">전일대비 0만원</div></div></div>
+        </div>
+
+        <!-- 메일/결재/업무요청 -->
+        <div class="card">
+          <div class="tabs"><span class="on">메일 <span class="c">0</span></span><span>결재 <span class="c">0</span></span><span>업무 요청 <span class="c">1</span></span></div>
+          <div class="ml"><i class="ti ti-mail"></i><div class="t"><div class="s">[전자결재] 반려 - 근태사유서</div><div class="f">admin@korhrdcorp.co.kr</div></div><span class="dt">06.10</span></div>
+          <div class="ml"><i class="ti ti-mail"></i><div class="t"><div class="s">[전자결재] 상신 완료 - 근태사유서</div><div class="f">admin@korhrdcorp.co.kr</div></div><span class="dt">06.08</span></div>
+          <div class="ml"><i class="ti ti-mail-opened"></i><div class="t"><div class="s">admin@korhrdcorp.co.kr</div><div class="f">박상훈</div></div><span class="dt">05.29</span></div>
+          <div class="ml"><i class="ti ti-mail-opened"></i><div class="t"><div class="s">test</div><div class="f">박상훈</div></div><span class="dt">05.29</span></div>
+          <div class="ml"><i class="ti ti-mail"></i><div class="t"><div class="s">[전자결재] 상신 완료 - 지출결의서(법…</div><div class="f">admin@korhrdcorp.co.kr</div></div><span class="dt">05.29</span></div>
+          <div class="more-link">메일함 바로가기 ›</div>
+        </div>
+
+        <!-- 캘린더 -->
+        <div class="card">
+          <div class="calhd"><i class="ti ti-chevron-left"></i><span>2026.06</span><i class="ti ti-chevron-right"></i></div>
+          <table class="cal" id="cal"></table>
+        </div>
+
+        <!-- KPI 목표 + 공지 -->
+        <div class="card kgoal">
+          <h3>KPI 목표 <span class="more" style="border:1px solid var(--line2);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--txt2);cursor:pointer"><i class="ti ti-target" style="font-size:13px"></i> 목표 설정</span></h3>
+          <div class="line"><span class="tag">2026년 2분기 목표</span><span class="big">300,000,000원</span></div>
+          <div class="bar"><i></i></div>
+          <div class="res"><b>310,124,000원</b><span class="ok">103% (+3% 초과)</span></div>
+          <div class="notice">
+            <h3 style="margin-top:18px">공지사항</h3>
+            <div class="nrow"><span class="tg">공지</span><span class="x">2026년 상반기 인사발령 공지</span><span class="dt">06.12</span></div>
+            <div class="nrow"><span class="tg">공지</span><span class="x">2026년 하계휴가 운영 안내</span><span class="dt">06.02</span></div>
+            <div class="nrow"><span class="tg">공지</span><span class="x">한평생 오피스 테스트 안내</span><span class="dt">05.29</span></div>
+            <div class="nrow"><span class="x">휴가 운영안 안내 (26.07.01)</span><span class="dt">06.23</span></div>
+            <div class="nrow"><span class="x">근태 운영안 안내 (26.07.01)</span><span class="dt">06.23</span></div>
+            <div class="more-link">공지사항 바로가기 ›</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="hint" id="hint"></div>
+
+<script>
+/* 라이브 시계 */
+const DOW=['일','월','화','수','목','금','토'];
+function clock(){const d=new Date();const p=n=>String(n).padStart(2,'0');
+  document.getElementById('now').textContent=`${d.getFullYear()}년 ${p(d.getMonth()+1)}월 ${p(d.getDate())}일 (${DOW[d.getDay()]}) ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;}
+setInterval(clock,1000);clock();
+
+/* 캘린더 (2026.06, 오늘 25일, 일부 이벤트 점) */
+(function cal(){
+  const ev={1:'1',4:'3',8:'1',10:'1',11:'1',12:'1',16:'3|amb',19:'2',25:'',26:'1'};
+  const firstDow=1, days=30, today=25;
+  let html='<tr>'+DOW.map((d,i)=>`<th class="${i===0?'sun':i===6?'sat':''}">${d}</th>`).join('')+'</tr><tr>';
+  for(let i=0;i<firstDow;i++) html+='<td class="mut"></td>';
+  let col=firstDow;
+  for(let d=1;d<=days;d++){
+    const dow=col%7; const cls=[]; if(dow===0)cls.push('sun'); if(dow===6)cls.push('sat');
+    if(d===today)cls.push('today');
+    let cell=`<td class="${cls.join(' ')}">`+(d===today?`<span>${d}</span>`:d);
+    if(d in ev && ev[d]!==''){const[v,c]=ev[d].split('|');cell+=`<span class="ev ${c||''}">${v}</span>`;}
+    cell+='</td>'; html+=cell; col++;
+    if(col%7===0 && d<days) html+='</tr><tr>';
+  }
+  html+='</tr>';
+  document.getElementById('cal').innerHTML=html;
+})();
+
+/* ===== 축구 ↔ 위장 전환 ===== */
+const goalView=document.getElementById('goalView');
+const videoView=document.getElementById('videoView');
+const hint=document.getElementById('hint');
+const KEY='hp_office_stream';
+let savedSrc=null;
+function flash(t){hint.textContent=t;hint.classList.add('show');clearTimeout(flash._t);flash._t=setTimeout(()=>hint.classList.remove('show'),1300);}
+
+function showVideo(on){
+  if(on){goalView.classList.add('hide');videoView.classList.add('show');}
+  else{
+    videoView.classList.remove('show');goalView.classList.remove('hide');
+    const f=document.querySelector('#stage iframe'); if(f){savedSrc=f.src;f.src='';}  /* 소리 차단 */
+  }
+}
+function isVideo(){return videoView.classList.contains('show');}
+function toggle(){
+  if(isVideo()){showVideo(false);flash('위장 모드 — 목표 현황');}
+  else{
+    showVideo(true);
+    const f=document.querySelector('#stage iframe'); if(f&&savedSrc&&!f.src){f.src=savedSrc;savedSrc=null;}
+    flash('관전 모드');
+  }
+}
+document.getElementById('goalToggle').addEventListener('click',toggle);
+
+function mkIframe(src){const f=document.createElement('iframe');f.src=src;f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';f.allowFullscreen=true;return f;}
+function normalize(u){
+  u=u.trim();
+  const ifr=u.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i); if(ifr) return ifr[1];
+  const m1=u.match(/[?&]v=([\w-]{6,})/); if(m1) return 'https://www.youtube.com/embed/'+m1[1]+'?autoplay=1';
+  const m2=u.match(/youtu\.be\/([\w-]{6,})/); if(m2) return 'https://www.youtube.com/embed/'+m2[1]+'?autoplay=1';
+  return u;
+}
+function loadStream(){
+  const raw=document.getElementById('url').value; if(!raw.trim())return;
+  const src=normalize(raw);
+  const st=document.getElementById('stage');st.innerHTML='';st.appendChild(mkIframe(src));
+  localStorage.setItem(KEY,src);
+}
+function clearStream(){
+  localStorage.removeItem(KEY);savedSrc=null;
+  document.getElementById('stage').innerHTML='<div class="ph"><b>실시간 현황 미연결</b><br>URL을 붙여넣고 [연결]</div>';
+  document.getElementById('url').value='';
+}
+(function restore(){const s=localStorage.getItem(KEY);if(s){const st=document.getElementById('stage');st.innerHTML='';st.appendChild(mkIframe(s));document.getElementById('url').value=s;}})();
+
+/* 키: ` = 전환,  Esc = 무조건 위장(보스키) */
+document.addEventListener('keydown',e=>{
+  if(e.key==='`'){e.preventDefault();toggle();}
+  else if(e.key==='Escape'){if(isVideo()){showVideo(false);flash('위장 모드 — 목표 현황');}}
+});
+</script>
+</body>
+</html>
