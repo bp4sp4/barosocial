@@ -27,7 +27,7 @@ export default function Footer() {
             </Link>
           </div>
           <p className={styles.copyright}>
-            2026 © Hanpyeongsaeng Education Co., Ltd. All rights reserved.
+            2026 © KorhrdGroup Co., Ltd. All rights reserved.
           </p>
         </div>
       </div>
