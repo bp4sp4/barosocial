@@ -1866,7 +1866,7 @@ export default function AdminPage() {
               <div className={styles.formGroup}>
                 <label>유입 경로</label>
                 <div className={styles.sourceChips}>
-                  {['당근', '맘카페', '네이버', '인스타', '유튜브', '카카오', '페이스북', '기타'].map(m => (
+                  {['당근', '맘카페', '네이버', '인스타', '유튜브', '틱톡', '카카오', '페이스북', '기타'].map(m => (
                     <button type="button" key={m}
                       className={`${styles.sourceChip} ${addSourceMajor === m ? styles.sourceChipSelected : ''}`}
                       onClick={() => {
@@ -2177,7 +2177,7 @@ export default function AdminPage() {
               <div className={styles.formGroup}>
                 <label>유입 경로</label>
                 <div className={styles.sourceChips}>
-                  {['당근', '맘카페', '네이버', '인스타', '유튜브', '카카오', '페이스북', '기타'].map(m => (
+                  {['당근', '맘카페', '네이버', '인스타', '유튜브', '틱톡', '카카오', '페이스북', '기타'].map(m => (
                     <button type="button" key={m}
                       className={`${styles.sourceChip} ${addSourceMajor === m ? styles.sourceChipSelected : ''}`}
                       onClick={() => {

@@ -18,6 +18,7 @@ const formatClickSource = (
     facebook: "페이스북",
     google: "구글",
     youtube: "유튜브",
+    tiktok: "틱톡",
     kakao: "카카오",
     naver: "네이버",
     naverblog: "네이버블로그",
