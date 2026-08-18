@@ -45,6 +45,12 @@ const formatClickSource = (
     naese: "중리사랑방",
   };
 
+  // 한직훈 LMS 홈 "국가자격증은 여기서!" 카드/버튼 유입 — 오피스 문의 DB 에서
+  // 대분류 "한직훈" / 중분류 "국가자격증" 으로 보이게 고정 문자열을 씁니다.
+  if (utmSource === "hanjikhun") {
+    return "한직훈_국가자격증";
+  }
+
   const shortSource = sourceMap[utmSource] || utmSource;
 
   if (blogId) {
