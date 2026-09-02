@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "lastUpdated": "2026-06-25T08:15:21.948Z",
+  "lastUpdated": "2026-09-02T09:39:56.898Z",
   "activeFeatures": [
     "korhrdsocial",
     "admin",
@@ -17,7 +17,24 @@
     "korhrd_social_momcafe",
     "korhrd_privatecert2",
     "barosocial",
-    "daangn"
+    "daangn",
+    "tiktok",
+    "korhrdeducation",
+    "prepare",
+    "return",
+    "pay",
+    "done",
+    "payments",
+    "paid",
+    "privacy",
+    "layout",
+    "hpedu-payments",
+    "practice-hpedu-payments",
+    "nicepay",
+    "cancel",
+    "noti",
+    "recon",
+    "sync"
   ],
   "primaryFeature": "korhrdsocial",
   "features": {
@@ -43,9 +60,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-25T07:35:55.325Z",
-        "lastUpdated": "2026-03-13T08:48:17.470Z"
+        "lastUpdated": "2026-09-02T02:59:46.564Z"
       },
-      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/admin/AdminLayoutClient.tsx"
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/admin/AdminLayoutClient.tsx"
     },
     "consultations": {
       "phase": "do",
@@ -69,9 +86,9 @@
       "documents": {},
       "timestamps": {
         "started": "2026-02-27T09:17:37.633Z",
-        "lastUpdated": "2026-03-04T05:29:31.097Z"
+        "lastUpdated": "2026-08-12T01:21:17.605Z"
       },
-      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdsocial/app/mamcafe/[id]/page.tsx"
+      "lastFile": "/Users/korhrd/Documents/GitHub/barosocial/app/tiktok/[id]/page.tsx"
     },
     "mamcafe": {
       "phase": "do",
@@ -212,7 +229,7 @@
       "documents": {},
       "timestamps": {
         "started": "2026-06-23T09:03:13.444Z",
-        "lastUpdated": "2026-06-23T09:33:33.256Z"
+        "lastUpdated": "2026-08-12T01:21:19.017Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/barosocial/app/page.tsx"
     },
@@ -228,6 +245,227 @@
         "lastUpdated": "2026-06-25T08:15:21.948Z"
       },
       "lastFile": "/Users/korhrd/Documents/GitHub/barosocial/app/daangn/page.tsx"
+    },
+    "tiktok": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-08-12T01:21:13.355Z",
+        "lastUpdated": "2026-08-12T01:21:13.355Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/barosocial/app/tiktok/page.tsx"
+    },
+    "korhrdeducation": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T02:55:05.818Z",
+        "lastUpdated": "2026-09-02T09:39:21.653Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/lib/nicepay-recon.ts"
+    },
+    "prepare": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T02:56:00.102Z",
+        "lastUpdated": "2026-09-02T03:00:11.239Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/api/nicepay/prepare/route.ts"
+    },
+    "return": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T02:56:35.141Z",
+        "lastUpdated": "2026-09-02T02:56:35.141Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/api/nicepay/return/route.ts"
+    },
+    "pay": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T02:58:21.951Z",
+        "lastUpdated": "2026-09-02T03:08:37.457Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/pay/page.tsx"
+    },
+    "done": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T02:59:06.100Z",
+        "lastUpdated": "2026-09-02T05:18:32.564Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/pay/done/page.tsx"
+    },
+    "payments": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T02:59:09.063Z",
+        "lastUpdated": "2026-09-02T02:59:38.393Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/admin/payments/page.tsx"
+    },
+    "paid": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T02:59:16.559Z",
+        "lastUpdated": "2026-09-02T02:59:16.559Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/api/lms/paid/route.ts"
+    },
+    "privacy": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T03:07:12.018Z",
+        "lastUpdated": "2026-09-02T03:07:12.018Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/privacy/privacyData.ts"
+    },
+    "layout": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T03:23:25.130Z",
+        "lastUpdated": "2026-09-02T03:23:25.130Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/KorhrdGroupDB/src/components/layout/navConfig.tsx"
+    },
+    "hpedu-payments": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T03:23:40.818Z",
+        "lastUpdated": "2026-09-02T03:23:40.818Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/KorhrdGroupDB/src/app/api/practice/hpedu-payments/route.ts"
+    },
+    "practice-hpedu-payments": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T03:24:13.028Z",
+        "lastUpdated": "2026-09-02T03:24:13.028Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/KorhrdGroupDB/src/app/(dashboard)/practice-hpedu-payments/page.tsx"
+    },
+    "nicepay": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T06:59:09.957Z",
+        "lastUpdated": "2026-09-02T06:59:09.957Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/KorhrdGroupDB/src/lib/nicepay/cancel.ts"
+    },
+    "cancel": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T06:59:24.273Z",
+        "lastUpdated": "2026-09-02T06:59:24.273Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/KorhrdGroupDB/src/app/api/practice/hpedu-payments/cancel/route.ts"
+    },
+    "noti": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T07:06:55.980Z",
+        "lastUpdated": "2026-09-02T07:06:55.980Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/api/nicepay/noti/route.ts"
+    },
+    "recon": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T09:39:44.137Z",
+        "lastUpdated": "2026-09-02T09:39:44.137Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/korhrdeducation/app/api/nicepay/recon/route.ts"
+    },
+    "sync": {
+      "phase": "do",
+      "phaseNumber": 3,
+      "matchRate": null,
+      "iterationCount": 0,
+      "requirements": [],
+      "documents": {},
+      "timestamps": {
+        "started": "2026-09-02T09:39:56.898Z",
+        "lastUpdated": "2026-09-02T09:39:56.898Z"
+      },
+      "lastFile": "/Users/korhrd/Documents/GitHub/KorhrdGroupDB/src/app/api/practice/hpedu-payments/sync/route.ts"
     }
   },
   "pipeline": {
@@ -238,7 +476,7 @@
   "session": {
     "startedAt": "2026-02-23T02:24:27.317Z",
     "onboardingCompleted": false,
-    "lastActivity": "2026-06-25T08:15:21.948Z"
+    "lastActivity": "2026-09-02T09:39:56.898Z"
   },
   "history": [
     {
@@ -3814,6 +4052,240 @@
     {
       "timestamp": "2026-06-25T08:15:21.948Z",
       "feature": "daangn",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-12T01:21:13.355Z",
+      "feature": "tiktok",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-12T01:21:17.605Z",
+      "feature": "[id]",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-12T01:21:19.017Z",
+      "feature": "barosocial",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-08-12T01:21:20.365Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:55:05.818Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:55:43.803Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:56:00.102Z",
+      "feature": "prepare",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:56:35.141Z",
+      "feature": "return",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:58:21.951Z",
+      "feature": "pay",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:58:53.318Z",
+      "feature": "pay",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:59:06.100Z",
+      "feature": "done",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:59:09.063Z",
+      "feature": "payments",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:59:16.559Z",
+      "feature": "paid",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:59:38.393Z",
+      "feature": "payments",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T02:59:46.564Z",
+      "feature": "admin",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:00:05.228Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:00:11.239Z",
+      "feature": "prepare",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:00:12.734Z",
+      "feature": "pay",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:02:33.238Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:02:37.713Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:02:40.038Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:03:43.369Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:03:44.882Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:04:54.368Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:05:50.082Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:07:12.018Z",
+      "feature": "privacy",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:07:30.446Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:08:35.195Z",
+      "feature": "pay",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:08:37.457Z",
+      "feature": "pay",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:23:25.130Z",
+      "feature": "layout",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:23:40.818Z",
+      "feature": "hpedu-payments",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T03:24:13.028Z",
+      "feature": "practice-hpedu-payments",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T05:18:32.564Z",
+      "feature": "done",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T06:59:09.957Z",
+      "feature": "nicepay",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T06:59:24.273Z",
+      "feature": "cancel",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T07:06:55.980Z",
+      "feature": "noti",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T09:39:21.653Z",
+      "feature": "korhrdeducation",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T09:39:44.137Z",
+      "feature": "recon",
+      "phase": "do",
+      "action": "updated"
+    },
+    {
+      "timestamp": "2026-09-02T09:39:56.898Z",
+      "feature": "sync",
       "phase": "do",
       "action": "updated"
     }
