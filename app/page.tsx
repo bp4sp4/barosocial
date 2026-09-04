@@ -24,6 +24,8 @@ const formatClickSource = (
     naverblog: "네이버블로그",
     toss: "토스",
     mamcafe: "맘카페",
+    cashslide: "캐시슬라이드",
+    cashwalk: "캐시워크",
   };
 
   const cafeNameMap: { [key: string]: string } = {
