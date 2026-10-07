@@ -53,6 +53,11 @@ const formatClickSource = (
     return "한직훈_국가자격증";
   }
 
+  // 바로취업 배너 유입 — 오피스 문의 DB 대분류 "바로취업" / 중분류 "배너" (2026-10-07)
+  if (utmSource === "barojob") {
+    return "바로취업_배너";
+  }
+
   const shortSource = sourceMap[utmSource] || utmSource;
 
   if (blogId) {
