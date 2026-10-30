@@ -68,6 +68,10 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
 
   const receiverPhone = data.contact.replace(/-/g, '');
   const message = templateMessage;
+  // 템플릿에 등록된 버튼과 똑같이 보내야 한다. 빠지면 "메시지가 템플릿과 일치하지 않음"으로 실패.
+  // 기본값은 채널추가(AC) 버튼. 템플릿 버튼이 바뀌면 ALIGO_TEMPLATE_BUTTON 에 JSON 으로 넣는다.
+  const button = process.env.ALIGO_TEMPLATE_BUTTON ||
+    JSON.stringify({ button: [{ name: '채널추가', linkType: 'AC', linkTypeName: '채널 추가' }] });
 
   const proxyUrl = process.env.PROXY_URL;
   const proxySecret = process.env.PROXY_SECRET;
@@ -94,6 +98,7 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
           receiver_1: receiverPhone,
           subject_1: process.env.ALIGO_TEMPLATE_SUBJECT || '상담 신청 접수 안내',
           message_1: message,
+          button_1: button,
           failover: 'N',
         }),
       });
@@ -115,6 +120,7 @@ export async function sendAlimtalk(data: AlimtalkData): Promise<{ success: boole
       formData.append('receiver_1', receiverPhone);
       formData.append('subject_1', process.env.ALIGO_TEMPLATE_SUBJECT || '상담 신청 접수 안내');
       formData.append('message_1', message);
+      formData.append('button_1', button);
       formData.append('failover', 'N');
       const response = await fetch('https://kakaoapi.aligo.in/akv10/alimtalk/send/', {
         method: 'POST',
