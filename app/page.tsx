@@ -347,9 +347,9 @@ function StepFlowContent({ clickSource }: { clickSource: string }) {
         <div style={{ display: "flex", alignItems: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/logo.png"
-            alt="한평생교육"
-            style={{ height: "auto", width: "148px" }}
+            src="/logo.svg"
+            alt="한평생원격교육원"
+            style={{ height: "24px", width: "auto" }}
           />
         </div>
       </header>

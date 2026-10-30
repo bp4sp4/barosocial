@@ -146,7 +146,7 @@ export async function sendConsultationEmail(data: ConsultationEmailData) {
       <body style="margin: 0; padding: 0; background-color: #ffffff; color: #191f28;">
         <div style="max-width: 600px; margin: 0 auto; padding: 60px 24px;">
           <div style="margin-bottom: 48px;">
-            <img src="${logoUrl}" alt="한평생 바로기업" style="height: 32px; width: auto;" />
+            <img src="${logoUrl}" alt="한평생원격교육원" style="height: 24px; width: auto;" />
           </div>
 
           <div style="margin-bottom: 40px;">
