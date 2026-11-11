@@ -1,0 +1,51 @@
+[
+  {
+    "font": "Pretendard-Regular.woff2",
+    "original_bytes": 765892,
+    "core_bytes": 57288,
+    "core_glyphs": 669,
+    "fallback_glyphs": 13667
+  },
+  {
+    "font": "Pretendard-Medium.woff2",
+    "original_bytes": 778432,
+    "core_bytes": 57348,
+    "core_glyphs": 669,
+    "fallback_glyphs": 13667
+  },
+  {
+    "font": "Pretendard-SemiBold.woff2",
+    "original_bytes": 785856,
+    "core_bytes": 57440,
+    "core_glyphs": 669,
+    "fallback_glyphs": 13667
+  },
+  {
+    "font": "Pretendard-Bold.woff2",
+    "original_bytes": 791156,
+    "core_bytes": 57688,
+    "core_glyphs": 669,
+    "fallback_glyphs": 13667
+  },
+  {
+    "font": "Paperlogy-7Bold.ttf",
+    "original_bytes": 676716,
+    "core_bytes": 34136,
+    "core_glyphs": 666,
+    "fallback_glyphs": 11057
+  },
+  {
+    "font": "Paperlogy-8ExtraBold.ttf",
+    "original_bytes": 673912,
+    "core_bytes": 33264,
+    "core_glyphs": 666,
+    "fallback_glyphs": 11057
+  },
+  {
+    "font": "Cafe24Shiningstar-v2.0.woff2",
+    "original_bytes": 837752,
+    "core_bytes": 169056,
+    "core_glyphs": 660,
+    "fallback_glyphs": 10770
+  }
+]
