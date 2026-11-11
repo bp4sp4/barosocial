@@ -7,6 +7,7 @@ import styles from './admin.module.css';
 import { CAFE_NAMES, KNOWN_CAFE_NAMES, CAFE_CONFIG } from '@/lib/cafe-names';
 import Link from 'next/link';
 
+const BAROSOCIAL_BASE_URL = (process.env.NEXT_PUBLIC_BAROSOCIAL_BASE_URL || 'https://barosocial.vercel.app').replace(/\/$/, '');
 const EDUCATION_OPTIONS = ['고등학교 졸업', '전문대 졸업', '대학교 재학', '대학교 졸업', '대학원 이상'];
 const ADMIN_COURSE_OPTIONS = ['사회복지사', '아동학사', '평생교육사', '편입/대학원', '건강가정사', '청소년지도사', '보육교사', '심리상담사'];
 
@@ -336,7 +337,7 @@ export default function AdminPage() {
   };
 
   const handleCopyLink = (id: string) => {
-    const link = `https://barosocial.vercel.app/mamcafe/${id}`;
+    const link = `${BAROSOCIAL_BASE_URL}/mamcafe/${id}`;
     navigator.clipboard.writeText(link);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -1320,7 +1321,7 @@ export default function AdminPage() {
               {cafes
                 .filter(c => !cafeSearchText || c.name.includes(cafeSearchText) || c.id.includes(cafeSearchText))
                 .map(cafe => {
-                  const link = `https://barosocial.vercel.app/mamcafe/${cafe.id}`;
+                  const link = `${BAROSOCIAL_BASE_URL}/mamcafe/${cafe.id}`;
                   return (
                     <tr key={cafe.id}>
                       <td>{cafe.name}</td>
@@ -1435,7 +1436,7 @@ export default function AdminPage() {
               </div>
               {newCafeId && (
                 <div className={styles.trackingPreview}>
-                  생성될 링크: <span>https://barosocial.vercel.app/mamcafe/{newCafeId.trim()}</span>
+                  생성될 링크: <span>{BAROSOCIAL_BASE_URL}/mamcafe/{newCafeId.trim()}</span>
                 </div>
               )}
             </div>

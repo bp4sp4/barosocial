@@ -2,9 +2,20 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase/server';
 import { sendConsultationEmail } from '@/lib/email';
 import { formatClickSource as formatClickSourceStatic } from '@/lib/cafe-names';
+import { sendMetaLeadEvent } from '@/lib/meta-capi';
+import { sanitizeClickKey, sendAdisonPostback } from '@/lib/adison-postback';
+
+// 숫자만 있는 번호를 010-1234-5678 형태로 (중복 조회용 변형값)
+function formatPhoneHyphen(digits: string): string {
+  if (digits.length === 11) return `${digits.slice(0, 3)}-${digits.slice(3, 7)}-${digits.slice(7)}`;
+  if (digits.length === 10) return `${digits.slice(0, 3)}-${digits.slice(3, 6)}-${digits.slice(6)}`;
+  return digits;
+}
 
 async function formatClickSourceFromDB(clickSource: string | null): Promise<string> {
   if (!clickSource) return '미입력';
+  // 랜딩페이지 형식은 그대로 반환
+  if (clickSource.startsWith('랜딩페이지')) return clickSource;
   try {
     const { data } = await supabaseAdmin.from('channels').select('id, name');
     const map: Record<string, string> = Object.fromEntries((data || []).map((c: { id: string; name: string }) => [c.id, c.name]));
@@ -75,7 +86,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, memo, counsel_check, status, subject_cost, manager } = body;
+    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, memo, counsel_check, status, subject_cost, manager, fast_consultation, preferred_times, consult_time_memo, event_id, fbp, fbc, event_source_url, click_key } = body;
 
     // 유효성 검사 - 이름과 연락처만 필수
     if (!name || !contact) {
@@ -85,13 +96,58 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // 엔비티 리워드 광고 click_key (수동 추가 제외, 최대 255자)
+    const clickKey = is_manual_entry ? null : sanitizeClickKey(click_key);
+
+    // 중복 방지: 휴대폰번호 기준 포스트백은 최초 1회만 발송한다.
+    // 동일 번호로 재신청 시 리드는 저장하되 포스트백은 보내지 않는다 (중복 발송 = 리워드 다중 지급, 보상 불가).
+    let shouldSendPostback = false;
+    if (clickKey) {
+      const digits = String(contact).replace(/[^0-9]/g, '');
+      const variants = Array.from(
+        new Set([String(contact), digits, formatPhoneHyphen(digits)].filter(Boolean))
+      );
+      const { count, error: dupError } = await supabaseAdmin
+        .from('hakjeom_consultations')
+        .select('id', { count: 'exact', head: true })
+        .in('contact', variants)
+        .not('postback_sent_at', 'is', null);
+      if (dupError) {
+        // 조회 실패 시 안전하게 미발송 (오발송도 전부 과금되므로)
+        console.error('[ADISON] 중복 조회 실패 — 포스트백 미발송', dupError);
+      } else if ((count ?? 0) > 0) {
+        console.log('[ADISON] 동일 번호 포스트백 이력 있음 — 미발송');
+      } else {
+        shouldSendPostback = true;
+      }
+    }
+
+    // Meta 전환 API용 브라우저 식별값 — 오피스가 나중에 보내는 Contact·Purchase 이벤트를
+    // 이 Lead 와 같은 사람으로 매칭시키려면 저장해 두어야 한다. (연동 요청서 2판 3-1)
+    const clientIp =
+      request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+      request.headers.get('x-real-ip') ||
+      undefined;
+    const clientUserAgent = request.headers.get('user-agent') || undefined;
+
     // Supabase에 데이터 저장
     const { data, error } = await supabaseAdmin
-      .from('consultations')
+      .from('hakjeom_consultations')
       .insert([
         {
           name,
           contact,
+          // 수동 추가 리드는 실제 브라우저 유입이 아니므로 식별값을 남기지 않는다.
+          ...(is_manual_entry
+            ? {}
+            : {
+                fbp: fbp || null,
+                fbc: fbc || null,
+                client_ip: clientIp || null,
+                user_agent: clientUserAgent || null,
+              }),
+          // 컬럼 추가(hakjeom_consultations_adison_postback.sql) 전에도 일반 유입 저장이 깨지지 않도록 값이 있을 때만 포함
+          ...(clickKey ? { click_key: clickKey } : {}),
           education: education || null,
           hope_course: hope_course || null,
           reason: reason || null,
@@ -102,6 +158,9 @@ export async function POST(request: NextRequest) {
           subject_cost: subject_cost ? parseInt(String(subject_cost).replace(/,/g, '')) || null : null,
           manager: manager || null,
           status: status || '상담대기',
+          fast_consultation: !!fast_consultation,
+          preferred_times: Array.isArray(preferred_times) && preferred_times.length ? preferred_times : null,
+          consult_time_memo: consult_time_memo || null,
         },
       ])
       .select()
@@ -113,6 +172,38 @@ export async function POST(request: NextRequest) {
         { error: 'Failed to save consultation' },
         { status: 500 }
       );
+    }
+
+    // 엔비티 AdiSON 포스트백 발송 (click_key 있는 리워드 유입만, 번호당 1회, 실패해도 상담 신청은 성공 처리, 재시도 없음)
+    if (shouldSendPostback && clickKey) {
+      // 발송 시도 시점을 먼저 기록해 동시 제출로 인한 이중 발송 가능성을 줄인다.
+      const sentAt = new Date().toISOString();
+      await supabaseAdmin
+        .from('hakjeom_consultations')
+        .update({ postback_sent_at: sentAt, postback_status: 'sending' })
+        .eq('id', data.id);
+      const result = await sendAdisonPostback(clickKey);
+      const { error: pbError } = await supabaseAdmin
+        .from('hakjeom_consultations')
+        .update({ postback_status: result.status })
+        .eq('id', data.id);
+      if (pbError) console.error('[ADISON] 응답코드 저장 실패', pbError);
+    }
+
+    // Meta Conversions API - Lead 이벤트 서버 전송 (수동 추가 제외, 실패해도 상담 신청은 성공 처리)
+    if (!is_manual_entry) {
+      await sendMetaLeadEvent({
+        eventId: event_id || null,
+        eventSourceUrl: event_source_url || request.headers.get('referer') || null,
+        name,
+        phone: contact,
+        clientIp,
+        clientUserAgent,
+        fbp: fbp || null,
+        fbc: fbc || null,
+        // 오피스의 Contact·Purchase 이벤트와 묶이도록 리드 ID를 external_id 로 함께 보낸다.
+        leadId: data.id,
+      });
     }
 
     // 이메일 알림 전송 (비동기, 실패해도 상담 신청은 성공 처리)

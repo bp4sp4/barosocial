@@ -1,0 +1,122 @@
+[
+  {
+    "source": "/section3_03.png",
+    "optimized": "/optimized/section3_03.webp",
+    "original_bytes": 72836,
+    "optimized_bytes": 33536
+  },
+  {
+    "source": "/baro-employment-app.png",
+    "optimized": "/optimized/baro-employment-app.webp",
+    "original_bytes": 446170,
+    "optimized_bytes": 36920
+  },
+  {
+    "source": "/confirm_01.png",
+    "optimized": "/optimized/confirm_01.webp",
+    "original_bytes": 138248,
+    "optimized_bytes": 17798
+  },
+  {
+    "source": "/confirm_02.png",
+    "optimized": "/optimized/confirm_02.webp",
+    "original_bytes": 167242,
+    "optimized_bytes": 26058
+  },
+  {
+    "source": "/confirm_03.png",
+    "optimized": "/optimized/confirm_03.webp",
+    "original_bytes": 178889,
+    "optimized_bytes": 41298
+  },
+  {
+    "source": "/confirm_04.png",
+    "optimized": "/optimized/confirm_04.webp",
+    "original_bytes": 163678,
+    "optimized_bytes": 28268
+  },
+  {
+    "source": "/confirm_05.png",
+    "optimized": "/optimized/confirm_05.webp",
+    "original_bytes": 218527,
+    "optimized_bytes": 40264
+  },
+  {
+    "source": "/profile2.jpg",
+    "optimized": "/optimized/profile2.webp",
+    "original_bytes": 10776,
+    "optimized_bytes": 6056
+  },
+  {
+    "source": "/profile3.jpg",
+    "optimized": "/optimized/profile3.webp",
+    "original_bytes": 9181,
+    "optimized_bytes": 4580
+  },
+  {
+    "source": "/profile4.jpg",
+    "optimized": "/optimized/profile4.webp",
+    "original_bytes": 9636,
+    "optimized_bytes": 4842
+  },
+  {
+    "source": "/profile05.jpg",
+    "optimized": "/optimized/profile05.webp",
+    "original_bytes": 10066,
+    "optimized_bytes": 5582
+  },
+  {
+    "source": "/profile6.jpg",
+    "optimized": "/optimized/profile6.webp",
+    "original_bytes": 11335,
+    "optimized_bytes": 6508
+  },
+  {
+    "source": "/profile7.jpg",
+    "optimized": "/optimized/profile7.webp",
+    "original_bytes": 9072,
+    "optimized_bytes": 4990
+  },
+  {
+    "source": "/gift02.png",
+    "optimized": "/optimized/gift02.webp",
+    "original_bytes": 24599,
+    "optimized_bytes": 10208
+  },
+  {
+    "source": "/process03.png",
+    "optimized": "/optimized/process03.webp",
+    "original_bytes": 27474,
+    "optimized_bytes": 10590
+  },
+  {
+    "source": "/process02.png",
+    "optimized": "/optimized/process02.webp",
+    "original_bytes": 21746,
+    "optimized_bytes": 11324
+  },
+  {
+    "source": "/process04.png",
+    "optimized": "/optimized/process04.webp",
+    "original_bytes": 22179,
+    "optimized_bytes": 9530
+  },
+  {
+    "source": "/allcare_01.png",
+    "optimized": "/optimized/allcare_01.webp",
+    "original_bytes": 22697,
+    "optimized_bytes": 12728
+  },
+  {
+    "source": "/allcare_03.png",
+    "optimized": "/optimized/allcare_03.webp",
+    "original_bytes": 17511,
+    "optimized_bytes": 10652
+  },
+  {
+    "source": "/allcare_04.png",
+    "optimized": "/optimized/allcare_04.webp",
+    "original_bytes": 30938,
+    "optimized_bytes": 16164
+  }
+]
