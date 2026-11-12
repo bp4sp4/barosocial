@@ -81,6 +81,12 @@ function ClickSourceHandler({
     const blogId = searchParams.get("blog_id");
     const cafeId = searchParams.get("cafe_id");
 
+    // 오피스 「업셀링 캠페인」 문자 링크 — ?utm_source=upsell&campaign_id=UP-012 → 문의 DB 대분류 「업셀링」 / 중분류 캠페인 코드 (2026-11-12)
+    const upsellCode = searchParams.get("campaign_id");
+    if (utmSource === "upsell") {
+      onSourceChange(upsellCode && /^UP-\d{3,}$/.test(upsellCode) ? `업셀링_${upsellCode}` : "업셀링");
+      return;
+    }
     if (utmSource) {
       const formatted = formatClickSource(utmSource, materialId, blogId, cafeId);
       onSourceChange(formatted);
