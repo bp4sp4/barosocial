@@ -150,6 +150,12 @@ function FormContent({ clickSource }: { clickSource: string }) {
   // [선택] 광고성 정보 수신 동의 — 기본은 체크 안 됨, 체크 안 해도 신청 가능 (정보통신망법 제50조)
   const [marketingAgreed, setMarketingAgreed] = useState(false);
   const [showMarketingModal, setShowMarketingModal] = useState(false);
+  // 「모두 동의」 — 필수(개인정보) + 선택(광고성 정보 수신)을 한 번에 켜고 끔. 제출 조건(isFormValid)은 필수만 봄
+  const allConsentsAgreed = privacyAgreed && marketingAgreed;
+  const handleAllConsents = (checked: boolean) => {
+    setPrivacyAgreed(checked);
+    setMarketingAgreed(checked);
+  };
   const [fastConsult, setFastConsult] = useState(false);
   const [preferredTimes, setPreferredTimes] = useState<string[]>([]);
   const [consultTimeMemo, setConsultTimeMemo] = useState("");
@@ -378,6 +384,10 @@ function FormContent({ clickSource }: { clickSource: string }) {
             <div className={formStyles.consentSection}>
               <div className={formStyles.consentRows}>
                 <label className={formStyles.privacyRow}>
+                  <span><strong>모두 동의합니다</strong> <span className={formStyles.optional}>(선택 항목 포함)</span></span>
+                  <input type="checkbox" checked={allConsentsAgreed} onChange={(e) => handleAllConsents(e.target.checked)} />
+                </label>
+                <label className={formStyles.privacyRow}>
                   <span><button type="button" onClick={(e) => { e.preventDefault(); setShowPrivacyModal(true); }} className={formStyles.privacyLink}>개인정보처리방침</button> 동의 <span className={formStyles.optional}>(필수)</span></span>
                   <input type="checkbox" checked={privacyAgreed} onChange={(e) => setPrivacyAgreed(e.target.checked)} />
                 </label>
@@ -453,7 +463,7 @@ function FormContent({ clickSource }: { clickSource: string }) {
                 <p className={styles.modalPrivacyItem}>
                   <strong>2. 수집 및 이용하는 개인정보 항목</strong><br />
                   필수 - 이름, 연락처(휴대전화번호), 최종학력, 희망과정, 취득사유<br />
-                  선택 - 빠른 상담 여부, 상담 선호 시간, 상담 시간 메모
+                  선택 - 빠른 상담 여부, 상담 선호 시간, 상담 시간 메모, 광고성 정보 수신 동의 여부
                 </p>
                 <p className={styles.modalPrivacyItem}>
                   <strong>3. 보유 및 이용 기간</strong><br />
