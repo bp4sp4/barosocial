@@ -87,7 +87,10 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, memo, counsel_check, status, subject_cost, manager, fast_consultation, preferred_times, consult_time_memo, event_id, fbp, fbc, event_source_url, click_key } = body;
+    const { name, contact, education, hope_course, reason, click_source, is_manual_entry, residence, memo, counsel_check, status, subject_cost, manager, fast_consultation, preferred_times, consult_time_memo, event_id, fbp, fbc, event_source_url, click_key, marketingAgreed } = body;
+
+    // [선택] 광고성 정보 수신 동의 — 참일 때만 동의 시각을 남긴다 (정보통신망법 제50조 사전 동의 근거)
+    const marketingAgreedBool = marketingAgreed === true;
 
     // 유효성 검사 - 이름과 연락처만 필수
     if (!name || !contact) {
@@ -162,6 +165,8 @@ export async function POST(request: NextRequest) {
           fast_consultation: !!fast_consultation,
           preferred_times: Array.isArray(preferred_times) && preferred_times.length ? preferred_times : null,
           consult_time_memo: consult_time_memo || null,
+          marketing_agreed: marketingAgreedBool,
+          marketing_agreed_at: marketingAgreedBool ? new Date().toISOString() : null,
         },
       ])
       .select()

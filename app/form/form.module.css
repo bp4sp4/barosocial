@@ -271,6 +271,12 @@
   gap: 40px;
 }
 
+.consentRows {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .privacyLink {
   padding: 0;
   border: 0;
