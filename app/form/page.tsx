@@ -84,7 +84,7 @@ function ClickSourceHandler({
     // 오피스 「업셀링 캠페인」 문자 링크 — ?utm_source=upsell&campaign_id=UP-012 → 문의 DB 대분류 「업셀링」 / 중분류 캠페인 코드 (2026-11-12)
     const upsellCode = searchParams.get("campaign_id");
     if (utmSource === "upsell") {
-      const t = { "1": "1팀", "2": "2팀", e: "교육지원팀" }[searchParams.get("t") ?? ""]; // 팀별 상담 링크(&t=1 · 2 · e) → 중분류 앞에 팀
+      const t = { "1": "1팀", "2": "2팀", e: "교육지원팀", m: "마케팅팀" }[searchParams.get("t") ?? ""]; // 팀별 상담 링크(&t=1 · 2 · e · m) → 중분류 앞에 팀(마케팅팀은 오피스 DB 가 「공용」으로)
       onSourceChange(upsellCode && /^UP-\d{3,}$/.test(upsellCode) ? `업셀링_${upsellCode}${t ? `_${t}` : ""}` : "업셀링");
       return;
     }
